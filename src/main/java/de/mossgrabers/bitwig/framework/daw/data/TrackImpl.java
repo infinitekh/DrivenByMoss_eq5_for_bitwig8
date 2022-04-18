@@ -379,7 +379,7 @@ public class TrackImpl extends ChannelImpl implements ITrack
     public void addEqualizerDevice ()
     {
         if (this.doesExist ())
-            this.track.endOfDeviceChainInsertionPoint ().insertBitwigDevice (EqualizerDeviceImpl.ID_BITWIG_EQ_PLUS);
+            this.track.endOfDeviceChainInsertionPoint ().insertBitwigDevice (EqualizerDeviceImpl.ID_BITWIG_EQ_5);
     }
 
 

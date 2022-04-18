@@ -164,7 +164,7 @@ public class ModelImpl extends AbstractModel
                     break;
 
                 case EQ:
-                    deviceMatcher = controllerHost.createBitwigDeviceMatcher (UUID.fromString ("e4815188-ba6f-4d14-bcfc-2dcb8f778ccb"));
+                    deviceMatcher = controllerHost.createBitwigDeviceMatcher (UUID.fromString ("227e2e3c-75d5-46f3-960d-8fb5529fe29f"));
                     break;
 
                 case NI_KOMPLETE:

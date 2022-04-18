@@ -30,8 +30,8 @@ import java.util.UUID;
  */
 public class EqualizerDeviceImpl extends SpecificDeviceImpl implements IEqualizerDevice
 {
-    /** The ID of the Bitwig EQ+ plugin. */
-    public static final UUID                                 ID_BITWIG_EQ_PLUS = UUID.fromString ("e4815188-ba6f-4d14-bcfc-2dcb8f778ccb");
+    /** The ID of the Bitwig EQ5 plugin. */
+    public static final UUID                                 ID_BITWIG_EQ_5 = UUID.fromString ("227e2e3c-75d5-46f3-960d-8fb5529fe29f");
 
     private static final Map<String, EqualizerBandType>      EQ_TYPES          = new HashMap<> ();
     private static final EnumMap<EqualizerBandType, Integer> EQ_TYPE_INDICES   = new EnumMap<> (EqualizerBandType.class);
@@ -54,7 +54,7 @@ public class EqualizerDeviceImpl extends SpecificDeviceImpl implements IEqualize
         EQ_TYPE_INDICES.put (EqualizerBandType.NOTCH, Integer.valueOf (14));
     }
 
-    private static final int       NUMBER_OF_BANDS = 8;
+    private static final int       NUMBER_OF_BANDS = 5;
 
     private final List<IParameter> types           = new ArrayList<> ();
     private final List<IParameter> frequencies     = new ArrayList<> ();
@@ -75,7 +75,7 @@ public class EqualizerDeviceImpl extends SpecificDeviceImpl implements IEqualize
     {
         super (host, valueChanger, device, 0, numParamPages, numParams, 0, 0, 0);
 
-        final SpecificBitwigDevice eqDevice = device.createSpecificBitwigDevice (ID_BITWIG_EQ_PLUS);
+        final SpecificBitwigDevice eqDevice = device.createSpecificBitwigDevice (ID_BITWIG_EQ_5);
 
         for (int i = 0; i < NUMBER_OF_BANDS; i++)
         {
