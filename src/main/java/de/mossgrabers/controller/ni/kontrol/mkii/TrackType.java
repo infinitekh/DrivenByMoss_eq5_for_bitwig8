@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ni.kontrol.mkii;
@@ -86,8 +86,7 @@ public class TrackType
                 return AUDIO;
             case INSTRUMENT:
                 return MIDI;
-            case GROUP:
-            case GROUP_OPEN:
+            case GROUP, GROUP_OPEN:
                 return GROUP;
             case EFFECT:
                 return RETURN_BUS;

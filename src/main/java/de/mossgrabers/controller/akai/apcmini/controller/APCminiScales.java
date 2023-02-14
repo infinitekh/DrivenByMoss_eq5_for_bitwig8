@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.apcmini.controller;
@@ -19,14 +19,10 @@ public class APCminiScales extends Scales
      * Constructor.
      *
      * @param valueChanger A value changer
-     * @param startNote The first MIDI note of the pad grid
-     * @param endNote The last MIDI note of the pad grid
-     * @param numColumns The number of columns of the pad grid
-     * @param numRows The number of rows of the pad grid
      */
-    public APCminiScales (final IValueChanger valueChanger, final int startNote, final int endNote, final int numColumns, final int numRows)
+    public APCminiScales (final IValueChanger valueChanger)
     {
-        super (valueChanger, startNote, endNote, numColumns, numRows);
+        super (valueChanger, 36, 100, 8, 8);
     }
 
 

@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.apc;
@@ -18,6 +18,7 @@ import de.mossgrabers.controller.akai.apc.command.trigger.SessionRecordCommand;
 import de.mossgrabers.controller.akai.apc.command.trigger.StopAllClipsOrBrowseCommand;
 import de.mossgrabers.controller.akai.apc.controller.APCColorManager;
 import de.mossgrabers.controller.akai.apc.controller.APCControlSurface;
+import de.mossgrabers.controller.akai.apc.controller.APCScales;
 import de.mossgrabers.controller.akai.apc.mode.BrowserMode;
 import de.mossgrabers.controller.akai.apc.mode.NoteMode;
 import de.mossgrabers.controller.akai.apc.mode.PanMode;
@@ -31,12 +32,12 @@ import de.mossgrabers.controller.akai.apc.view.SessionView;
 import de.mossgrabers.controller.akai.apc.view.ShiftView;
 import de.mossgrabers.framework.command.continuous.KnobRowModeCommand;
 import de.mossgrabers.framework.command.trigger.Direction;
+import de.mossgrabers.framework.command.trigger.FootswitchCommand;
 import de.mossgrabers.framework.command.trigger.application.PaneCommand;
 import de.mossgrabers.framework.command.trigger.application.PaneCommand.Panels;
 import de.mossgrabers.framework.command.trigger.application.PanelLayoutCommand;
 import de.mossgrabers.framework.command.trigger.application.RedoCommand;
 import de.mossgrabers.framework.command.trigger.application.UndoCommand;
-import de.mossgrabers.framework.command.trigger.clip.NewCommand;
 import de.mossgrabers.framework.command.trigger.device.DeviceLayerLeftCommand;
 import de.mossgrabers.framework.command.trigger.device.DeviceLayerRightCommand;
 import de.mossgrabers.framework.command.trigger.device.DeviceOnOffCommand;
@@ -67,7 +68,6 @@ import de.mossgrabers.framework.controller.valuechanger.TwosComplementValueChang
 import de.mossgrabers.framework.daw.IHost;
 import de.mossgrabers.framework.daw.ITransport;
 import de.mossgrabers.framework.daw.ModelSetup;
-import de.mossgrabers.framework.daw.data.IParameter;
 import de.mossgrabers.framework.daw.data.ITrack;
 import de.mossgrabers.framework.daw.data.bank.IParameterBank;
 import de.mossgrabers.framework.daw.data.bank.ITrackBank;
@@ -80,9 +80,8 @@ import de.mossgrabers.framework.featuregroup.ViewManager;
 import de.mossgrabers.framework.mode.Modes;
 import de.mossgrabers.framework.mode.device.ParameterMode;
 import de.mossgrabers.framework.mode.track.TrackVolumeMode;
-import de.mossgrabers.framework.scale.Scales;
+import de.mossgrabers.framework.parameter.IParameter;
 import de.mossgrabers.framework.utils.Timeout;
-import de.mossgrabers.framework.view.AbstractSequencerView;
 import de.mossgrabers.framework.view.TempoView;
 import de.mossgrabers.framework.view.Views;
 
@@ -106,7 +105,7 @@ public class APCControllerSetup extends AbstractControllerSetup<APCControlSurfac
      * @param factory The factory
      * @param globalSettings The global settings
      * @param documentSettings The document (project) specific settings
-     * @param isMkII True if is mkII
+     * @param isMkII True if is MkII
      */
     public APCControllerSetup (final IHost host, final ISetupFactory factory, final ISettingsUI globalSettings, final ISettingsUI documentSettings, final boolean isMkII)
     {
@@ -115,7 +114,7 @@ public class APCControllerSetup extends AbstractControllerSetup<APCControlSurfac
         this.isMkII = isMkII;
         this.colorManager = new APCColorManager (isMkII);
         this.valueChanger = new TwosComplementValueChanger (128, 1);
-        this.configuration = new APCConfiguration (host, this.valueChanger, factory.getArpeggiatorModes ());
+        this.configuration = new APCConfiguration (host, this.valueChanger, factory.getArpeggiatorModes (), isMkII);
     }
 
 
@@ -123,7 +122,7 @@ public class APCControllerSetup extends AbstractControllerSetup<APCControlSurfac
     @Override
     protected void createScales ()
     {
-        this.scales = new Scales (this.valueChanger, 36, 76, 8, 5);
+        this.scales = new APCScales (this.valueChanger);
         this.scales.setDrumDefaultOffset (12);
     }
 
@@ -135,6 +134,7 @@ public class APCControllerSetup extends AbstractControllerSetup<APCControlSurfac
         final ModelSetup ms = new ModelSetup ();
         ms.setNumScenes (5);
         ms.setNumDrumPadLayers (12);
+        ms.setNumMarkers (8);
         this.model = this.factory.createModel (this.configuration, this.colorManager, this.valueChanger, this.scales, ms);
         final ITrackBank trackBank = this.model.getTrackBank ();
         trackBank.setIndication (true);
@@ -148,8 +148,8 @@ public class APCControllerSetup extends AbstractControllerSetup<APCControlSurfac
     {
         final IMidiAccess midiAccess = this.factory.createMidiAccess ();
         final IMidiOutput output = midiAccess.createOutput ();
-        final IMidiInput input = midiAccess.createInput (this.isMkII ? "Akai APC40 mkII" : "Akai APC40",
-                "B040??" /* Sustain pedal */);
+        final IMidiInput input = midiAccess.createInput ("Pads", "80????" /* Note off */,
+                "90????" /* Note on */);
         final APCControlSurface surface = new APCControlSurface (this.host, this.colorManager, this.configuration, output, input, this.isMkII);
         this.surfaces.add (surface);
     }
@@ -161,7 +161,10 @@ public class APCControllerSetup extends AbstractControllerSetup<APCControlSurfac
     {
         super.createObservers ();
 
+        final APCControlSurface surface = this.getSurface ();
+
         this.createScaleObservers (this.configuration);
+        this.createNoteRepeatObservers (this.configuration, surface);
 
         this.configuration.registerDeactivatedItemsHandler (this.model);
 
@@ -227,7 +230,7 @@ public class APCControllerSetup extends AbstractControllerSetup<APCControlSurfac
                 @Override
                 protected void displayMode ()
                 {
-                    ((UserMode) modeManager.get (Modes.USER)).displayPageName ();
+                    ((UserMode) this.modeManager.get (Modes.USER)).displayPageName ();
                 }
             }, APCControlSurface.APC_BUTTON_SEND_B, () -> modeManager.isActive (Modes.USER), ColorManager.BUTTON_STATE_OFF, ColorManager.BUTTON_STATE_ON);
         }
@@ -248,24 +251,11 @@ public class APCControllerSetup extends AbstractControllerSetup<APCControlSurfac
             this.addButton (ButtonID.get (ButtonID.ROW4_1, i), "Arm " + (i + 1), new RecArmCommand<> (i, this.model, surface), i, APCControlSurface.APC_BUTTON_RECORD_ARM, () -> this.getButtonState (index, APCControlSurface.APC_BUTTON_RECORD_ARM) ? 1 : 0, ColorManager.BUTTON_STATE_OFF, ColorManager.BUTTON_STATE_ON);
 
             if (this.isMkII)
-            {
-                this.addButton (ButtonID.get (ButtonID.ROW5_1, i), "X-fade " + (i + 1), new CrossfadeModeCommand<> (i, this.model, surface), i, APCControlSurface.APC_BUTTON_A_B, () -> {
-                    final ITrackBank tb = this.model.getCurrentTrackBank ();
-                    final ITrack track = tb.getItem (index);
-                    final boolean trackExists = track.doesExist ();
-                    return getCrossfadeButtonColor (track, trackExists);
-                }, ColorManager.BUTTON_STATE_OFF, ColorManager.BUTTON_STATE_ON, APCColorManager.BUTTON_STATE_BLINK);
-            }
+                this.addButton (ButtonID.get (ButtonID.ROW5_1, i), "X-fade " + (i + 1), new CrossfadeModeCommand<> (i, this.model, surface), i, APCControlSurface.APC_BUTTON_A_B, () -> this.getCrossfadeButtonColor (index), ColorManager.BUTTON_STATE_OFF, ColorManager.BUTTON_STATE_ON, APCColorManager.BUTTON_STATE_BLINK);
 
             final ButtonID stopButtonID = ButtonID.get (ButtonID.ROW6_1, i);
-            this.addButton (stopButtonID, "Stop " + (i + 1), new APCStopClipCommand (i, this.model, surface), i, APCControlSurface.APC_BUTTON_CLIP_STOP, () -> {
-
-                final IView view = viewManager.getActive ();
-                if (view instanceof final AbstractSequencerView<?, ?> sequencerView)
-                    return sequencerView.getResolutionIndex () == index ? 1 : 0;
-                return surface.isPressed (stopButtonID) ? 1 : 0;
-
-            }, ColorManager.BUTTON_STATE_OFF, ColorManager.BUTTON_STATE_ON);
+            final APCStopClipCommand apcStopClipCommand = new APCStopClipCommand (i, this.model, surface);
+            this.addButton (stopButtonID, "Stop " + (i + 1), apcStopClipCommand, i, APCControlSurface.APC_BUTTON_CLIP_STOP, () -> apcStopClipCommand.getButtonColor (stopButtonID), ColorManager.BUTTON_STATE_OFF, ColorManager.BUTTON_STATE_ON);
         }
 
         if (this.isMkII)
@@ -279,7 +269,6 @@ public class APCControllerSetup extends AbstractControllerSetup<APCControlSurfac
         else
         {
             this.addButton (ButtonID.STOP, "STOP", new StopCommand<> (this.model, surface), APCControlSurface.APC_BUTTON_STOP, () -> !t.isPlaying (), ColorManager.BUTTON_STATE_OFF, ColorManager.BUTTON_STATE_ON);
-            this.addButton (ButtonID.NEW, "Footswitch", new NewCommand<> (this.model, surface), APCControlSurface.APC_FOOTSWITCH_2);
         }
 
         this.addButton (ButtonID.CLIP, this.isMkII ? "SESSION" : "MIDI OVERDUB", new SessionRecordCommand (this.model, surface), this.isMkII ? APCControlSurface.APC_BUTTON_SESSION : APCControlSurface.APC_BUTTON_MIDI_OVERDUB, t::isLauncherOverdub, ColorManager.BUTTON_STATE_OFF, ColorManager.BUTTON_STATE_ON);
@@ -305,6 +294,10 @@ public class APCControllerSetup extends AbstractControllerSetup<APCControlSurfac
             final ButtonID sceneButtonID = ButtonID.get (ButtonID.SCENE1, i);
             this.addButton (sceneButtonID, "Scene " + (i + 1), new ViewButtonCommand<> (sceneButtonID, surface), APCControlSurface.APC_BUTTON_SCENE_LAUNCH_1 + i, new FeatureGroupButtonColorSupplier (viewManager, sceneButtonID));
         }
+
+        this.addButton (ButtonID.FOOTSWITCH1, "Foot Controller 1", new FootswitchCommand<> (this.model, surface, 0), APCControlSurface.APC_FOOTSWITCH_1);
+        if (!this.isMkII)
+            this.addButton (ButtonID.FOOTSWITCH2, "Foot Controller 2", new FootswitchCommand<> (this.model, surface, 1), APCControlSurface.APC_FOOTSWITCH_2);
     }
 
 
@@ -423,6 +416,9 @@ public class APCControllerSetup extends AbstractControllerSetup<APCControlSurfac
             surface.getButton (ButtonID.SCENE3).setBounds (500.75, 137.5, 36.0, 18.5);
             surface.getButton (ButtonID.SCENE4).setBounds (500.75, 165.5, 36.0, 18.5);
             surface.getButton (ButtonID.SCENE5).setBounds (500.75, 194.5, 36.0, 18.5);
+
+            surface.getButton (ButtonID.FOOTSWITCH1).setBounds (670, 1.25, 37.5, 21.0);
+
             surface.getButton (ButtonID.STOP_ALL_CLIPS).setBounds (502.25, 227.25, 33.25, 18.75);
             surface.getButton (ButtonID.MASTERTRACK).setBounds (500.75, 263.0, 36.0, 15.75);
 
@@ -615,7 +611,8 @@ public class APCControllerSetup extends AbstractControllerSetup<APCControlSurfac
             surface.getButton (ButtonID.SCENE4).setBounds (428.25, 184.75, 33.0, 32.0);
             surface.getButton (ButtonID.SCENE5).setBounds (428.25, 228.0, 33.0, 32.0);
 
-            surface.getButton (ButtonID.NEW).setBounds (715.5, 1.25, 37.5, 21.0);
+            surface.getButton (ButtonID.FOOTSWITCH1).setBounds (670, 1.25, 37.5, 21.0);
+            surface.getButton (ButtonID.FOOTSWITCH2).setBounds (715.5, 1.25, 37.5, 21.0);
 
             surface.getButton (ButtonID.SHIFT).setBounds (508.25, 270.75, 33.25, 15.0);
             surface.getButton (ButtonID.PLAY).setBounds (551.0, 536.75, 32.5, 20.0);
@@ -667,13 +664,14 @@ public class APCControllerSetup extends AbstractControllerSetup<APCControlSurfac
     {
         final APCControlSurface surface = this.getSurface ();
         surface.getModeManager ().setActive (Modes.PAN);
-        surface.getViewManager ().setActive (Views.PLAY);
+        surface.getViewManager ().setActive (this.configuration.shouldStartWithSessionView () ? Views.SESSION : this.configuration.getPreferredNoteView ());
     }
 
 
-    private static int getCrossfadeButtonColor (final ITrack track, final boolean trackExists)
+    private int getCrossfadeButtonColor (final int index)
     {
-        if (!trackExists)
+        final ITrack track = this.model.getCurrentTrackBank ().getItem (index);
+        if (!track.doesExist ())
             return 0;
 
         final String crossfadeMode = track.getCrossfadeParameter ().getDisplayedValue ();
@@ -716,43 +714,12 @@ public class APCControllerSetup extends AbstractControllerSetup<APCControlSurfac
     }
 
 
-    /**
-     * Handle a track selection change.
-     *
-     * @param isSelected Has the track been selected?
-     */
-    private void handleTrackChange (final boolean isSelected)
-    {
-        if (!isSelected)
-            return;
-
-        final APCControlSurface surface = this.getSurface ();
-        // Recall last used view (if we are not in session mode)
-        final ViewManager viewManager = surface.getViewManager ();
-        if (viewManager.getActiveIDIgnoreTemporary () != Views.SESSION)
-        {
-            final ITrack cursorTrack = this.model.getCursorTrack ();
-            if (cursorTrack.doesExist ())
-            {
-                final Views preferredView = viewManager.getPreferredView (cursorTrack.getPosition ());
-                viewManager.setActive (preferredView == null ? Views.PLAY : preferredView);
-            }
-        }
-
-        if (viewManager.isActive (Views.PLAY))
-            viewManager.getActive ().updateNoteMapping ();
-
-        // Reset drum octave because the drum pad bank is also reset
-        this.scales.resetDrumOctave ();
-        if (viewManager.isActive (Views.DRUM))
-            viewManager.get (Views.DRUM).updateNoteMapping ();
-    }
-
-
     /** {@inheritDoc} */
     @Override
     protected BindType getTriggerBindType (final ButtonID buttonID)
     {
+        if (buttonID == ButtonID.FOOTSWITCH1 || buttonID == ButtonID.FOOTSWITCH2)
+            return BindType.CC;
         return BindType.NOTE;
     }
 
@@ -800,7 +767,7 @@ public class APCControllerSetup extends AbstractControllerSetup<APCControlSurfac
 
             case APCControlSurface.APC_BUTTON_RECORD_ARM:
                 if (isShift)
-                    return getCrossfadeButtonColor (track, trackExists) > 0;
+                    return this.getCrossfadeButtonColor (index) > 0;
                 return trackExists && track.isRecArm ();
 
             default:

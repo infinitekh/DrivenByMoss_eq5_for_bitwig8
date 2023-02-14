@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ableton.push.mode.device;
@@ -56,7 +56,7 @@ public class DeviceLayerDetailsMode extends BaseMode<ILayer>
                     bank = cursorDevice.getDrumPadBank ();
                     break;
                 case DRUM64:
-                    bank = this.model.getDrumDevice64 ().getDrumPadBank ();
+                    bank = this.model.getDrumDevice (64).getDrumPadBank ();
                     break;
                 case COLOR:
                     // Do not switch banks if view is left for color selection

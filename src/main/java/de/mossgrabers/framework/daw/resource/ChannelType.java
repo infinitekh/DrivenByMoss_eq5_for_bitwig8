@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.daw.resource;
@@ -56,7 +56,7 @@ public enum ChannelType
      * @param channelType THe channel type for which to get a label
      * @return The label
      */
-    public static String getLabel (ChannelType channelType)
+    public static String getLabel (final ChannelType channelType)
     {
         return LABELS.get (channelType);
     }

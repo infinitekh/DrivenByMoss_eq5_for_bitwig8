@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.controller;
@@ -78,6 +78,23 @@ public enum ContinuousID
     /** Volume Knob 8. */
     VOLUME_KNOB8,
 
+    /** Panorama Knob 1. */
+    PAN_KNOB1,
+    /** Panorama Knob 2. */
+    PAN_KNOB2,
+    /** Panorama Knob 3. */
+    PAN_KNOB3,
+    /** Panorama Knob 4. */
+    PAN_KNOB4,
+    /** Panorama Knob 5. */
+    PAN_KNOB5,
+    /** Panorama Knob 6. */
+    PAN_KNOB6,
+    /** Panorama Knob 7. */
+    PAN_KNOB7,
+    /** Panorama Knob 8. */
+    PAN_KNOB8,
+
     /** Parameter Knob 1. */
     PARAM_KNOB1,
     /** Parameter Knob 2. */
@@ -133,7 +150,7 @@ public enum ContinuousID
     TRACK_MUTE,
     /** Selection of solo with multiple values. */
     TRACK_SOLO,
-    /** Selection of rec arm with multiple values. */
+    /** Selection of record arm with multiple values. */
     TRACK_ARM,
 
     /** Navigate clips with multiple values. */
@@ -234,7 +251,112 @@ public enum ContinuousID
     /** Knob 7 controlling send 4. */
     SEND4_KNOB7,
     /** Knob 8 controlling send 4. */
-    SEND4_KNOB8;
+    SEND4_KNOB8,
+
+    /** Knob 1 controlling send 5. */
+    SEND5_KNOB1,
+    /** Knob 2 controlling send 5. */
+    SEND5_KNOB2,
+    /** Knob 3 controlling send 5. */
+    SEND5_KNOB3,
+    /** Knob 4 controlling send 5. */
+    SEND5_KNOB4,
+    /** Knob 5 controlling send 5. */
+    SEND5_KNOB5,
+    /** Knob 6 controlling send 5. */
+    SEND5_KNOB6,
+    /** Knob 7 controlling send 5. */
+    SEND5_KNOB7,
+    /** Knob 8 controlling send 5. */
+    SEND5_KNOB8,
+
+    /** Knob 1 controlling send 6. */
+    SEND6_KNOB1,
+    /** Knob 2 controlling send 6. */
+    SEND6_KNOB2,
+    /** Knob 3 controlling send 6. */
+    SEND6_KNOB3,
+    /** Knob 4 controlling send 6. */
+    SEND6_KNOB4,
+    /** Knob 5 controlling send 6. */
+    SEND6_KNOB5,
+    /** Knob 6 controlling send 6. */
+    SEND6_KNOB6,
+    /** Knob 7 controlling send 6. */
+    SEND6_KNOB7,
+    /** Knob 8 controlling send 6. */
+    SEND6_KNOB8,
+
+    /** Knob 1 controlling EQ type. */
+    EQ_TYPE_KNOB1,
+    /** Knob 2 controlling EQ type. */
+    EQ_TYPE_KNOB2,
+    /** Knob 3 controlling EQ type. */
+    EQ_TYPE_KNOB3,
+    /** Knob 4 controlling EQ type. */
+    EQ_TYPE_KNOB4,
+    /** Knob 5 controlling EQ type. */
+    EQ_TYPE_KNOB5,
+    /** Knob 6 controlling EQ type. */
+    EQ_TYPE_KNOB6,
+    /** Knob 7 controlling EQ type. */
+    EQ_TYPE_KNOB7,
+    /** Knob 8 controlling EQ type. */
+    EQ_TYPE_KNOB8,
+
+    /** Knob 1 controlling EQ Q. */
+    EQ_Q_KNOB1,
+    /** Knob 2 controlling EQ Q. */
+    EQ_Q_KNOB2,
+    /** Knob 3 controlling EQ Q. */
+    EQ_Q_KNOB3,
+    /** Knob 4 controlling EQ Q. */
+    EQ_Q_KNOB4,
+    /** Knob 5 controlling EQ Q. */
+    EQ_Q_KNOB5,
+    /** Knob 6 controlling EQ Q. */
+    EQ_Q_KNOB6,
+    /** Knob 7 controlling EQ Q. */
+    EQ_Q_KNOB7,
+    /** Knob 8 controlling EQ Q. */
+    EQ_Q_KNOB8,
+
+    /** Knob 1 controlling EQ frequency. */
+    EQ_FREQUENCY_KNOB1,
+    /** Knob 2 controlling EQ frequency. */
+    EQ_FREQUENCY_KNOB2,
+    /** Knob 3 controlling EQ frequency. */
+    EQ_FREQUENCY_KNOB3,
+    /** Knob 4 controlling EQ frequency. */
+    EQ_FREQUENCY_KNOB4,
+    /** Knob 5 controlling EQ frequency. */
+    EQ_FREQUENCY_KNOB5,
+    /** Knob 6 controlling EQ frequency. */
+    EQ_FREQUENCY_KNOB6,
+    /** Knob 7 controlling EQ frequency. */
+    EQ_FREQUENCY_KNOB7,
+    /** Knob 8 controlling EQ frequency. */
+    EQ_FREQUENCY_KNOB8,
+
+    /** Knob 1 controlling EQ gain. */
+    EQ_GAIN_KNOB1,
+    /** Knob 2 controlling EQ gain. */
+    EQ_GAIN_KNOB2,
+    /** Knob 3 controlling EQ gain. */
+    EQ_GAIN_KNOB3,
+    /** Knob 4 controlling EQ gain. */
+    EQ_GAIN_KNOB4,
+    /** Knob 5 controlling EQ gain. */
+    EQ_GAIN_KNOB5,
+    /** Knob 6 controlling EQ gain. */
+    EQ_GAIN_KNOB6,
+    /** Knob 7 controlling EQ gain. */
+    EQ_GAIN_KNOB7,
+    /** Knob 8 controlling EQ gain. */
+    EQ_GAIN_KNOB8,
+
+    /** Cue knob. */
+    CUE;
 
 
     /**
@@ -263,5 +385,22 @@ public enum ContinuousID
         for (int i = 0; i < size; i++)
             ids.add (get (firstID, i));
         return ids;
+    }
+
+
+    /**
+     * Get the index of the given continuous control in a range.
+     *
+     * @param continuousID The ID of the continuous control to test
+     * @param firstContinuousID The ID of the first control in the range
+     * @param length The number of controls in the range (1-based)
+     * @return The index of the control in the range, -1 if it is not part of the range
+     */
+    public static int isInRange (final ContinuousID continuousID, final ContinuousID firstContinuousID, final int length)
+    {
+        if (continuousID == null)
+            return -1;
+        final int diff = ContinuousID.get (firstContinuousID, length - 1).ordinal () - continuousID.ordinal ();
+        return diff >= 0 ? diff : -1;
     }
 }

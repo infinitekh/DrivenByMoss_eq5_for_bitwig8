@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ableton.push.mode;
@@ -175,9 +175,7 @@ public class RibbonMode extends BaseMode<IItem>
     @Override
     public void onSecondRow (final int index, final ButtonEvent event)
     {
-        if (event != ButtonEvent.UP)
-            return;
-        if (index == 0)
+        if (event != ButtonEvent.UP || index == 0)
             return;
         if (index < 5)
             this.surface.getConfiguration ().setRibbonModeCC (RibbonMode.MIDI_CCS[index - 1]);

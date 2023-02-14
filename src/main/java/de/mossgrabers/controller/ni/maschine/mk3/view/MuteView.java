@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ni.maschine.mk3.view;
@@ -70,7 +70,7 @@ public class MuteView extends BaseView
             final int y = 3 - i / 4;
             if (item.doesExist ())
             {
-                final int colorIndex = this.colorManager.getColorIndex (DAWColor.getColorIndex (item.getColor ()));
+                final int colorIndex = this.colorManager.getColorIndex (DAWColor.getColorID (item.getColor ()));
                 if (item.isMute ())
                     padGrid.lightEx (x, y, colorIndex, MaschineColorManager.COLOR_DARK_GREY, false);
                 else

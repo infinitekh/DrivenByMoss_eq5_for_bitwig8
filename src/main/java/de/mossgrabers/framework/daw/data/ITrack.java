@@ -1,11 +1,12 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.daw.data;
 
 import de.mossgrabers.framework.daw.constants.RecordQuantization;
 import de.mossgrabers.framework.daw.data.bank.ISlotBank;
+import de.mossgrabers.framework.parameter.IParameter;
 
 import java.util.Arrays;
 
@@ -49,6 +50,14 @@ public interface ITrack extends IChannel
 
     /**
      * Expand or collapse the group.
+     *
+     * @param isExpanded True to expand the group otherwise collapse it
+     */
+    void setGroupExpanded (boolean isExpanded);
+
+
+    /**
+     * Toggle the expanded state of the group.
      */
     void toggleGroupExpanded ();
 
@@ -251,15 +260,15 @@ public interface ITrack extends IChannel
 
 
     /**
-     * Add an equalizer device to this track.
-     */
-    void addEqualizerDevice ();
-
-
-    /**
      * Does the track contain a drum device?
      *
      * @return True if it contains a drum device
      */
     boolean hasDrumDevice ();
+
+
+    /**
+     * Switch to the previous playing clip of the track and immediately start it.
+     */
+    void launchLastClipImmediately ();
 }

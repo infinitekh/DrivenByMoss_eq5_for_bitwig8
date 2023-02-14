@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.generic;
@@ -116,7 +116,7 @@ public class GenericFlexiConfiguration extends AbstractConfiguration
         "37  CC Portamento Time (LSB)",
         "38  CC Data Entry (LSB)",
         "39  CC Channel Volume (LSB)",
-        "30  CC Balance (LSB)",
+        "40  CC Balance (LSB)",
         "41  CC Undefined (LSB)",
         "42  CC Pan (LSB)",
         "43  CC Expression (LSB)",
@@ -300,6 +300,7 @@ public class GenericFlexiConfiguration extends AbstractConfiguration
     private int                                      keyboardChannel              = 0;
     private boolean                                  keyboardRouteTimbre          = false;
     private boolean                                  keyboardRouteModulation      = true;
+    private boolean                                  keyboardRouteExpression      = false;
     private boolean                                  keyboardRouteSustain         = true;
     private boolean                                  keyboardRoutePitchbend       = true;
 
@@ -494,6 +495,9 @@ public class GenericFlexiConfiguration extends AbstractConfiguration
 
         final IEnumSetting routeModulationSetting = globalSettings.getEnumSetting ("Route Modulation (CC01)", CATEGORY_KEYBOARD, AbstractConfiguration.ON_OFF_OPTIONS, AbstractConfiguration.ON_OFF_OPTIONS[1]);
         this.keyboardRouteModulation = "On".equals (routeModulationSetting.get ());
+
+        final IEnumSetting routeExpressionSetting = globalSettings.getEnumSetting ("Route Expression (CC11)", CATEGORY_KEYBOARD, AbstractConfiguration.ON_OFF_OPTIONS, AbstractConfiguration.ON_OFF_OPTIONS[0]);
+        this.keyboardRouteExpression = "On".equals (routeExpressionSetting.get ());
 
         final IEnumSetting routeSustainSetting = globalSettings.getEnumSetting ("Route Sustain (CC64)", CATEGORY_KEYBOARD, AbstractConfiguration.ON_OFF_OPTIONS, AbstractConfiguration.ON_OFF_OPTIONS[1]);
         this.keyboardRouteSustain = "On".equals (routeSustainSetting.get ());
@@ -787,6 +791,17 @@ public class GenericFlexiConfiguration extends AbstractConfiguration
     public boolean isKeyboardRouteModulation ()
     {
         return this.keyboardRouteModulation;
+    }
+
+
+    /**
+     * Should CC expression directly routed to the DAW?
+     *
+     * @return True to route
+     */
+    public boolean isKeyboardRouteExpression ()
+    {
+        return this.keyboardRouteExpression;
     }
 
 

@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.novation.launchkey.mini;
@@ -41,7 +41,7 @@ import de.mossgrabers.framework.daw.data.bank.ITrackBank;
 import de.mossgrabers.framework.daw.midi.IMidiAccess;
 import de.mossgrabers.framework.daw.midi.IMidiInput;
 import de.mossgrabers.framework.daw.midi.IMidiOutput;
-import de.mossgrabers.framework.featuregroup.AbstractMode;
+import de.mossgrabers.framework.featuregroup.AbstractParameterMode;
 import de.mossgrabers.framework.featuregroup.ModeManager;
 import de.mossgrabers.framework.featuregroup.ViewManager;
 import de.mossgrabers.framework.mode.Modes;
@@ -162,11 +162,11 @@ public class LaunchkeyMiniMk3ControllerSetup extends AbstractControllerSetup<Lau
 
         final BooleanSupplier offSupplier = () -> false;
 
-        modeManager.register (Modes.VOLUME, new TrackVolumeMode<> (surface, this.model, true, AbstractMode.DEFAULT_KNOB_IDS, offSupplier));
-        modeManager.register (Modes.PAN, new TrackPanMode<> (surface, this.model, true, AbstractMode.DEFAULT_KNOB_IDS, offSupplier));
-        modeManager.register (Modes.SEND1, new TrackSendMode<> (0, surface, this.model, true, AbstractMode.DEFAULT_KNOB_IDS, offSupplier));
-        modeManager.register (Modes.SEND2, new TrackSendMode<> (1, surface, this.model, true, AbstractMode.DEFAULT_KNOB_IDS, offSupplier));
-        modeManager.register (Modes.DEVICE_PARAMS, new ParameterMode<> (surface, this.model, true, AbstractMode.DEFAULT_KNOB_IDS, offSupplier));
+        modeManager.register (Modes.VOLUME, new TrackVolumeMode<> (surface, this.model, true, AbstractParameterMode.DEFAULT_KNOB_IDS, offSupplier));
+        modeManager.register (Modes.PAN, new TrackPanMode<> (surface, this.model, true, AbstractParameterMode.DEFAULT_KNOB_IDS, offSupplier));
+        modeManager.register (Modes.SEND1, new TrackSendMode<> (0, surface, this.model, true, AbstractParameterMode.DEFAULT_KNOB_IDS, offSupplier));
+        modeManager.register (Modes.SEND2, new TrackSendMode<> (1, surface, this.model, true, AbstractParameterMode.DEFAULT_KNOB_IDS, offSupplier));
+        modeManager.register (Modes.DEVICE_PARAMS, new ParameterMode<> (surface, this.model, true, AbstractParameterMode.DEFAULT_KNOB_IDS, offSupplier));
         modeManager.register (Modes.USER, new UserMode<> (surface, this.model, true, ContinuousID.createSequentialList (ContinuousID.DEVICE_KNOB1, 8), offSupplier));
     }
 
@@ -198,7 +198,7 @@ public class LaunchkeyMiniMk3ControllerSetup extends AbstractControllerSetup<Lau
 
         this.addButton (ButtonID.PLAY, "Play", new PlayCommand<> (this.model, surface), 15, LaunchkeyMiniMk3ControlSurface.LAUNCHKEY_PLAY, t::isPlaying);
         final ConfiguredRecordCommand<LaunchkeyMiniMk3ControlSurface, LaunchkeyMiniMk3Configuration> recordCommand = new ConfiguredRecordCommand<> (this.model, surface);
-        this.addButton (ButtonID.RECORD, "Record", recordCommand, 15, LaunchkeyMiniMk3ControlSurface.LAUNCHKEY_RECORD, recordCommand::isLit);
+        this.addButton (ButtonID.RECORD, "Record", recordCommand, 15, LaunchkeyMiniMk3ControlSurface.LAUNCHKEY_RECORD, (BooleanSupplier) recordCommand::isLit);
 
         final ModeCursorCommand<LaunchkeyMiniMk3ControlSurface, LaunchkeyMiniMk3Configuration> leftCommand = new ModeCursorCommand<> (Direction.LEFT, this.model, surface, true);
         this.addButton (ButtonID.MOVE_TRACK_LEFT, "Previous", leftCommand, 15, LaunchkeyMiniMk3ControlSurface.LAUNCHKEY_LEFT, leftCommand::canScroll);
@@ -230,7 +230,7 @@ public class LaunchkeyMiniMk3ControllerSetup extends AbstractControllerSetup<Lau
     private void createViewButton (final ButtonID buttonID, final OutputID outputID, final String label, final Views view, final int viewIndex)
     {
         final LaunchkeyMiniMk3ControlSurface surface = this.getSurface ();
-        final ViewMultiSelectCommand<LaunchkeyMiniMk3ControlSurface, LaunchkeyMiniMk3Configuration> viewSelectCommand = new ViewMultiSelectCommand<> (this.model, surface, true, view);
+        final ViewMultiSelectCommand<LaunchkeyMiniMk3ControlSurface, LaunchkeyMiniMk3Configuration> viewSelectCommand = new ViewMultiSelectCommand<> (this.model, surface, view);
         this.addButton (surface, buttonID, label, (event, velocity) -> {
             viewSelectCommand.executeNormal (event);
             surface.getPadGrid ().setView (view);

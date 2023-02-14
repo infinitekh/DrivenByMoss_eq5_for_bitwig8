@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.apc.view;
@@ -36,16 +36,10 @@ public class PlayView extends AbstractPlayView<APCControlSurface, APCConfigurati
 
     /** {@inheritDoc} */
     @Override
-    public void onGridNote (final int note, final int velocity)
+    protected void playNote (final int note, final int velocity)
     {
-        if (!this.model.canSelectedTrackHoldNotes ())
-            return;
-
-        super.onGridNote (note, velocity);
-
-        final int mapped = this.keyManager.map (note);
-        if (mapped != -1)
-            this.surface.sendMidiEvent (MidiConstants.CMD_NOTE_ON, mapped, velocity);
+        if (!this.surface.isMkII ())
+            this.surface.sendMidiEvent (MidiConstants.CMD_NOTE_ON, note, velocity);
     }
 
 

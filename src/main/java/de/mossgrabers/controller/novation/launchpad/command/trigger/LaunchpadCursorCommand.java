@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.novation.launchpad.command.trigger;
@@ -14,10 +14,9 @@ import de.mossgrabers.framework.controller.ButtonID;
 import de.mossgrabers.framework.daw.GrooveParameterID;
 import de.mossgrabers.framework.daw.IBrowser;
 import de.mossgrabers.framework.daw.IModel;
-import de.mossgrabers.framework.daw.INoteClip;
 import de.mossgrabers.framework.daw.ITransport;
+import de.mossgrabers.framework.daw.clip.INoteClip;
 import de.mossgrabers.framework.daw.data.ICursorDevice;
-import de.mossgrabers.framework.daw.data.IParameter;
 import de.mossgrabers.framework.daw.data.ITrack;
 import de.mossgrabers.framework.daw.data.bank.IParameterBank;
 import de.mossgrabers.framework.daw.data.bank.ISceneBank;
@@ -26,14 +25,15 @@ import de.mossgrabers.framework.featuregroup.IMode;
 import de.mossgrabers.framework.featuregroup.IView;
 import de.mossgrabers.framework.featuregroup.ViewManager;
 import de.mossgrabers.framework.mode.Modes;
+import de.mossgrabers.framework.parameter.IParameter;
 import de.mossgrabers.framework.scale.Scale;
 import de.mossgrabers.framework.scale.Scales;
 import de.mossgrabers.framework.utils.ButtonEvent;
 import de.mossgrabers.framework.utils.FrameworkException;
-import de.mossgrabers.framework.view.AbstractDrumView;
-import de.mossgrabers.framework.view.AbstractSequencerView;
 import de.mossgrabers.framework.view.TransposeView;
 import de.mossgrabers.framework.view.Views;
+import de.mossgrabers.framework.view.sequencer.AbstractDrumView;
+import de.mossgrabers.framework.view.sequencer.AbstractSequencerView;
 
 import java.util.Optional;
 
@@ -78,8 +78,7 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
             return;
         switch (activeViewId)
         {
-            case CONTROL:
-            case USER:
+            case CONTROL, USER:
                 this.canScrollUp = false;
                 this.canScrollDown = false;
                 this.canScrollLeft = false;
@@ -93,8 +92,7 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
                 this.canScrollRight = true;
                 break;
 
-            case PLAY:
-            case CHORDS:
+            case PLAY, CHORDS:
                 final int octave = this.scales.getOctave ();
                 this.canScrollUp = octave < 3;
                 this.canScrollDown = octave > -3;
@@ -120,9 +118,7 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
                 this.canScrollRight = false;
                 break;
 
-            case SEQUENCER:
-            case RAINDROPS:
-            case POLY_SEQUENCER:
+            case SEQUENCER, RAINDROPS, POLY_SEQUENCER:
                 final INoteClip clip = AbstractSequencerView.class.cast (viewManager.getActive ()).getClip ();
                 final int seqOctave = this.scales.getOctave ();
                 this.canScrollUp = seqOctave < Scales.OCTAVE_RANGE;
@@ -131,9 +127,7 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
                 this.canScrollRight = clip.canScrollStepsForwards ();
                 break;
 
-            case DRUM:
-            case DRUM4:
-            case DRUM8:
+            case DRUM, DRUM4, DRUM8:
                 final INoteClip drumClip = AbstractDrumView.class.cast (viewManager.get (activeViewId)).getClip ();
                 this.canScrollUp = this.scales.canScrollDrumOctaveUp ();
                 this.canScrollDown = this.scales.canScrollDrumOctaveDown ();
@@ -158,11 +152,7 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
                 this.canScrollRight = browser.hasNextContentType ();
                 break;
 
-            case SESSION:
-            case TRACK_VOLUME:
-            case TRACK_PAN:
-            case TRACK_SENDS:
-            case MIX:
+            case SESSION, TRACK_VOLUME, TRACK_PAN, TRACK_SENDS, MIX:
                 final Optional<ITrack> sel = tb.getSelectedItem ();
                 final int selIndex = sel.isPresent () ? sel.get ().getIndex () : -1;
                 this.canScrollLeft = selIndex > 0 || tb.canScrollPageBackwards ();
@@ -172,13 +162,18 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
                 this.canScrollDown = sceneBank.canScrollPageForwards ();
                 break;
 
-            case SHUFFLE:
-            case TEMPO:
-            case PROJECT:
+            case SHUFFLE, TEMPO, PROJECT:
                 this.canScrollLeft = true;
                 this.canScrollRight = true;
                 this.canScrollUp = true;
                 this.canScrollDown = true;
+                break;
+
+            case NOTE_EDIT_VIEW, CLIP_LENGTH:
+                this.canScrollLeft = false;
+                this.canScrollRight = false;
+                this.canScrollUp = false;
+                this.canScrollDown = false;
                 break;
 
             default:
@@ -194,8 +189,7 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
         final ViewManager viewManager = this.surface.getViewManager ();
         switch (viewManager.getActiveID ())
         {
-            case USER:
-            case CONTROL:
+            case USER, CONTROL:
                 // Not used
                 break;
 
@@ -203,25 +197,18 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
                 viewManager.setTemporary (Views.SHUFFLE);
                 break;
 
-            case PLAY:
-            case CHORDS:
+            case PLAY, CHORDS:
                 this.scales.prevScale ();
                 final String name = this.scales.getScale ().getName ();
                 this.surface.getConfiguration ().setScale (name);
                 this.surface.getDisplay ().notify (name);
                 break;
 
-            case PIANO:
-            case DRUM64:
+            case PIANO, DRUM64:
                 // Not used
                 break;
 
-            case SEQUENCER:
-            case RAINDROPS:
-            case POLY_SEQUENCER:
-            case DRUM:
-            case DRUM4:
-            case DRUM8:
+            case SEQUENCER, RAINDROPS, POLY_SEQUENCER, DRUM, DRUM4, DRUM8:
                 final IView activeView = viewManager.getActive ();
                 if (activeView instanceof final AbstractSequencerView<?, ?> sequencerView)
                 {
@@ -252,10 +239,7 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
                 this.mvHelper.notifySelectedTrack ();
                 break;
 
-            case TRACK_VOLUME:
-            case TRACK_PAN:
-            case TRACK_SENDS:
-            case MIX:
+            case TRACK_VOLUME, TRACK_PAN, TRACK_SENDS, MIX:
                 final IMode mode = this.surface.getModeManager ().get (Modes.VOLUME);
                 if (mode != null)
                     mode.selectPreviousItem ();
@@ -275,6 +259,10 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
                 this.triggerChangeZoom1 (false);
                 break;
 
+            case NOTE_EDIT_VIEW:
+                // Not used
+                break;
+
             default:
                 throw new FrameworkException ("Missing cursor key left handling for view.");
         }
@@ -288,8 +276,7 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
         final ViewManager viewManager = this.surface.getViewManager ();
         switch (viewManager.getActiveID ())
         {
-            case USER:
-            case CONTROL:
+            case USER, CONTROL:
                 // Not used
                 break;
 
@@ -297,25 +284,18 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
                 viewManager.setTemporary (Views.SHUFFLE);
                 break;
 
-            case PLAY:
-            case CHORDS:
+            case PLAY, CHORDS:
                 this.scales.nextScale ();
                 final String name = this.scales.getScale ().getName ();
                 this.surface.getConfiguration ().setScale (name);
                 this.surface.getDisplay ().notify (name);
                 break;
 
-            case PIANO:
-            case DRUM64:
+            case PIANO, DRUM64:
                 // Not used
                 break;
 
-            case SEQUENCER:
-            case RAINDROPS:
-            case POLY_SEQUENCER:
-            case DRUM:
-            case DRUM4:
-            case DRUM8:
+            case SEQUENCER, RAINDROPS, POLY_SEQUENCER, DRUM, DRUM4, DRUM8:
                 final IView activeView = viewManager.getActive ();
                 if (activeView instanceof final AbstractSequencerView<?, ?> sequencerView)
                 {
@@ -346,10 +326,7 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
                 this.mvHelper.notifySelectedTrack ();
                 break;
 
-            case TRACK_VOLUME:
-            case TRACK_PAN:
-            case TRACK_SENDS:
-            case MIX:
+            case TRACK_VOLUME, TRACK_PAN, TRACK_SENDS, MIX:
                 final IMode mode = this.surface.getModeManager ().get (Modes.VOLUME);
                 if (mode != null)
                     mode.selectNextItem ();
@@ -369,6 +346,10 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
                 this.triggerChangeZoom1 (true);
                 break;
 
+            case NOTE_EDIT_VIEW:
+                // Not used
+                break;
+
             default:
                 throw new FrameworkException ("Missing cursor key right handling for view.");
         }
@@ -382,8 +363,7 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
         final ViewManager viewManager = this.surface.getViewManager ();
         switch (viewManager.getActiveID ())
         {
-            case USER:
-            case CONTROL:
+            case USER, CONTROL:
                 // Not Used
                 break;
 
@@ -391,16 +371,7 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
                 viewManager.setTemporary (Views.TEMPO);
                 break;
 
-            case PLAY:
-            case CHORDS:
-            case PIANO:
-            case DRUM64:
-            case DRUM:
-            case SEQUENCER:
-            case RAINDROPS:
-            case POLY_SEQUENCER:
-            case DRUM4:
-            case DRUM8:
+            case PLAY, CHORDS, PIANO, DRUM64, DRUM, SEQUENCER, RAINDROPS, POLY_SEQUENCER, DRUM4, DRUM8:
                 ((TransposeView) viewManager.getActive ()).onOctaveUp (ButtonEvent.DOWN);
                 break;
 
@@ -423,10 +394,7 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
                     super.scrollUp ();
                 break;
 
-            case TRACK_VOLUME:
-            case TRACK_PAN:
-            case TRACK_SENDS:
-            case MIX:
+            case TRACK_VOLUME, TRACK_PAN, TRACK_SENDS, MIX:
                 super.scrollUp ();
                 break;
 
@@ -444,6 +412,10 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
                 this.model.getApplication ().incTrackHeight ();
                 break;
 
+            case NOTE_EDIT_VIEW:
+                // Not used
+                break;
+
             default:
                 throw new FrameworkException ("Missing cursor key up handling for view.");
         }
@@ -457,8 +429,7 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
         final ViewManager viewManager = this.surface.getViewManager ();
         switch (viewManager.getActiveID ())
         {
-            case USER:
-            case CONTROL:
+            case USER, CONTROL:
                 // Not Used
                 break;
 
@@ -466,16 +437,7 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
                 viewManager.setTemporary (Views.TEMPO);
                 break;
 
-            case PLAY:
-            case CHORDS:
-            case PIANO:
-            case DRUM64:
-            case DRUM:
-            case SEQUENCER:
-            case RAINDROPS:
-            case POLY_SEQUENCER:
-            case DRUM4:
-            case DRUM8:
+            case PLAY, CHORDS, PIANO, DRUM64, DRUM, SEQUENCER, RAINDROPS, POLY_SEQUENCER, DRUM4, DRUM8:
                 ((TransposeView) viewManager.getActive ()).onOctaveDown (ButtonEvent.DOWN);
                 break;
 
@@ -498,10 +460,7 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
                     super.scrollDown ();
                 break;
 
-            case TRACK_VOLUME:
-            case TRACK_PAN:
-            case TRACK_SENDS:
-            case MIX:
+            case TRACK_VOLUME, TRACK_PAN, TRACK_SENDS, MIX:
                 super.scrollDown ();
                 break;
 
@@ -517,6 +476,10 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
 
             case PROJECT:
                 this.model.getApplication ().decTrackHeight ();
+                break;
+
+            case NOTE_EDIT_VIEW:
+                // Not used
                 break;
 
             default:
@@ -560,5 +523,21 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
             this.model.getApplication ().zoomOut ();
 
         this.surface.scheduleTask ( () -> this.triggerChangeZoom1 (in), REPEAT_SPEED);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    protected ButtonEvent getTriggerEvent ()
+    {
+        final ViewManager viewManager = this.surface.getViewManager ();
+        switch (viewManager.getActiveID ())
+        {
+            case DRUM, SEQUENCER, POLY_SEQUENCER, DRUM4, DRUM8:
+                return ButtonEvent.UP;
+
+            default:
+                return ButtonEvent.DOWN;
+        }
     }
 }

@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ni.kontrol.mki;
@@ -62,6 +62,7 @@ public class Kontrol1Configuration extends AbstractConfiguration
         // Transport
 
         this.activateBehaviourOnStopSetting (globalSettings);
+        this.activateBehaviourOnPauseSetting (globalSettings);
         this.activateFlipRecordSetting (globalSettings);
 
         ///////////////////////////

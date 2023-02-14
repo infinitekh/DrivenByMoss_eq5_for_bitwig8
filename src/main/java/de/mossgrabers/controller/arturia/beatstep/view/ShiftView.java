@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.arturia.beatstep.view;
@@ -73,7 +73,7 @@ public class ShiftView extends AbstractView<BeatstepControlSurface, BeatstepConf
         padGrid.light (48, BeatstepColorManager.BEATSTEP_BUTTON_STATE_PINK);
         padGrid.light (49, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
         padGrid.light (50, BeatstepColorManager.BEATSTEP_BUTTON_STATE_OFF);
-        padGrid.light (51, BeatstepColorManager.BEATSTEP_BUTTON_STATE_PINK);
+        padGrid.light (51, this.model.getCursorDevice ().isWindowOpen () ? BeatstepColorManager.BEATSTEP_BUTTON_STATE_PINK : BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
     }
 
 

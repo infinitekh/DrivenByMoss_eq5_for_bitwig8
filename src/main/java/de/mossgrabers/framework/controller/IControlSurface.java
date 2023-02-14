@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.controller;
@@ -11,6 +11,7 @@ import de.mossgrabers.framework.controller.display.IGraphicDisplay;
 import de.mossgrabers.framework.controller.display.ITextDisplay;
 import de.mossgrabers.framework.controller.grid.ILightGuide;
 import de.mossgrabers.framework.controller.grid.IPadGrid;
+import de.mossgrabers.framework.controller.hardware.BindType;
 import de.mossgrabers.framework.controller.hardware.IHwAbsoluteKnob;
 import de.mossgrabers.framework.controller.hardware.IHwButton;
 import de.mossgrabers.framework.controller.hardware.IHwContinuousControl;
@@ -292,6 +293,17 @@ public interface IControlSurface<C extends Configuration>
 
 
     /**
+     * Update the lighting of a trigger (if the trigger has light).
+     *
+     * @param bindType The bind type
+     * @param channel The MIDI channel to use
+     * @param cc The trigger
+     * @param value The color / brightness depending on the controller
+     */
+    void setTrigger (BindType bindType, int channel, int cc, int value);
+
+
+    /**
      * Add a piano keyboard.
      *
      * @param numKeys The number of the keys, e.g. 25 or 88
@@ -527,15 +539,27 @@ public interface IControlSurface<C extends Configuration>
 
 
     /**
-     * Bind MIDI commands again to the grid.
+     * Unbind MIDI commands from all input controls.
      */
-    void rebindGrid ();
+    void unbindAllInputControls ();
+
+
+    /**
+     * Re-bind MIDI commands from all input controls.
+     */
+    void rebindAllInputControls ();
 
 
     /**
      * Unbind MIDI commands from the grid.
      */
     void unbindGrid ();
+
+
+    /**
+     * Bind MIDI commands again to the grid.
+     */
+    void rebindGrid ();
 
 
     /**

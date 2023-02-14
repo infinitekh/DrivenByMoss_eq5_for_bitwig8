@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.bitwig.framework.daw.data;
@@ -11,11 +11,11 @@ import de.mossgrabers.bitwig.framework.daw.data.bank.SlotBankImpl;
 import de.mossgrabers.framework.controller.valuechanger.IValueChanger;
 import de.mossgrabers.framework.daw.IHost;
 import de.mossgrabers.framework.daw.constants.RecordQuantization;
-import de.mossgrabers.framework.daw.data.IParameter;
 import de.mossgrabers.framework.daw.data.ITrack;
 import de.mossgrabers.framework.daw.data.bank.ISlotBank;
 import de.mossgrabers.framework.daw.resource.ChannelType;
 import de.mossgrabers.framework.observer.INoteObserver;
+import de.mossgrabers.framework.parameter.IParameter;
 
 import com.bitwig.extension.controller.api.BooleanValue;
 import com.bitwig.extension.controller.api.CursorTrack;
@@ -200,6 +200,14 @@ public class TrackImpl extends ChannelImpl implements ITrack
 
     /** {@inheritDoc} */
     @Override
+    public void setGroupExpanded (final boolean isExpanded)
+    {
+        this.track.isGroupExpanded ().set (isExpanded);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
     public void toggleGroupExpanded ()
     {
         this.track.isGroupExpanded ().toggle ();
@@ -376,18 +384,22 @@ public class TrackImpl extends ChannelImpl implements ITrack
 
     /** {@inheritDoc} */
     @Override
-    public void addEqualizerDevice ()
+    public boolean hasDrumDevice ()
     {
+<<<<<<< HEAD
         if (this.doesExist ())
             this.track.endOfDeviceChainInsertionPoint ().insertBitwigDevice (EqualizerDeviceImpl.ID_BITWIG_EQ_5);
+=======
+        return this.drumMachineDevice.exists ().get ();
+>>>>>>> superorigin/master
     }
 
 
     /** {@inheritDoc} */
     @Override
-    public boolean hasDrumDevice ()
+    public void launchLastClipImmediately ()
     {
-        return this.drumMachineDevice.exists ().get ();
+        this.track.launchLastClipWithOptions ("none", "continue_immediately");
     }
 
 

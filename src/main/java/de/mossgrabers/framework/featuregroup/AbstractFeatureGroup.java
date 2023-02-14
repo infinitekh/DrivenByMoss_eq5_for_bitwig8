@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.featuregroup;
@@ -40,7 +40,7 @@ public abstract class AbstractFeatureGroup<S extends IControlSurface<C>, C exten
     /**
      * Constructor.
      *
-     * @param name The name of the view
+     * @param name The name of the feature group
      * @param surface The surface
      * @param model The model
      */

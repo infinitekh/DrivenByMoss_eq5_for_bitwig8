@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.featuregroup;
@@ -42,6 +42,15 @@ public interface IMode extends IFeatureGroup
      * @return The value or -1
      */
     int getKnobValue (int index);
+
+
+    /**
+     * Get the color for a knob or fader, which is controlled by the mode.
+     *
+     * @param index The index of the knob
+     * @return A color index
+     */
+    int getKnobColor (int index);
 
 
     /**

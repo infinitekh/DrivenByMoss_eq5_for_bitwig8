@@ -1,12 +1,14 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.parameterprovider;
 
-import de.mossgrabers.framework.daw.data.IParameter;
+import de.mossgrabers.framework.controller.color.ColorEx;
 import de.mossgrabers.framework.observer.IParametersAdjustObserver;
+import de.mossgrabers.framework.parameter.IParameter;
 
+import java.util.Optional;
 import java.util.Set;
 
 
@@ -32,6 +34,15 @@ public interface IParameterProvider
      * @return The parameter
      */
     IParameter get (int index);
+
+
+    /**
+     * Get the color to use to represent the parameter, if supported by the parameter.
+     *
+     * @param index The index of the parameter
+     * @return The color if available
+     */
+    Optional<ColorEx> getColor (int index);
 
 
     /**

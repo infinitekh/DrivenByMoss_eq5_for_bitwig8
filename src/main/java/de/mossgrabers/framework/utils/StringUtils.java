@@ -1,10 +1,15 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.utils;
 
+import de.mossgrabers.framework.controller.color.ColorEx;
+
 import java.nio.ByteBuffer;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 
 /**
@@ -107,12 +112,10 @@ public class StringUtils
                     case 'ä':
                         str.append ("ae");
                         break;
-                    case 'Ö':
-                    case '\u0152':
+                    case 'Ö', '\u0152':
                         str.append ("Oe");
                         break;
-                    case 'ö':
-                    case '\u0153':
+                    case 'ö', '\u0153':
                         str.append ("oe");
                         break;
                     case 'Ü':
@@ -124,14 +127,39 @@ public class StringUtils
                     case 'ß':
                         str.append ("ss");
                         break;
-                    case 'é':
+                    case 'é', 'ê':
                         str.append ("e");
+                        break;
+                    case 'ī', 'ï':
+                        str.append ("i");
+                        break;
+                    case 'ā':
+                        str.append ("a");
                         break;
                     case '→':
                         str.append ("->");
                         break;
                     case '♯':
                         str.append ("#");
+                        break;
+                    case '\u2013':
+                        str.append ("-");
+                        break;
+                    case '¼':
+                        str.append ("1/4");
+                        break;
+                    case '⅕':
+                        str.append ("1/5");
+                        break;
+                    case '⅙':
+                        str.append ("1/6");
+                        break;
+                    case '’':
+                        str.append ("'");
+                        break;
+                    // superscript p
+                    case '\u1d3e':
+                        str.append ("p");
                         break;
                     default:
                         str.append ("?");
@@ -221,9 +249,26 @@ public class StringUtils
      */
     public static String toHexStr (final int [] data)
     {
+        return toHexStr (data, true);
+    }
+
+
+    /**
+     * Convert the bytes to a hex string.
+     *
+     * @param data The data to convert
+     * @param addSpace True to add a space character after each hex number
+     * @return The hex string
+     */
+    public static String toHexStr (final int [] data, final boolean addSpace)
+    {
         final StringBuilder sysex = new StringBuilder ();
         for (final int d: data)
-            sysex.append (toHexStr (d)).append (' ');
+        {
+            sysex.append (toHexStr (d));
+            if (addSpace)
+                sysex.append (' ');
+        }
         return sysex.toString ();
     }
 
@@ -309,6 +354,23 @@ public class StringUtils
 
 
     /**
+     * Interpret the content of an integer array as an ASCII text.
+     *
+     * @param start At which index to start to convert the ASCII text in the array
+     * @param length The number of integers to convert
+     * @param data The integer array
+     * @return The converted ASCII string
+     */
+    public static String integerArrayToString (final int start, final int length, final int [] data)
+    {
+        final StringBuilder sb = new StringBuilder (length);
+        for (int i = 0; i < length; i++)
+            sb.append ((char) data[start + i]);
+        return sb.toString ();
+    }
+
+
+    /**
      * Format a velocity percentage.
      *
      * @param noteVelocity The velocity in the range of 0..1.
@@ -316,7 +378,9 @@ public class StringUtils
      */
     public static String formatPercentage (final double noteVelocity)
     {
-        return String.format ("%.01f%%", Double.valueOf (noteVelocity * 100.0));
+        final DecimalFormat df = new DecimalFormat ("0", DecimalFormatSymbols.getInstance (Locale.ENGLISH));
+        df.setMaximumFractionDigits (1);
+        return df.format (Double.valueOf (noteVelocity * 100.0)) + "%";
     }
 
 
@@ -411,5 +475,17 @@ public class StringUtils
 
         final int millis = (int) ((time - ((hours * 60 + minutes) * 60 + seconds)) * 1000);
         return String.format (longFormat, Integer.valueOf (hours), Integer.valueOf (minutes), Integer.valueOf (seconds), Integer.valueOf (millis));
+    }
+
+
+    /**
+     * Format the color as a 3 byte hex number, e.g. FFFFFF.
+     *
+     * @param color THe color to format
+     * @return The formatted color
+     */
+    public static String formatColor (final ColorEx color)
+    {
+        return toHexStr (color.toIntRGB255 (), false);
     }
 }

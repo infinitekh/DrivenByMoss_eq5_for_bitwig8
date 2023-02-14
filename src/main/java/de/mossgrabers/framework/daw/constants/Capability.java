@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.daw.constants;
@@ -26,23 +26,6 @@ public enum Capability
     /** The API provides support for latching notes. */
     NOTE_REPEAT_LATCH,
 
-    /** The API provides support for editing a notes' mute state. */
-    NOTE_EDIT_MUTE,
-    /** The API provides support for editing note velocity spread. */
-    NOTE_EDIT_VELOCITY_SPREAD,
-    /** The API provides support for editing note release velocity. */
-    NOTE_EDIT_RELEASE_VELOCITY,
-    /** Supports editing of note expressions like gain, panorama, pitch, timbre and pressure. */
-    NOTE_EDIT_EXPRESSIONS,
-    /** Supports editing of note repeat options like count, curve, etc. */
-    NOTE_EDIT_REPEAT,
-    /** Supports editing of note chance. */
-    NOTE_EDIT_CHANCE,
-    /** Supports editing of note occurrence. */
-    NOTE_EDIT_OCCURRENCE,
-    /** Supports editing of note recurrence. */
-    NOTE_EDIT_RECCURRENCE,
-
     /** The API provides support quantizing the note lengths of MIDI input. */
     QUANTIZE_INPUT_NOTE_LENGTH,
     /** The API provides support quantizing notes by an amount percentage. */
@@ -59,6 +42,8 @@ public enum Capability
     HAS_CROSSFADER,
     /** If the DAW supports track/device pinning. */
     HAS_PINNING,
+    /** If plugins have a parameter page which can be toggled. */
+    HAS_PARAMETER_PAGE_SECTION,
     /** The host has a dedicated send bank. */
     HAS_EFFECT_BANK,
     /** The host supports browser preview. */

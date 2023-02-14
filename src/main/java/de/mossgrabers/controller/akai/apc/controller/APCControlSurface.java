@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.apc.controller;
@@ -127,7 +127,7 @@ public class APCControlSurface extends AbstractControlSurface<APCConfiguration>
      * @param configuration The configuration
      * @param output The MIDI output
      * @param input The MIDI input
-     * @param isMkII
+     * @param isMkII True if is mkII
      */
     public APCControlSurface (final IHost host, final ColorManager colorManager, final APCConfiguration configuration, final IMidiOutput output, final IMidiInput input, final boolean isMkII)
     {
@@ -150,14 +150,6 @@ public class APCControlSurface extends AbstractControlSurface<APCConfiguration>
     public boolean isMkII ()
     {
         return this.isMkII;
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public void setTrigger (final int channel, final int cc, final int state)
-    {
-        this.output.sendNoteEx (channel, cc, state);
     }
 
 

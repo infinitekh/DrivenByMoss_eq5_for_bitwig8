@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.arturia.beatstep.view;
@@ -57,8 +57,7 @@ public class TrackView extends AbstractView<BeatstepControlSurface, BeatstepConf
         switch (index)
         {
             // Send 5 - 6
-            case 12:
-            case 13:
+            case 12, 13:
                 if (!this.model.isEffectTrackBankActive ())
                     selectedTrack.get ().getSendBank ().getItem (index - 8).changeValue (value);
                 break;
@@ -87,65 +86,48 @@ public class TrackView extends AbstractView<BeatstepControlSurface, BeatstepConf
             return;
 
         final ITrackBank tb = this.model.getCurrentTrackBank ();
-
-        int track;
         final Optional<ITrack> selectedTrack = tb.getSelectedItem ();
-        int index;
-        switch (note - 36)
+        final int index = note - 36;
+        switch (index)
         {
-            // Toggle Activate
             case 0:
-
                 if (selectedTrack.isPresent ())
                     selectedTrack.get ().toggleIsActivated ();
                 break;
 
-            // Track left
             case 1:
-                index = selectedTrack.isEmpty () ? 0 : selectedTrack.get ().getIndex () - 1;
-                if (index == -1 || this.surface.isShiftPressed ())
-                    tb.selectPreviousPage ();
-                else
-                    this.selectTrack (index);
-                break;
-
-            // Track right
-            case 2:
-                index = selectedTrack.isEmpty () ? 0 : selectedTrack.get ().getIndex () + 1;
-                if (index == 8 || this.surface.isShiftPressed ())
-                    tb.selectNextPage ();
-                else
-                    this.selectTrack (index);
-                break;
-
-            // Move down
-            case 3:
                 if (selectedTrack.isPresent ())
-                    selectedTrack.get ().enter ();
+                    selectedTrack.get ().toggleRecArm ();
                 break;
 
-            // Move up
+            case 2:
+                if (selectedTrack.isPresent ())
+                    selectedTrack.get ().toggleGroupExpanded ();
+                break;
+
+            case 3:
+                this.model.getApplication ().addInstrumentTrack ();
+                break;
+
             case 4:
-                tb.selectParent ();
+                this.model.getApplication ().addAudioTrack ();
                 break;
 
-            // Unused
             case 5:
+                this.model.getApplication ().addEffectTrack ();
                 break;
 
-            // Track Page down
             case 6:
                 tb.selectPreviousPage ();
                 break;
 
-            // Track Page up
             case 7:
                 tb.selectNextPage ();
                 break;
 
+            // 8-15
             default:
-                track = note - 36 - 8;
-                this.selectTrack (track);
+                this.selectTrack (index - 8);
                 break;
         }
     }
@@ -161,12 +143,18 @@ public class TrackView extends AbstractView<BeatstepControlSurface, BeatstepConf
             padGrid.light (44 + i, tb.getItem (i).isSelected () ? BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE : BeatstepColorManager.BEATSTEP_BUTTON_STATE_OFF);
 
         final Optional<ITrack> sel = tb.getSelectedItem ();
-        padGrid.light (36, sel.isPresent () && sel.get ().isActivated () ? BeatstepColorManager.BEATSTEP_BUTTON_STATE_RED : BeatstepColorManager.BEATSTEP_BUTTON_STATE_OFF);
-        padGrid.light (37, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
-        padGrid.light (38, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
-        padGrid.light (39, BeatstepColorManager.BEATSTEP_BUTTON_STATE_RED);
-        padGrid.light (40, BeatstepColorManager.BEATSTEP_BUTTON_STATE_RED);
-        padGrid.light (41, BeatstepColorManager.BEATSTEP_BUTTON_STATE_OFF);
+        final boolean isPresent = sel.isPresent ();
+        padGrid.light (36, isPresent && sel.get ().isActivated () ? BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE : BeatstepColorManager.BEATSTEP_BUTTON_STATE_OFF);
+        padGrid.light (37, isPresent && sel.get ().isRecArm () ? BeatstepColorManager.BEATSTEP_BUTTON_STATE_RED : BeatstepColorManager.BEATSTEP_BUTTON_STATE_OFF);
+
+        int groupColor = BeatstepColorManager.BEATSTEP_BUTTON_STATE_OFF;
+        if (isPresent && sel.get ().isGroup ())
+            groupColor = sel.get ().isGroupExpanded () ? BeatstepColorManager.BEATSTEP_BUTTON_STATE_PINK : BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE;
+        padGrid.light (38, groupColor);
+
+        padGrid.light (39, BeatstepColorManager.BEATSTEP_BUTTON_STATE_PINK);
+        padGrid.light (40, BeatstepColorManager.BEATSTEP_BUTTON_STATE_PINK);
+        padGrid.light (41, BeatstepColorManager.BEATSTEP_BUTTON_STATE_PINK);
         padGrid.light (42, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
         padGrid.light (43, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
     }

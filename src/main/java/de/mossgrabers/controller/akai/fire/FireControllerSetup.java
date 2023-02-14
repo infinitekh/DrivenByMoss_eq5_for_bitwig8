@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.fire;
@@ -29,6 +29,7 @@ import de.mossgrabers.controller.akai.fire.mode.FireUserMode;
 import de.mossgrabers.controller.akai.fire.mode.NoteMode;
 import de.mossgrabers.controller.akai.fire.view.Drum4View;
 import de.mossgrabers.controller.akai.fire.view.DrumView64;
+import de.mossgrabers.controller.akai.fire.view.DrumXoXView;
 import de.mossgrabers.controller.akai.fire.view.IFireView;
 import de.mossgrabers.controller.akai.fire.view.MixView;
 import de.mossgrabers.controller.akai.fire.view.PianoView;
@@ -59,7 +60,6 @@ import de.mossgrabers.framework.daw.IHost;
 import de.mossgrabers.framework.daw.ITransport;
 import de.mossgrabers.framework.daw.ModelSetup;
 import de.mossgrabers.framework.daw.constants.DeviceID;
-import de.mossgrabers.framework.daw.data.ITrack;
 import de.mossgrabers.framework.daw.data.bank.ITrackBank;
 import de.mossgrabers.framework.daw.midi.IMidiAccess;
 import de.mossgrabers.framework.daw.midi.IMidiInput;
@@ -115,7 +115,6 @@ public class FireControllerSetup extends AbstractControllerSetup<FireControlSurf
     protected void createModel ()
     {
         final ModelSetup ms = new ModelSetup ();
-        ms.enableDrum64Device (true);
         ms.enableDevice (DeviceID.FIRST_INSTRUMENT);
         ms.setNumTracks (16);
         ms.setNumScenes (4);
@@ -127,6 +126,11 @@ public class FireControllerSetup extends AbstractControllerSetup<FireControlSurf
         ms.setNumFilterColumnEntries (3);
         ms.setNumResults (3);
         ms.setHasFullFlatTrackList (true);
+        ms.setAdditionalDrumDevices (new int []
+        {
+            64,
+            16
+        });
 
         this.model = this.factory.createModel (this.configuration, this.colorManager, this.valueChanger, this.scales, ms);
 
@@ -175,8 +179,17 @@ public class FireControllerSetup extends AbstractControllerSetup<FireControlSurf
         modeManager.register (Modes.VOLUME, new FireTrackMixerMode (surface, this.model));
         modeManager.register (Modes.DEVICE_PARAMS, new FireParameterMode (surface, this.model));
         modeManager.register (Modes.USER, new FireUserMode (surface, this.model));
-        modeManager.register (Modes.NOTE, new NoteMode (surface, this.model));
         modeManager.register (Modes.BROWSER, new BrowserMode (surface, this.model));
+
+        // Note mode needs the ALT button to exist
+        this.addButton (ButtonID.ALT, "ALT", (event, velocity) -> {
+
+            final IMode activeMode = modeManager.getActive ();
+            if (activeMode instanceof final IParametersAdjustObserver observer)
+                observer.parametersAdjusted ();
+
+        }, FireControlSurface.FIRE_ALT);
+        modeManager.register (Modes.NOTE, new NoteMode (surface, this.model));
     }
 
 
@@ -193,6 +206,7 @@ public class FireControllerSetup extends AbstractControllerSetup<FireControlSurf
         viewManager.register (Views.PLAY, new PlayView (surface, this.model));
         viewManager.register (Views.PIANO, new PianoView (surface, this.model));
 
+        viewManager.register (Views.DRUM, new DrumXoXView (surface, this.model));
         viewManager.register (Views.DRUM4, new Drum4View (surface, this.model));
         viewManager.register (Views.DRUM64, new DrumView64 (surface, this.model));
 
@@ -254,7 +268,7 @@ public class FireControllerSetup extends AbstractControllerSetup<FireControlSurf
             if (viewManager.isActive (Views.POLY_SEQUENCER))
                 return 2;
             return surface.isShiftPressed () && surface.getConfiguration ().isAccentActive () ? 1 : 0;
-        }, FireColorManager.BUTTON_STATE_ON2, FireColorManager.BUTTON_STATE_HI2, ColorManager.BUTTON_STATE_HI);
+        }, FireColorManager.BUTTON_STATE_ON2, FireColorManager.BUTTON_STATE_HI2, ColorManager.BUTTON_STATE_ON);
 
         this.addButton (ButtonID.NOTE, "NOTE", new PlaySelectCommand (this.model, surface), FireControlSurface.FIRE_NOTE, () -> {
             if (viewManager.isActive (Views.PLAY))
@@ -262,15 +276,17 @@ public class FireControllerSetup extends AbstractControllerSetup<FireControlSurf
             if (viewManager.isActive (Views.PIANO))
                 return 2;
             return 0;
-        }, FireColorManager.BUTTON_STATE_ON2, FireColorManager.BUTTON_STATE_HI2, ColorManager.BUTTON_STATE_HI);
+        }, FireColorManager.BUTTON_STATE_ON2, FireColorManager.BUTTON_STATE_HI2, ColorManager.BUTTON_STATE_ON);
 
         this.addButton (ButtonID.DRUM, "DRUM", new DrumSequencerSelectCommand (this.model, surface), FireControlSurface.FIRE_DRUM, () -> {
-            if (viewManager.isActive (Views.DRUM4))
+            if (viewManager.isActive (Views.DRUM))
                 return 1;
-            if (viewManager.isActive (Views.DRUM64))
+            if (viewManager.isActive (Views.DRUM4))
                 return 2;
-            return surface.isPressed (ButtonID.DRUM) ? 1 : 0;
-        }, FireColorManager.BUTTON_STATE_ON2, FireColorManager.BUTTON_STATE_HI2, ColorManager.BUTTON_STATE_HI);
+            if (viewManager.isActive (Views.DRUM64))
+                return 3;
+            return 0;
+        }, FireColorManager.BUTTON_STATE_ON2, FireColorManager.BUTTON_STATE_HI2, ColorManager.BUTTON_STATE_ON, ColorManager.BUTTON_STATE_HI);
 
         this.addButton (ButtonID.SESSION, "PERFORM", new SessionSelectCommand (this.model, surface), FireControlSurface.FIRE_PERFORM, () -> {
             if (viewManager.isActive (Views.SESSION))
@@ -278,16 +294,9 @@ public class FireControllerSetup extends AbstractControllerSetup<FireControlSurf
             if (viewManager.isActive (Views.MIX))
                 return 2;
             return 0;
-        }, FireColorManager.BUTTON_STATE_ON2, FireColorManager.BUTTON_STATE_HI2, ColorManager.BUTTON_STATE_HI);
+        }, FireColorManager.BUTTON_STATE_ON2, FireColorManager.BUTTON_STATE_HI2, ColorManager.BUTTON_STATE_ON);
 
         this.addButton (ButtonID.SHIFT, "SHIFT", new ToggleShiftViewCommand<> (this.model, surface), FireControlSurface.FIRE_SHIFT, () -> viewManager.isActive (Views.SHIFT) || surface.isShiftPressed () ? 1 : 0, FireColorManager.BUTTON_STATE_ON2, FireColorManager.BUTTON_STATE_HI2);
-        this.addButton (ButtonID.ALT, "ALT", (event, velocity) -> {
-
-            final IMode activeMode = modeManager.getActive ();
-            if (activeMode instanceof final IParametersAdjustObserver observer)
-                observer.parametersAdjusted ();
-
-        }, FireControlSurface.FIRE_ALT);
 
         this.addButton (ButtonID.SELECT, "SELECT", new FireSelectButtonCommand (this.model, surface), FireControlSurface.SELECT);
         this.addButton (ButtonID.BROWSE, "BROWSER", new FireBrowserCommand (this.model, surface), FireControlSurface.FIRE_BROWSER, () -> modeManager.isActive (Modes.BROWSER));
@@ -515,9 +524,8 @@ public class FireControllerSetup extends AbstractControllerSetup<FireControlSurf
     public void startup ()
     {
         final FireControlSurface surface = this.getSurface ();
-        surface.getViewManager ().setActive (Views.PLAY);
+        surface.getViewManager ().setActive (this.configuration.shouldStartWithSessionView () ? Views.SESSION : this.configuration.getPreferredNoteView ());
         surface.getModeManager ().setActive (Modes.TRACK);
-
         this.modeSelectCommand.activateMode (Modes.TRACK);
     }
 
@@ -536,39 +544,5 @@ public class FireControllerSetup extends AbstractControllerSetup<FireControlSurf
     private void onViewChange ()
     {
         this.getSurface ().getDisplay ().cancelNotification ();
-    }
-
-
-    /**
-     * Handle a track selection change.
-     *
-     * @param isSelected Has the track been selected?
-     */
-    private void handleTrackChange (final boolean isSelected)
-    {
-        if (!isSelected)
-            return;
-
-        final FireControlSurface surface = this.getSurface ();
-        final ViewManager viewManager = surface.getViewManager ();
-
-        // Recall last used view (if we are not in session mode)
-        if (!viewManager.isActive (Views.SESSION) && !viewManager.isActive (Views.MIX))
-        {
-            final ITrack cursorTrack = this.model.getCursorTrack ();
-            if (cursorTrack.doesExist ())
-            {
-                final Views preferredView = viewManager.getPreferredView (cursorTrack.getPosition ());
-                viewManager.setActive (preferredView == null ? Views.PLAY : preferredView);
-            }
-        }
-
-        if (viewManager.isActive (Views.PLAY))
-            viewManager.getActive ().updateNoteMapping ();
-
-        // Reset drum octave because the drum pad bank is also reset
-        this.scales.resetDrumOctave ();
-        if (viewManager.isActive (Views.DRUM4))
-            viewManager.get (Views.DRUM4).updateNoteMapping ();
     }
 }

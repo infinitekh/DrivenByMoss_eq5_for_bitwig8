@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.mackie.mcu.controller;
@@ -53,6 +53,8 @@ public class MCUDisplay extends AbstractTextDisplay
         this.isFirstDisplay = isFirst;
         this.hasMaster = hasMaster;
         this.isExtender = isMCUExtender;
+
+        this.centerNotification = false;
 
         for (int i = 0; i < this.executors.length; i++)
             this.executors[i] = new LatestTaskExecutor ();
@@ -147,7 +149,7 @@ public class MCUDisplay extends AbstractTextDisplay
         if (this.isShutdown)
             return;
 
-        this.notifyOnDisplay ("Please start " + this.host.getName () + " ...     ");
+        this.notifyOnDisplay ("Please  start " + this.host.getName () + " ...     ");
 
         // Prevent further sends
         this.isShutdown = true;

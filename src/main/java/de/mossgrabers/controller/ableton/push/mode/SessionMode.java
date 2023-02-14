@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ableton.push.mode;
@@ -53,13 +53,12 @@ public class SessionMode extends AbstractTrackMode
      *
      * @param surface The control surface
      * @param model The model
-     * @param sceneBank The scene bank to monitor
      */
-    public SessionMode (final PushControlSurface surface, final IModel model, final ISceneBank sceneBank)
+    public SessionMode (final PushControlSurface surface, final IModel model)
     {
         super ("Session", surface, model);
 
-        this.sceneBank = sceneBank;
+        this.sceneBank = model.getSceneBank (64);
 
         this.rowDisplayMode = this.isPush2 ? RowDisplayMode.ALL : RowDisplayMode.UPPER;
     }

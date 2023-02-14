@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.bitwig.framework.hardware;
@@ -11,8 +11,8 @@ import de.mossgrabers.framework.command.core.PitchbendCommand;
 import de.mossgrabers.framework.controller.hardware.AbstractHwContinuousControl;
 import de.mossgrabers.framework.controller.hardware.BindType;
 import de.mossgrabers.framework.controller.hardware.IHwAbsoluteControl;
-import de.mossgrabers.framework.daw.data.IParameter;
 import de.mossgrabers.framework.daw.midi.IMidiInput;
+import de.mossgrabers.framework.parameter.IParameter;
 
 import com.bitwig.extension.controller.api.AbsoluteHardwarControlBindable;
 import com.bitwig.extension.controller.api.AbsoluteHardwareControl;
@@ -37,6 +37,7 @@ public abstract class AbstractHwAbsoluteControl<T extends AbsoluteHardwareContro
     private final AbsoluteHardwarControlBindable defaultSimpleParameterAction;
     private AbsoluteHardwareControlBinding       binding;
     private IParameter                           parameter;
+    private int                                  control;
 
 
     /**
@@ -135,7 +136,30 @@ public abstract class AbstractHwAbsoluteControl<T extends AbsoluteHardwareContro
     @Override
     public void bind (final IMidiInput input, final BindType type, final int channel, final int control)
     {
+        this.input = input;
+        this.type = type;
+        this.channel = channel;
+        this.control = control;
+
         input.bind (this, type, channel, control);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public void unbind ()
+    {
+        if (this.input != null)
+            this.input.unbind (this);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public void rebind ()
+    {
+        if (this.input != null)
+            this.input.bind (this, this.type, this.channel, this.control);
     }
 
 

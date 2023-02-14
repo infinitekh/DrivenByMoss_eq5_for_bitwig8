@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.daw.data;
@@ -8,6 +8,7 @@ import de.mossgrabers.framework.controller.color.ColorEx;
 import de.mossgrabers.framework.daw.data.bank.ISendBank;
 import de.mossgrabers.framework.daw.resource.ChannelType;
 import de.mossgrabers.framework.observer.IValueObserver;
+import de.mossgrabers.framework.parameter.IParameter;
 
 
 /**
@@ -355,4 +356,10 @@ public interface IChannel extends IItem
      * @param metadata The metadata of the device to add
      */
     void addDevice (IDeviceMetadata metadata);
+
+
+    /**
+     * Add an equalizer device to this channels' device chain.
+     */
+    void addEqualizerDevice ();
 }

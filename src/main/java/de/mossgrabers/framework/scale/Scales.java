@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.scale;
@@ -27,7 +27,7 @@ public class Scales
     private static final int            DRUM_DEFAULT_OFFSET      = 16;
 
     /** The names of notes. */
-    private static final List<String>   NOTE_NAMES               = List.of ("C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B");
+    public static final List<String>    NOTE_NAMES               = List.of ("C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B");
 
     /** The names of the base notes. */
     public static final List<String>    BASES                    = List.of ("C", "G", "D", "A", "E", "B", "F", "Bb", "Eb", "Ab", "Db", "Gb");
@@ -258,7 +258,7 @@ public class Scales
      */
     public void prevScaleOffset ()
     {
-        this.setScaleOffset (this.scaleOffset - 1);
+        this.setScaleOffsetByIndex (this.scaleOffset - 1);
     }
 
 
@@ -267,16 +267,27 @@ public class Scales
      */
     public void nextScaleOffset ()
     {
-        this.setScaleOffset (this.scaleOffset + 1);
+        this.setScaleOffsetByIndex (this.scaleOffset + 1);
     }
 
 
     /**
-     * Get the base note (offset) to use for the current scale.
+     * Get the base note offset to use for the current scale.
      *
-     * @return The offset
+     * @return The index of the offset
      */
     public int getScaleOffset ()
+    {
+        return Scales.OFFSETS[this.scaleOffset];
+    }
+
+
+    /**
+     * Get the index of the base note (offset) to use for the current scale.
+     *
+     * @return The index of the offset
+     */
+    public int getScaleOffsetIndex ()
     {
         return this.scaleOffset;
     }
@@ -285,11 +296,11 @@ public class Scales
     /**
      * Set the base note (offset) to use for the current scale.
      *
-     * @param scaleOffset The offset
+     * @param scaleOffsetIndex The index of the offset
      */
-    public void setScaleOffset (final int scaleOffset)
+    public void setScaleOffsetByIndex (final int scaleOffsetIndex)
     {
-        this.scaleOffset = Math.max (0, Math.min (scaleOffset, Scales.OFFSETS.length - 1));
+        this.scaleOffset = Math.max (0, Math.min (scaleOffsetIndex, Scales.OFFSETS.length - 1));
     }
 
 
@@ -347,6 +358,14 @@ public class Scales
             case EIGHT_UP_CENTER:
             case EIGHT_RIGHT_CENTER:
                 this.setPlayShift (7, 12);
+                break;
+            case STAGGERED_UP:
+            case STAGGERED_RIGHT:
+                // Note, scaleShift is dynamically determined by ScaleGrid depending on scale. It
+                // isn't calculated
+                // here because scale could change without a subsequent layout change to refresh the
+                // computed value.
+                this.setPlayShift (0, 5);
                 break;
         }
     }
@@ -477,7 +496,7 @@ public class Scales
 
 
     /**
-     * Resetss the octave offset for the drum layout.
+     * Resets the octave offset for the drum layout.
      */
     public void resetDrumOctave ()
     {
@@ -689,7 +708,7 @@ public class Scales
      * @param midiNote The MIDI note to convert
      * @return The note in the octave
      */
-    private int toNoteInOctave (final int midiNote)
+    public int toNoteInOctave (final int midiNote)
     {
         // Add 12 to prevent negative values
         return (12 + midiNote - Scales.OFFSETS[this.scaleOffset]) % 12;
@@ -710,6 +729,35 @@ public class Scales
                 return true;
         }
         return false;
+    }
+
+
+    /**
+     * Get the MIDI note which is the closest in the active scale.
+     *
+     * @param midiNote The MIDI note (0-127)
+     * @return The closest MIDI note in the scale (0-127)
+     */
+    public int getNearestNoteInScale (final int midiNote)
+    {
+        final int noteInOctave = this.toNoteInOctave (midiNote);
+
+        int diff = 12;
+        int resultNoteInOctave = 0;
+        for (final int interval: this.selectedScale.getIntervals ())
+        {
+            final int newDiff = Math.abs (interval - noteInOctave);
+            if (Math.abs (interval - noteInOctave) < diff)
+            {
+                diff = newDiff;
+                resultNoteInOctave = interval;
+            }
+            if (diff == 0)
+                break;
+        }
+
+        final int octaves = midiNote / 12 * 12;
+        return octaves + (resultNoteInOctave + Scales.OFFSETS[this.scaleOffset]) % 12;
     }
 
 
@@ -988,7 +1036,7 @@ public class Scales
     public String getDrumRangeText ()
     {
         final int s = this.getDrumOffset ();
-        return Scales.formatDrumNote (s) + " to " + Scales.formatDrumNote (s + 15);
+        return "Offset: " + (s - this.drumNoteStart) + " (" + Scales.formatDrumNote (s) + ")";
     }
 
 

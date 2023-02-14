@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ableton.push.command.trigger;
@@ -67,6 +67,6 @@ public class PlayPositionKnobCommand extends PlayPositionCommand<PushControlSurf
 
     private void displayPosition ()
     {
-        this.surface.getDisplay ().notify (this.transport.getPositionText ());
+        this.surface.getDisplay ().notify (this.transport.getBeatText () + " - " + this.transport.getPositionText ());
     }
 }

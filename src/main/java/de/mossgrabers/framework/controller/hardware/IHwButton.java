@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.controller.hardware;
@@ -34,14 +34,6 @@ public interface IHwButton extends IHwInputControl
      * @param value The specific value of the control to bind to
      */
     void bind (IMidiInput input, BindType type, int channel, int control, int value);
-
-
-    /**
-     * Unbind the button from the given MIDI input.
-     *
-     * @param input The MIDI input from which to unbind
-     */
-    void unbind (IMidiInput input);
 
 
     /**

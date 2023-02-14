@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ableton.push.mode.device;
@@ -19,12 +19,12 @@ import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.constants.Capability;
 import de.mossgrabers.framework.daw.data.ICursorDevice;
 import de.mossgrabers.framework.daw.data.IDevice;
-import de.mossgrabers.framework.daw.data.IParameter;
 import de.mossgrabers.framework.daw.data.bank.IDeviceBank;
 import de.mossgrabers.framework.daw.data.bank.IParameterBank;
 import de.mossgrabers.framework.daw.data.bank.IParameterPageBank;
 import de.mossgrabers.framework.featuregroup.ModeManager;
 import de.mossgrabers.framework.mode.Modes;
+import de.mossgrabers.framework.parameter.IParameter;
 import de.mossgrabers.framework.parameterprovider.device.BankParameterProvider;
 import de.mossgrabers.framework.utils.ButtonEvent;
 import de.mossgrabers.framework.utils.StringUtils;
@@ -71,6 +71,8 @@ public class DeviceParamsMode extends BaseMode<IParameter>
 
         System.arraycopy (MENU, 0, this.hostMenu, 0, MENU.length);
         final IHost host = this.model.getHost ();
+        if (!host.supports (Capability.HAS_PARAMETER_PAGE_SECTION))
+            this.hostMenu[1] = "";
         if (!host.supports (Capability.HAS_PINNING))
             this.hostMenu[5] = "";
         if (!host.supports (Capability.HAS_SLOT_CHAINS))

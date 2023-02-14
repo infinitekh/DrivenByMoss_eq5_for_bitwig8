@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.novation.launchpad.view;
@@ -8,13 +8,13 @@ import de.mossgrabers.controller.novation.launchpad.LaunchpadConfiguration;
 import de.mossgrabers.controller.novation.launchpad.controller.LaunchpadColorManager;
 import de.mossgrabers.controller.novation.launchpad.controller.LaunchpadControlSurface;
 import de.mossgrabers.framework.controller.ButtonID;
-import de.mossgrabers.framework.controller.grid.IPadGrid;
 import de.mossgrabers.framework.daw.IModel;
-import de.mossgrabers.framework.daw.INoteClip;
+import de.mossgrabers.framework.daw.clip.INoteClip;
+import de.mossgrabers.framework.daw.clip.NotePosition;
 import de.mossgrabers.framework.daw.constants.Resolution;
 import de.mossgrabers.framework.daw.midi.INoteRepeat;
 import de.mossgrabers.framework.utils.ButtonEvent;
-import de.mossgrabers.framework.view.AbstractDrumView;
+import de.mossgrabers.framework.view.sequencer.AbstractDrumExView;
 
 
 /**
@@ -22,11 +22,9 @@ import de.mossgrabers.framework.view.AbstractDrumView;
  *
  * @author J&uuml;rgen Mo&szlig;graber
  */
-public class DrumView extends AbstractDrumView<LaunchpadControlSurface, LaunchpadConfiguration>
+public class DrumView extends AbstractDrumExView<LaunchpadControlSurface, LaunchpadConfiguration>
 {
-    private boolean extraButtonsOn     = false;
-    private boolean noteRepeatPeriodOn = false;
-    private boolean noteRepeatLengthOn = false;
+    private NotePosition noteEditPosition;
 
 
     /**
@@ -74,7 +72,7 @@ public class DrumView extends AbstractDrumView<LaunchpadControlSurface, Launchpa
 
         if (!this.isActive ())
             return LaunchpadColorManager.LAUNCHPAD_COLOR_BLACK;
-        return scene == 7 - this.selectedResolutionIndex ? LaunchpadColorManager.LAUNCHPAD_COLOR_YELLOW : LaunchpadColorManager.LAUNCHPAD_COLOR_GREEN;
+        return scene == 7 - this.getResolutionIndex () ? LaunchpadColorManager.LAUNCHPAD_COLOR_YELLOW : LaunchpadColorManager.LAUNCHPAD_COLOR_GREEN;
     }
 
 
@@ -108,94 +106,70 @@ public class DrumView extends AbstractDrumView<LaunchpadControlSurface, Launchpa
         if (pad == 15)
         {
             if (velocity > 0)
-                this.extraButtonsOn = !this.extraButtonsOn;
+                this.toggleExtraButtons ();
             return;
         }
 
-        if (!this.extraButtonsOn || pad < 8)
-        {
-            super.handleLoopArea (pad, velocity);
-            return;
-        }
-
-        if (velocity == 0)
-            return;
-
-        final LaunchpadConfiguration configuration = this.surface.getConfiguration ();
-
-        switch (pad)
-        {
-            case 12:
-                configuration.toggleNoteRepeatActive ();
-                break;
-            case 13:
-                this.noteRepeatPeriodOn = !this.noteRepeatPeriodOn;
-                if (this.noteRepeatPeriodOn)
-                    this.noteRepeatLengthOn = false;
-                break;
-            case 14:
-                this.noteRepeatLengthOn = !this.noteRepeatLengthOn;
-                if (this.noteRepeatLengthOn)
-                    this.noteRepeatPeriodOn = false;
-                break;
-            default:
-                // Not used
-                break;
-        }
+        super.handleLoopArea (pad, velocity);
     }
 
 
     /** {@inheritDoc} */
     @Override
-    protected void drawPages (final INoteClip clip, final boolean isActive)
+    public void onGridNoteLongPress (final int note)
     {
-        super.drawPages (clip, isActive);
+        if (!this.isActive ())
+            return;
 
-        // Draw the extra buttons
+        final int index = note - DRUM_START_KEY;
+        final int x = index % this.numColumns;
+        final int y = index / this.numColumns;
+        final int offsetY = this.scales.getDrumOffset ();
 
-        final IPadGrid padGrid = this.surface.getPadGrid ();
+        // Sequencer steps
+        if (y < this.playRows)
+            return;
 
-        if (this.extraButtonsOn)
+        // Remember the long pressed note to use it either for editing or for changing the length of
+        // the note on pad release
+        this.noteEditPosition = new NotePosition (this.configuration.getMidiEditChannel (), this.numColumns * (this.allRows - 1 - y) + x, offsetY + this.selectedPad);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    protected void handleSequencerArea (final int index, final int x, final int y, final int offsetY, final int velocity)
+    {
+        // Toggle the note on up, so we can intercept the long presses
+        if (velocity != 0)
         {
-            padGrid.lightEx (4, 6, this.isSelectTrigger () ? LaunchpadColorManager.LAUNCHPAD_COLOR_WHITE : LaunchpadColorManager.LAUNCHPAD_COLOR_GREY_LO);
-            padGrid.lightEx (5, 6, this.isMuteTrigger () ? LaunchpadColorManager.LAUNCHPAD_COLOR_YELLOW_HI : LaunchpadColorManager.LAUNCHPAD_COLOR_YELLOW_LO);
-            padGrid.lightEx (6, 6, this.isSoloTrigger () ? LaunchpadColorManager.LAUNCHPAD_COLOR_BLUE_HI : LaunchpadColorManager.LAUNCHPAD_COLOR_BLUE_LO);
-            padGrid.lightEx (7, 6, this.isBrowseTrigger () ? LaunchpadColorManager.LAUNCHPAD_COLOR_CYAN_HI : LaunchpadColorManager.LAUNCHPAD_COLOR_CYAN_LO);
-
-            final INoteRepeat noteRepeat = this.surface.getMidiInput ().getDefaultNoteInput ().getNoteRepeat ();
-
-            padGrid.lightEx (4, 7, noteRepeat.isActive () ? LaunchpadColorManager.LAUNCHPAD_COLOR_ORCHID_HI : LaunchpadColorManager.LAUNCHPAD_COLOR_ORCHID_LO);
-            padGrid.lightEx (5, 7, this.noteRepeatPeriodOn ? LaunchpadColorManager.LAUNCHPAD_COLOR_SKY_HI : LaunchpadColorManager.LAUNCHPAD_COLOR_SKY_LO);
-            padGrid.lightEx (6, 7, this.noteRepeatLengthOn ? LaunchpadColorManager.LAUNCHPAD_COLOR_PINK_HI : LaunchpadColorManager.LAUNCHPAD_COLOR_PINK_LO);
+            this.noteEditPosition = null;
+            return;
         }
 
-        padGrid.lightEx (7, 7, this.extraButtonsOn ? LaunchpadColorManager.LAUNCHPAD_COLOR_RED_HI : LaunchpadColorManager.LAUNCHPAD_COLOR_RED_LO);
+        // Note: If the length of the note was changed this method will not be called since button
+        // up was consumed! Therefore, always call edit note
+        if (this.noteEditPosition != null)
+            this.editNote (this.getClip (), this.noteEditPosition, false);
+        else
+            super.handleSequencerArea (index, x, y, offsetY, velocity);
     }
 
 
     /** {@inheritDoc} */
     @Override
-    protected int getNumberOfAvailablePages ()
-    {
-        // Remove the last 8 buttons so we can use it for something else if extra buttons are active
-        return super.getNumberOfAvailablePages () - (this.extraButtonsOn ? 8 : 1);
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    protected boolean handleSequencerAreaButtonCombinations (final INoteClip clip, final int channel, final int step, final int note, final int velocity)
+    protected boolean handleSequencerAreaButtonCombinations (final INoteClip clip, final NotePosition notePosition, final int velocity)
     {
         final boolean isUpPressed = this.surface.isPressed (ButtonID.UP);
         if (isUpPressed || this.surface.isPressed (ButtonID.DOWN))
         {
             this.surface.setTriggerConsumed (isUpPressed ? ButtonID.UP : ButtonID.DOWN);
             if (velocity > 0)
-                this.handleSequencerAreaRepeatOperator (clip, channel, step, note, velocity, isUpPressed);
+                this.handleSequencerAreaRepeatOperator (clip, notePosition, velocity, isUpPressed);
             return true;
         }
 
-        return super.handleSequencerAreaButtonCombinations (clip, channel, step, note, velocity);
+        return super.handleSequencerAreaButtonCombinations (clip, notePosition, velocity);
     }
 
 

@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.generic;
@@ -13,6 +13,7 @@ import de.mossgrabers.controller.generic.flexihandler.DeviceHandler;
 import de.mossgrabers.controller.generic.flexihandler.EqHandler;
 import de.mossgrabers.controller.generic.flexihandler.FxTrackHandler;
 import de.mossgrabers.controller.generic.flexihandler.GlobalHandler;
+import de.mossgrabers.controller.generic.flexihandler.LayerHandler;
 import de.mossgrabers.controller.generic.flexihandler.LayoutHandler;
 import de.mossgrabers.controller.generic.flexihandler.MarkerHandler;
 import de.mossgrabers.controller.generic.flexihandler.MasterHandler;
@@ -179,7 +180,7 @@ public class GenericFlexiControllerSetup extends AbstractControllerSetup<Generic
     protected void createModel ()
     {
         final ModelSetup ms = new ModelSetup ();
-        ms.enableDrumDevice (false);
+        ms.enableMainDrumDevice (false);
         ms.setNumMarkers (8);
         ms.enableDevice (DeviceID.EQ);
         this.model = this.factory.createModel (this.configuration, this.colorManager, this.valueChanger, this.scales, ms);
@@ -281,10 +282,8 @@ public class GenericFlexiControllerSetup extends AbstractControllerSetup<Generic
     {
         this.configuration.clearNoteMap ();
 
-        final GenericFlexiControlSurface surface = this.getSurface ();
-        surface.getModeManager ().setActive (Modes.TRACK);
-
         // Load last configuration
+        final GenericFlexiControlSurface surface = this.getSurface ();
         this.host.scheduleTask ( () -> this.host.println (surface.loadFile (this.configuration.getFilename ())), 2000);
     }
 
@@ -316,6 +315,7 @@ public class GenericFlexiControllerSetup extends AbstractControllerSetup<Generic
         surface.registerHandler (new FxTrackHandler (this.model, surface, this.configuration, this.absoluteLowResValueChanger, this.signedBitRelativeValueChanger, this.offsetBinaryRelativeValueChanger));
         surface.registerHandler (new MasterHandler (this.model, surface, this.configuration, this.absoluteLowResValueChanger, this.signedBitRelativeValueChanger, this.offsetBinaryRelativeValueChanger));
         surface.registerHandler (new DeviceHandler (this.model, surface, this.configuration, this.absoluteLowResValueChanger, this.signedBitRelativeValueChanger, this.offsetBinaryRelativeValueChanger));
+        surface.registerHandler (new LayerHandler (this.model, surface, this.configuration, this.absoluteLowResValueChanger, this.signedBitRelativeValueChanger, this.offsetBinaryRelativeValueChanger));
         surface.registerHandler (new EqHandler (this.model, surface, this.configuration, this.absoluteLowResValueChanger, this.signedBitRelativeValueChanger, this.offsetBinaryRelativeValueChanger));
         surface.registerHandler (new BrowserHandler (this.model, surface, this.configuration, this.absoluteLowResValueChanger, this.signedBitRelativeValueChanger, this.offsetBinaryRelativeValueChanger));
         surface.registerHandler (new SceneHandler (this.model, surface, this.configuration, this.absoluteLowResValueChanger, this.signedBitRelativeValueChanger, this.offsetBinaryRelativeValueChanger));
@@ -329,12 +329,8 @@ public class GenericFlexiControllerSetup extends AbstractControllerSetup<Generic
     }
 
 
-    /**
-     * Handle a track selection change.
-     *
-     * @param isSelected Has the track been selected?
-     */
-    private void handleTrackChange (final boolean isSelected)
+    @Override
+    protected void handleTrackChange (final boolean isSelected)
     {
         if (isSelected)
             this.update (null);
@@ -366,6 +362,8 @@ public class GenericFlexiControllerSetup extends AbstractControllerSetup<Generic
 
         if (this.configuration.isKeyboardRouteModulation ())
             filters.add ("B" + midiChannel + "01??");
+        if (this.configuration.isKeyboardRouteExpression ())
+            filters.add ("B" + midiChannel + "0B??");
         if (this.configuration.isKeyboardRouteSustain ())
             filters.add ("B" + midiChannel + "40??");
         if (this.configuration.isKeyboardRouteTimbre ())

@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.arturia.beatstep.controller;
@@ -117,13 +117,5 @@ public class BeatstepControlSurface extends AbstractControlSurface<BeatstepConfi
     public boolean isShiftPressed ()
     {
         return this.isShift;
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public void setTrigger (final int channel, final int cc, final int state)
-    {
-        this.output.sendCCEx (channel, cc, state);
     }
 }

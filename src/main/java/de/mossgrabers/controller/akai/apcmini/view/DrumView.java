@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.apcmini.view;
@@ -9,10 +9,10 @@ import de.mossgrabers.controller.akai.apcmini.controller.APCminiControlSurface;
 import de.mossgrabers.framework.controller.ButtonID;
 import de.mossgrabers.framework.controller.color.ColorManager;
 import de.mossgrabers.framework.daw.IModel;
-import de.mossgrabers.framework.daw.INoteClip;
+import de.mossgrabers.framework.daw.clip.INoteClip;
 import de.mossgrabers.framework.daw.data.IChannel;
 import de.mossgrabers.framework.utils.ButtonEvent;
-import de.mossgrabers.framework.view.AbstractDrumView;
+import de.mossgrabers.framework.view.sequencer.AbstractDrumView;
 
 
 /**
@@ -99,6 +99,6 @@ public class DrumView extends AbstractDrumView<APCminiControlSurface, APCminiCon
         final boolean isKeyboardEnabled = this.model.canSelectedTrackHoldNotes ();
         final int index = buttonID.ordinal () - ButtonID.SCENE1.ordinal ();
         final int res = 7 - index;
-        return isKeyboardEnabled && res == this.selectedResolutionIndex ? ColorManager.BUTTON_STATE_ON : ColorManager.BUTTON_STATE_OFF;
+        return isKeyboardEnabled && res == this.getResolutionIndex () ? ColorManager.BUTTON_STATE_ON : ColorManager.BUTTON_STATE_OFF;
     }
 }

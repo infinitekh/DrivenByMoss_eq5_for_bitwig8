@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ni.kontrol.mkii;
@@ -61,6 +61,7 @@ import de.mossgrabers.framework.view.Views;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import java.util.function.IntSupplier;
 
 
@@ -172,7 +173,7 @@ public class KontrolProtocolControllerSetup extends AbstractControllerSetup<Kont
     protected void createModel ()
     {
         final ModelSetup ms = new ModelSetup ();
-        ms.enableDrumDevice (false);
+        ms.enableMainDrumDevice (false);
         ms.enableDevice (DeviceID.NI_KOMPLETE);
         ms.setHasFullFlatTrackList (true);
         ms.setNumFilterColumnEntries (0);
@@ -230,9 +231,9 @@ public class KontrolProtocolControllerSetup extends AbstractControllerSetup<Kont
         this.addButton (ButtonID.PLAY, "Play", new PlayCommand<> (this.model, surface), 15, KontrolProtocolControlSurface.KONTROL_PLAY, t::isPlaying);
         this.addButton (ButtonID.NEW, "Shift+\nPlay", new NewCommand<> (this.model, surface), 15, KontrolProtocolControlSurface.KONTROL_RESTART);
         final ConfiguredRecordCommand<KontrolProtocolControlSurface, KontrolProtocolConfiguration> recordCommand = new ConfiguredRecordCommand<> (false, this.model, surface);
-        this.addButton (ButtonID.RECORD, "Record", recordCommand, 15, KontrolProtocolControlSurface.KONTROL_RECORD, recordCommand::isLit);
+        this.addButton (ButtonID.RECORD, "Record", recordCommand, 15, KontrolProtocolControlSurface.KONTROL_RECORD, (BooleanSupplier) recordCommand::isLit);
         final ConfiguredRecordCommand<KontrolProtocolControlSurface, KontrolProtocolConfiguration> shiftedRecordCommand = new ConfiguredRecordCommand<> (true, this.model, surface);
-        this.addButton (ButtonID.REC_ARM, "Shift+\nRecord", shiftedRecordCommand, 15, KontrolProtocolControlSurface.KONTROL_COUNT_IN, shiftedRecordCommand::isLit);
+        this.addButton (ButtonID.REC_ARM, "Shift+\nRecord", shiftedRecordCommand, 15, KontrolProtocolControlSurface.KONTROL_COUNT_IN, (BooleanSupplier) shiftedRecordCommand::isLit);
         this.addButton (ButtonID.STOP, "Stop", new StopCommand<> (this.model, surface), 15, KontrolProtocolControlSurface.KONTROL_STOP, () -> !t.isPlaying ());
 
         this.addButton (ButtonID.LOOP, "Loop", new ToggleLoopCommand<> (this.model, surface), 15, KontrolProtocolControlSurface.KONTROL_LOOP, t::isLoop);
@@ -321,7 +322,7 @@ public class KontrolProtocolControllerSetup extends AbstractControllerSetup<Kont
             knob1.setIndexInGroup (i);
 
             final int knobMidi2 = KontrolProtocolControlSurface.KONTROL_TRACK_PAN + i;
-            final IHwRelativeKnob knob2 = this.addRelativeKnob (ContinuousID.get (ContinuousID.FADER1, i), "Fader " + (i + 1), null, BindType.CC, 15, KontrolProtocolControlSurface.KONTROL_TRACK_PAN + i);
+            final IHwRelativeKnob knob2 = this.addRelativeKnob (ContinuousID.get (ContinuousID.FADER1, i), "Fader " + (i + 1), null, BindType.CC, 15, knobMidi2);
             knob2.addOutput ( () -> this.getKnobValue (knobMidi2), value -> surface.setTrigger (15, knobMidi2, value));
             knob2.setIndexInGroup (i);
         }

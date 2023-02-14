@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.gamepad.controller;
@@ -27,7 +27,6 @@ public class GamepadControllerInputThread implements Runnable
 {
     private static final long                    INTERVAL           = 1;
 
-    private Thread                               worker;
     private final AtomicBoolean                  running            = new AtomicBoolean (false);
 
     private final IHost                          host;
@@ -59,8 +58,7 @@ public class GamepadControllerInputThread implements Runnable
      */
     public void start ()
     {
-        this.worker = new Thread (this);
-        this.worker.start ();
+        new Thread (this).start ();
     }
 
 

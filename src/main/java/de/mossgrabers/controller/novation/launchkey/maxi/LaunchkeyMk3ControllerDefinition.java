@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.novation.launchkey.maxi;
@@ -19,7 +19,16 @@ import java.util.UUID;
  */
 public class LaunchkeyMk3ControllerDefinition extends DefaultControllerDefinition
 {
-    private static final UUID EXTENSION_ID = UUID.fromString ("10CB5692-541C-4A5D-9EB4-07D80F34A02C");
+    private static final UUID   EXTENSION_ID = UUID.fromString ("10CB5692-541C-4A5D-9EB4-07D80F34A02C");
+
+    private static final int [] KEY_SIZES    =
+    {
+        25,
+        37,
+        49,
+        61,
+        88
+    };
 
 
     /**
@@ -51,142 +60,56 @@ public class LaunchkeyMk3ControllerDefinition extends DefaultControllerDefinitio
                 break;
 
             case MAC:
-                midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (new String []
+                for (final int element: KEY_SIZES)
                 {
-                    "Launchkey MK3 25 LKMK3 DAW Out",
-                    "Launchkey MK3 25 LKMK3 MIDI Out"
-                }, new String []
-                {
-                    "Launchkey MK3 25 LKMK3 DAW In"
-                }));
-                midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (new String []
-                {
-                    "Launchkey MK3 37 LKMK3 DAW Out",
-                    "Launchkey MK3 37 LKMK3 MIDI Out"
-                }, new String []
-                {
-                    "Launchkey MK3 37 LKMK3 DAW In"
-                }));
-                midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (new String []
-                {
-                    "Launchkey MK3 49 LKMK3 DAW Out",
-                    "Launchkey MK3 49 LKMK3 MIDI Out"
-                }, new String []
-                {
-                    "Launchkey MK3 49 LKMK3 DAW In"
-                }));
-                midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (new String []
-                {
-                    "Launchkey MK3 61 LKMK3 DAW Out",
-                    "Launchkey MK3 61 LKMK3 MIDI Out"
-                }, new String []
-                {
-                    "Launchkey MK3 61 LKMK3 DAW In"
-                }));
+                    final String deviceName = "Launchkey MK3 " + element;
+                    midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (new String []
+                    {
+                        deviceName + " LKMK3 DAW Out",
+                        deviceName + " LKMK3 MIDI Out"
+                    }, new String []
+                    {
+                        deviceName + " LKMK3 DAW In"
+                    }));
+                }
                 break;
 
             case LINUX:
-                // Kernel 5.13+
-                midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (new String []
+                for (final int element: KEY_SIZES)
                 {
-                    "Launchkey MK3 25 LKMK3 DAW Out",
-                    "Launchkey MK3 25 LKMK3 MIDI Out"
-                }, new String []
-                {
-                    "Launchkey MK3 25 LKMK3 DAW In"
-                }));
-                midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (new String []
-                {
-                    "Launchkey MK3 37 LKMK3 DAW Out",
-                    "Launchkey MK3 37 LKMK3 MIDI Out"
-                }, new String []
-                {
-                    "Launchkey MK3 37 LKMK3 DAW In"
-                }));
-                midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (new String []
-                {
-                    "Launchkey MK3 49 LKMK3 DAW Out",
-                    "Launchkey MK3 49 LKMK3 MIDI Out"
-                }, new String []
-                {
-                    "Launchkey MK3 49 LKMK3 DAW In"
-                }));
-                midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (new String []
-                {
-                    "Launchkey MK3 61 LKMK3 DAW Out",
-                    "Launchkey MK3 61 LKMK3 MIDI Out"
-                }, new String []
-                {
-                    "Launchkey MK3 61 LKMK3 DAW In"
-                }));
+                    final String deviceName = "Launchkey MK3 " + element;
 
-                // Kernel prior 5.13
-                midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (new String []
-                {
-                    "Launchkey MK3 25 MIDI 2",
-                    "Launchkey MK3 25 MIDI 1"
-                }, new String []
-                {
-                    "Launchkey MK3 25 MIDI 2"
-                }));
-                midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (new String []
-                {
-                    "Launchkey MK3 37 MIDI 2",
-                    "Launchkey MK3 37 MIDI 1"
-                }, new String []
-                {
-                    "Launchkey MK3 37 MIDI 2"
-                }));
-                midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (new String []
-                {
-                    "Launchkey MK3 49 MIDI 2",
-                    "Launchkey MK3 49 MIDI 1"
-                }, new String []
-                {
-                    "Launchkey MK3 49 MIDI 2"
-                }));
-                midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (new String []
-                {
-                    "Launchkey MK3 61 MIDI 2",
-                    "Launchkey MK3 61 MIDI 1"
-                }, new String []
-                {
-                    "Launchkey MK3 61 MIDI 2"
-                }));
+                    // Kernel 5.13+
+                    midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (new String []
+                    {
+                        deviceName + " LKMK3 DAW Out",
+                        deviceName + " LKMK3 MIDI Out"
+                    }, new String []
+                    {
+                        deviceName + " LKMK3 DAW In"
+                    }));
 
-                // Reaper specific
-                midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (new String []
-                {
-                    "L25 [hw:1,0,1]",
-                    "L25 [hw:1,0,0]"
-                }, new String []
-                {
-                    "L25 [hw:1,0,1]"
-                }));
-                midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (new String []
-                {
-                    "L37 [hw:1,0,1]",
-                    "L37 [hw:1,0,0]"
-                }, new String []
-                {
-                    "L37 [hw:1,0,1]"
-                }));
-                midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (new String []
-                {
-                    "L49 [hw:1,0,1]",
-                    "L49 [hw:1,0,0]"
-                }, new String []
-                {
-                    "L49 [hw:1,0,1]"
-                }));
-                midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (new String []
-                {
-                    "L61 [hw:1,0,1]",
-                    "L61 [hw:1,0,0]"
-                }, new String []
-                {
-                    "L61 [hw:1,0,1]"
-                }));
+                    // Kernel prior 5.13
+                    midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (new String []
+                    {
+                        deviceName + " MIDI 2",
+                        deviceName + " MIDI 1"
+                    }, new String []
+                    {
+                        deviceName + " MIDI 2"
+                    }));
+
+                    // Reaper specific
+                    final String deviceID = "L" + element;
+                    midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (new String []
+                    {
+                        deviceID + " [hw:1,0,1]",
+                        deviceID + " [hw:1,0,0]"
+                    }, new String []
+                    {
+                        deviceID + " [hw:1,0,1]"
+                    }));
+                }
                 break;
         }
         return midiDiscoveryPairs;

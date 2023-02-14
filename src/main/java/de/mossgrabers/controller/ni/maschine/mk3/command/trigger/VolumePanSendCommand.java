@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ni.maschine.mk3.command.trigger;
@@ -12,6 +12,7 @@ import de.mossgrabers.framework.command.trigger.mode.ModeMultiSelectCommand;
 import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.featuregroup.ModeManager;
 import de.mossgrabers.framework.mode.Modes;
+import de.mossgrabers.framework.parameter.NoteAttribute;
 import de.mossgrabers.framework.utils.ButtonEvent;
 import de.mossgrabers.framework.view.Views;
 
@@ -47,8 +48,8 @@ public class VolumePanSendCommand extends ModeMultiSelectCommand<MaschineControl
             if (event == ButtonEvent.DOWN)
             {
                 final EditNoteMode mode = (EditNoteMode) modeManager.get (Modes.NOTE);
-                final boolean isVelocity = mode.getSelectedItem () == EditNoteMode.VELOCITY;
-                mode.selectItem (isVelocity ? EditNoteMode.GAIN : EditNoteMode.VELOCITY);
+                final boolean isVelocity = mode.getActiveParameter () == NoteAttribute.VELOCITY;
+                mode.selectActiveParameter (isVelocity ? NoteAttribute.GAIN : NoteAttribute.VELOCITY);
                 this.surface.getDisplay ().notify (isVelocity ? "Gain" : "Velocity");
             }
             return;

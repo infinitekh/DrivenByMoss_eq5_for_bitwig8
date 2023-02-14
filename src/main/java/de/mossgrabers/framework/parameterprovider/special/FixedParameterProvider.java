@@ -1,14 +1,17 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.parameterprovider.special;
 
-import de.mossgrabers.framework.daw.data.IParameter;
+import de.mossgrabers.framework.controller.color.ColorEx;
 import de.mossgrabers.framework.observer.IParametersAdjustObserver;
+import de.mossgrabers.framework.parameter.IParameter;
 import de.mossgrabers.framework.parameterprovider.IParameterProvider;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 
@@ -30,6 +33,17 @@ public class FixedParameterProvider implements IParameterProvider
     public FixedParameterProvider (final IParameter... parameters)
     {
         this.parameters = parameters;
+    }
+
+
+    /**
+     * Constructor.
+     *
+     * @param parameters The fixed parameters
+     */
+    public FixedParameterProvider (final List<IParameter> parameters)
+    {
+        this.parameters = parameters.toArray (new IParameter [parameters.size ()]);
     }
 
 
@@ -74,5 +88,13 @@ public class FixedParameterProvider implements IParameterProvider
     public Set<IParametersAdjustObserver> removeParametersObservers ()
     {
         return Collections.emptySet ();
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public Optional<ColorEx> getColor (final int index)
+    {
+        return Optional.empty ();
     }
 }

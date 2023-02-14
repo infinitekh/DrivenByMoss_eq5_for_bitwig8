@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.bitwig.framework.daw.data.bank;
@@ -58,7 +58,7 @@ public abstract class AbstractChannelBankImpl<B extends Bank<?>, T extends IChan
         final Optional<T> sel = this.getSelectedItem ();
         if (sel.isEmpty ())
             return DAWColor.COLOR_OFF.name ();
-        return DAWColor.getColorIndex (sel.get ().getColor ());
+        return DAWColor.getColorID (sel.get ().getColor ());
     }
 
 

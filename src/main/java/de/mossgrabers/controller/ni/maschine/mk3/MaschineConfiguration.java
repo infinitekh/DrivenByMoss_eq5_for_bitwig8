@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ni.maschine.mk3;
@@ -73,7 +73,7 @@ public class MaschineConfiguration extends AbstractConfiguration
 
         this.activateRecordButtonSetting (globalSettings);
         this.activateShiftedRecordButtonSetting (globalSettings);
-        this.activateBehaviourOnStopSetting (globalSettings);
+        this.activateBehaviourOnPauseSetting (globalSettings);
 
         ///////////////////////////
         // Play and Sequence

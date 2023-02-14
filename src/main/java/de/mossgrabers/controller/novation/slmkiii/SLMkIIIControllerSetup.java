@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.novation.slmkiii;
@@ -140,7 +140,7 @@ public class SLMkIIIControllerSetup extends AbstractControllerSetup<SLMkIIIContr
     {
         final IMidiAccess midiAccess = this.factory.createMidiAccess ();
         final IMidiOutput output = midiAccess.createOutput ();
-        final IMidiInput keyboardInput = midiAccess.createInput (1, "Keyboard", "8?????", "9?????", "B?????", "D?????", "E?????");
+        final IMidiInput keyboardInput = midiAccess.createInput (1, "Keyboard", "8?????", "9?????", "B?????", "C?????", "D?????", "E?????");
         final IHost hostProxy = this.model.getHost ();
         final IMidiInput input = midiAccess.createInput ("Pads", "8?????", "9?????");
         final SLMkIIILightGuide lightGuide = new SLMkIIILightGuide (this.model, this.colorManager, output);

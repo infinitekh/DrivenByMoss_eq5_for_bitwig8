@@ -1,21 +1,21 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.parameterprovider.device;
 
 import de.mossgrabers.framework.daw.data.IChannel;
-import de.mossgrabers.framework.daw.data.IParameter;
 import de.mossgrabers.framework.daw.data.ISpecificDevice;
 import de.mossgrabers.framework.daw.data.bank.ISendBank;
 import de.mossgrabers.framework.daw.data.empty.EmptyParameter;
+import de.mossgrabers.framework.parameter.IParameter;
 
 import java.util.Optional;
 
 
 /**
- * Get a number of parameters. This implementation provides all panorama parameters of the layers of
- * the current device.
+ * Get a number of parameters. This implementation provides send parameters of the layers of the
+ * current device.
  *
  * @author J&uuml;rgen Mo&szlig;graber
  */

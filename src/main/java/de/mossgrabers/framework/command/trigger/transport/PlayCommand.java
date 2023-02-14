@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.command.trigger.transport;
@@ -61,7 +61,7 @@ public class PlayCommand<S extends IControlSurface<C>, C extends Configuration> 
     protected void executeSingleClick ()
     {
         // Handle the different options when the playback is stopped
-        switch (this.surface.getConfiguration ().getBehaviourOnStop ())
+        switch (this.surface.getConfiguration ().getBehaviourOnPause ())
         {
             case RETURN_TO_ZERO:
                 if (this.transport.isPlaying ())
@@ -70,16 +70,16 @@ public class PlayCommand<S extends IControlSurface<C>, C extends Configuration> 
                     this.transport.play ();
                 break;
 
-            case MOVE_PLAY_CURSOR:
-                this.transport.play ();
-                this.doubleClickTest ();
-                break;
-
-            case PAUSE:
+            case STOP:
                 if (this.transport.isPlaying ())
                     this.transport.stop ();
                 else
                     this.transport.play ();
+                this.doubleClickTest ();
+                break;
+
+            case PAUSE:
+                this.transport.play ();
                 this.doubleClickTest ();
                 break;
         }

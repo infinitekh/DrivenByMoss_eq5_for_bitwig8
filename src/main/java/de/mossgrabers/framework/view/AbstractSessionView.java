@@ -132,35 +132,32 @@ public abstract class AbstractSessionView<S extends IControlSurface<C>, C extend
     @Override
     public void onGridNote (final int note, final int velocity)
     {
-        // Trigger on pad release to intercept long presses
-        if (velocity != 0)
-            return;
-
         final Pair<Integer, Integer> padPos = this.getPad (note);
         final ITrack track = this.model.getCurrentTrackBank ().getItem (padPos.getKey ().intValue ());
         final ISlot slot = track.getSlotBank ().getItem (padPos.getValue ().intValue ());
 
-        if (this.handleButtonCombinations (track, slot))
-            return;
-
-        if (this.surface.isSelectPressed ())
+        // Trigger on pad release to intercept long presses
+        if (velocity != 0)
         {
-            slot.select ();
-            if (slot.hasContent ())
-            {
-                final String slotName = slot.getName ();
-                if (!slotName.isBlank ())
-                    this.surface.getDisplay ().notify (slotName);
-            }
+            if (this.isButtonCombination (ButtonID.SELECT))
+                slot.launchImmediately ();
             return;
         }
+
+        if (this.handleButtonCombinations (track, slot))
+            return;
 
         if (this.doSelectClipOnLaunch ())
             slot.select ();
 
         if (!track.isRecArm () || slot.hasContent ())
         {
-            slot.launch ();
+            // Needs to be called here to always reset the state!
+            final boolean wasLaunchedImmediately = slot.testAndClearLaunchedImmediately ();
+            if (this.surface.isSelectPressed ())
+                track.launchLastClipImmediately ();
+            else if (!wasLaunchedImmediately)
+                slot.launch ();
             return;
         }
 
@@ -188,10 +185,19 @@ public abstract class AbstractSessionView<S extends IControlSurface<C>, C extend
     @Override
     public void onGridNoteLongPress (final int note)
     {
+        if (this.surface.isShiftPressed () || this.surface.isSelectPressed ())
+            return;
+
         final Pair<Integer, Integer> padPos = this.getPad (note);
         final ITrack track = this.model.getCurrentTrackBank ().getItem (padPos.getKey ().intValue ());
         final ISlot slot = track.getSlotBank ().getItem (padPos.getValue ().intValue ());
         slot.select ();
+        if (slot.hasContent ())
+        {
+            final String slotName = slot.getName ();
+            if (!slotName.isBlank ())
+                this.surface.getDisplay ().notify (slotName);
+        }
 
         final int index = note - 36;
         this.surface.getButton (ButtonID.get (ButtonID.PAD1, index)).setConsumed ();
@@ -432,31 +438,38 @@ public abstract class AbstractSessionView<S extends IControlSurface<C>, C extend
     }
 
 
-    protected LightInfo getPadColor (final ISlot slot, final boolean isArmed)
+    /**
+     * Get the pad color for a slot.
+     *
+     * @param slot The slot
+     * @param isArmed True if armed
+     * @return The light info
+     */
+    public LightInfo getPadColor (final ISlot slot, final boolean isArmed)
     {
-        final String colorIndex = DAWColor.getColorIndex (slot.getColor ());
+        final String colorID = DAWColor.getColorID (slot.getColor ());
         final ColorManager cm = this.model.getColorManager ();
 
         if (slot.isRecordingQueued ())
             return this.clipColorIsRecordingQueued;
 
         if (slot.isRecording ())
-            return this.insertClipColor (cm, colorIndex, this.clipColorIsRecording);
+            return this.insertClipColor (cm, colorID, this.clipColorIsRecording);
 
         if (slot.isPlayingQueued ())
-            return this.insertClipColor (cm, colorIndex, this.clipColorIsPlayingQueued);
+            return this.insertClipColor (cm, colorID, this.clipColorIsPlayingQueued);
 
         if (slot.isPlaying ())
-            return this.insertClipColor (cm, colorIndex, this.clipColorIsPlaying);
+            return this.insertClipColor (cm, colorID, this.clipColorIsPlaying);
 
         if (slot.hasContent ())
         {
             final int blinkColor = this.clipColorHasContent.getBlinkColor ();
-            final int color = this.useClipColor && colorIndex != null ? cm.getColorIndex (colorIndex) : this.clipColorHasContent.getColor ();
+            final int color = this.useClipColor && colorID != null ? cm.getColorIndex (colorID) : this.clipColorHasContent.getColor ();
             return new LightInfo (color, slot.isSelected () ? blinkColor : -1, this.clipColorHasContent.isFast ());
         }
 
-        return isArmed && this.surface.getConfiguration ().isDrawRecordStripe () ? this.clipColorIsRecArmed : this.clipColorHasNoContent;
+        return slot.doesExist () && isArmed && this.surface.getConfiguration ().isDrawRecordStripe () ? this.clipColorIsRecArmed : this.clipColorHasNoContent;
     }
 
 
@@ -475,17 +488,17 @@ public abstract class AbstractSessionView<S extends IControlSurface<C>, C extend
      * the clips' color.
      *
      * @param colorManager The color manager
-     * @param colorIndex The index of the clip color
+     * @param colorID The ID of the clip color
      * @param lightInfo The light info
      * @return THe updated light info
      */
-    private LightInfo insertClipColor (final ColorManager colorManager, final String colorIndex, final LightInfo lightInfo)
+    private LightInfo insertClipColor (final ColorManager colorManager, final String colorID, final LightInfo lightInfo)
     {
-        if (this.useClipColor && colorIndex != null)
+        if (this.useClipColor && colorID != null)
         {
             final int blinkColor = lightInfo.getBlinkColor ();
             if (blinkColor > 0)
-                return new LightInfo (colorManager.getColorIndex (colorIndex), blinkColor, lightInfo.isFast ());
+                return new LightInfo (colorManager.getColorIndex (colorID), blinkColor, lightInfo.isFast ());
         }
         return lightInfo;
     }

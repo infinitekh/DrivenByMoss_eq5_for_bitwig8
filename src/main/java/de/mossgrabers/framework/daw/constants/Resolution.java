@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.daw.constants;
@@ -88,7 +88,7 @@ public enum Resolution
     /**
      * Get the value of the resolution.
      *
-     * @param index The index of the resolution enum
+     * @param index The index of the resolution enumeration
      * @return The value
      */
     public static double getValueAt (final int index)
@@ -100,7 +100,7 @@ public enum Resolution
     /**
      * Get the name of the resolution.
      *
-     * @param index The index of the resolution enum
+     * @param index The index of the resolution enumeration
      * @return The name
      */
     public static String getNameAt (final int index)
@@ -138,7 +138,7 @@ public enum Resolution
      * Get the resolution which matches the given value (the difference is less than 0.001).
      *
      * @param value A resolution value
-     * @return The index
+     * @return The index (ordinal) of the resolution
      */
     public static int getMatch (final double value)
     {

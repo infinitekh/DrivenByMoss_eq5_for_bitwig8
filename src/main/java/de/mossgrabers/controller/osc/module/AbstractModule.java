@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.osc.module;
@@ -7,12 +7,12 @@ package de.mossgrabers.controller.osc.module;
 import de.mossgrabers.controller.osc.exception.IllegalParameterException;
 import de.mossgrabers.controller.osc.exception.MissingCommandException;
 import de.mossgrabers.framework.controller.color.ColorEx;
-import de.mossgrabers.framework.daw.IClip;
 import de.mossgrabers.framework.daw.IHost;
 import de.mossgrabers.framework.daw.IModel;
-import de.mossgrabers.framework.daw.data.IParameter;
+import de.mossgrabers.framework.daw.clip.IClip;
 import de.mossgrabers.framework.daw.data.ISend;
 import de.mossgrabers.framework.osc.IOpenSoundControlWriter;
+import de.mossgrabers.framework.parameter.IParameter;
 
 import java.util.LinkedList;
 import java.util.Optional;
@@ -40,6 +40,7 @@ public abstract class AbstractModule implements IModule
     protected static final String     TAG_INDICATE      = "indicate";
     protected static final String     TAG_TOUCHED       = "touched";
     protected static final String     TAG_COLOR         = "color";
+    protected static final String     TAG_BYPASS        = "bypass";
     protected static final String     TAG_PARAM         = "param";
     protected static final String     TAG_MIXER         = "mixer";
     protected static final String     TAG_PREROLL       = "preroll";
@@ -186,6 +187,7 @@ public abstract class AbstractModule implements IModule
     {
         final boolean isSend = fxParam instanceof ISend;
 
+        writer.sendOSC (fxAddress + TAG_EXISTS, fxParam.doesExist (), dump);
         writer.sendOSC (fxAddress + TAG_NAME, fxParam.getName (), dump);
         writer.sendOSC (fxAddress + (isSend ? "volumeStr" : "valueStr"), fxParam.getDisplayedValue (), dump);
         writer.sendOSC (fxAddress + (isSend ? TAG_VOLUME : "value"), fxParam.getValue (), dump);

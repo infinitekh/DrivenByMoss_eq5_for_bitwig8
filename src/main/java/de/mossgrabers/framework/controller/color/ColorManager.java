@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.controller.color;
@@ -12,7 +12,8 @@ import java.util.Map;
 
 
 /**
- * Manages color indices by IDs.
+ * Manages colors. Color indices can be identified by a text identifier. The second lookup handles
+ * the mapping from color indices to the real color values as ColorEx objects.
  *
  * @author J&uuml;rgen Mo&szlig;graber
  */
@@ -97,7 +98,7 @@ public class ColorManager
 
 
     /**
-     * Get the color index which is registered with the given key.
+     * Get the color which is registered at the given index.
      *
      * @param colorIndex The color index
      * @param buttonID The ID of the button in case button LEDs have a different color range

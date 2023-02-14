@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.mode;
@@ -97,6 +97,10 @@ public enum Modes
     DEVICE_LAYER_SEND8,
     /** Edit layer details. */
     DEVICE_LAYER_DETAILS,
+    /** Layer mute. */
+    DEVICE_LAYER_MUTE,
+    /** Layer solo. */
+    DEVICE_LAYER_SOLO,
 
     /** Browser mode. */
     BROWSER,
@@ -157,7 +161,11 @@ public enum Modes
     /** A mode that does nothing. */
     DUMMY,
     /** A mode to select options for adding a track. */
-    ADD_TRACK;
+    ADD_TRACK,
+    /** A drum sequencer mode. */
+    DRUM_SEQUENCER,
+    /** A note sequencer mode. */
+    NOTE_SEQUENCER;
 
 
     /** The name of the Track mode. */
@@ -166,6 +174,8 @@ public enum Modes
     public static final String      NAME_VOLUME         = "Volume";
     /** The name of the Panorama mode. */
     public static final String      NAME_PANORAMA       = "Panorama";
+    /** The name of the Sends mode. */
+    public static final String      NAME_SENDS          = "Sends";
     /** The name of the Crossfade mode. */
     public static final String      NAME_CROSSFADE      = "Crossfade";
     /** The name of the Parameters mode. */
@@ -178,10 +188,13 @@ public enum Modes
     public static final String      NAME_LAYER_PANORAMA = "Layer Panorama";
     /** The name of the Layer Sends mode. */
     public static final String      NAME_LAYER_SENDS    = "Layer Sends";
+    /** The name of the Equalizer mode. */
+    public static final String      NAME_EQUALIZER      = "Equalizer";
 
     private static final Set<Modes> TRACK_MODES         = EnumSet.range (Modes.TRACK, Modes.STOP_CLIP);
     private static final Set<Modes> LAYER_MODES         = EnumSet.range (Modes.DEVICE_LAYER, Modes.DEVICE_LAYER_DETAILS);
     private static final Set<Modes> SEND_MODES          = EnumSet.range (Modes.SEND1, Modes.SEND8);
+    private static final Set<Modes> LAYER_SEND_MODES    = EnumSet.range (Modes.DEVICE_LAYER_SEND1, Modes.DEVICE_LAYER_SEND8);
     private static final Set<Modes> MIX_MODES           = EnumSet.range (Modes.TRACK, Modes.SEND);
     private static final Set<Modes> MASTER_MODES        = EnumSet.of (Modes.MASTER, Modes.MASTER_TEMP, Modes.FRAME);
 
@@ -245,6 +258,18 @@ public enum Modes
     public static boolean isLayerMode (final Modes modeId)
     {
         return LAYER_MODES.contains (modeId);
+    }
+
+
+    /**
+     * Returns true if the given mode ID is one of the layer send modes.
+     *
+     * @param modeId The mode ID to test
+     * @return True if it is a layer send mode
+     */
+    public static boolean isLayerSendMode (final Modes modeId)
+    {
+        return LAYER_SEND_MODES.contains (modeId);
     }
 
 

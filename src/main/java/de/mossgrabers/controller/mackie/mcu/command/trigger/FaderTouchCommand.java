@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.mackie.mcu.command.trigger;
@@ -7,6 +7,7 @@ package de.mossgrabers.controller.mackie.mcu.command.trigger;
 import de.mossgrabers.controller.mackie.mcu.MCUConfiguration;
 import de.mossgrabers.controller.mackie.mcu.controller.MCUControlSurface;
 import de.mossgrabers.framework.daw.IModel;
+import de.mossgrabers.framework.daw.data.IItem;
 import de.mossgrabers.framework.featuregroup.ModeManager;
 import de.mossgrabers.framework.mode.Modes;
 import de.mossgrabers.framework.utils.ButtonEvent;
@@ -39,51 +40,61 @@ public class FaderTouchCommand extends SelectCommand
     @Override
     public void executeNormal (final ButtonEvent event)
     {
-        final MCUConfiguration configuration = this.surface.getConfiguration ();
-        if (event == ButtonEvent.LONG || configuration.useFadersAsKnobs ())
+        if (event == ButtonEvent.LONG)
             return;
 
+        final ModeManager modeManager = this.surface.getModeManager ();
+        final MCUConfiguration configuration = this.surface.getConfiguration ();
         final boolean isTouched = event == ButtonEvent.DOWN;
 
         // Master Channel
         if (this.index == 8)
         {
-            if (isTouched && configuration.isTouchChannel ())
+            if (isTouched && configuration.isTouchSelectsChannel ())
                 this.model.getMasterTrack ().select ();
+            modeManager.get (Modes.MASTER).onKnobTouch (0, isTouched);
             return;
         }
 
-        // Select channel
-        if (configuration.isTouchChannel () && event == ButtonEvent.DOWN)
-            this.getTrackBank ().getItem (this.channel).select ();
-
-        final ModeManager modeManager = this.surface.getModeManager ();
         if (configuration.useFadersAsKnobs ())
         {
             modeManager.getActive ().onKnobTouch (this.index, isTouched);
             return;
         }
-        modeManager.get (Modes.VOLUME).onKnobTouch (this.index, isTouched);
+
+        // Select channel or layer
+        final boolean isLayerMode = Modes.isLayerMode (modeManager.getActiveID ());
+        if (isTouched && configuration.isTouchSelectsChannel ())
+        {
+            final IItem item = isLayerMode ? this.model.getCursorDevice ().getLayerBank ().getItem (this.channel) : this.getTrackBank ().getItem (this.channel);
+            item.select ();
+        }
+
+        final Modes volumeMode = isLayerMode ? Modes.DEVICE_LAYER_VOLUME : Modes.VOLUME;
+        modeManager.get (volumeMode).onKnobTouch (this.index, isTouched);
 
         final int pos = this.surface.getSurfaceID () * 8 + this.index;
 
-        // Temporarily enable volume mode
-        if (isTouched)
+        // Temporarily enable (layer) volume mode
+        if (configuration.isTouchChannelVolumeMode ())
         {
-            if (!hasTouchedFader ())
+            if (isTouched)
             {
-                if (modeManager.isActive (Modes.VOLUME))
-                    modeManager.setPreviousID (Modes.VOLUME);
-                else
-                    modeManager.setActive (Modes.VOLUME);
+                if (!hasTouchedFader ())
+                {
+                    if (modeManager.isActive (volumeMode))
+                        modeManager.setPreviousID (volumeMode);
+                    else
+                        modeManager.setActive (volumeMode);
+                }
+                setTouchedFader (pos, true);
             }
-            setTouchedFader (pos, true);
-        }
-        else
-        {
-            setTouchedFader (pos, false);
-            if (!hasTouchedFader ())
-                modeManager.restore ();
+            else
+            {
+                setTouchedFader (pos, false);
+                if (!hasTouchedFader ())
+                    modeManager.restore ();
+            }
         }
     }
 

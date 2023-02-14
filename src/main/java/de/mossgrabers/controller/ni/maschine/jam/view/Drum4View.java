@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ni.maschine.jam.view;
@@ -11,9 +11,10 @@ import de.mossgrabers.controller.ni.maschine.jam.controller.MaschineJamControlSu
 import de.mossgrabers.framework.command.trigger.Direction;
 import de.mossgrabers.framework.controller.ButtonID;
 import de.mossgrabers.framework.daw.IModel;
-import de.mossgrabers.framework.daw.INoteClip;
+import de.mossgrabers.framework.daw.clip.INoteClip;
+import de.mossgrabers.framework.daw.clip.NotePosition;
 import de.mossgrabers.framework.utils.ButtonEvent;
-import de.mossgrabers.framework.view.AbstractDrum4View;
+import de.mossgrabers.framework.view.sequencer.AbstractDrum4View;
 
 
 /**
@@ -120,16 +121,16 @@ public class Drum4View extends AbstractDrum4View<MaschineJamControlSurface, Masc
 
     /** {@inheritDoc} */
     @Override
-    protected boolean handleNoteAreaButtonCombinations (final INoteClip clip, final int channel, final int step, final int row, final int note, final int velocity, final int accentVelocity)
+    protected boolean handleSequencerAreaButtonCombinations (final INoteClip clip, final NotePosition notePosition, final int row, final int velocity, final int accentVelocity)
     {
         final boolean isSelectPressed = this.surface.isSelectPressed ();
         if (isSelectPressed)
         {
             if (velocity > 0)
-                this.handleSequencerAreaRepeatOperator (clip, channel, step, note, velocity, isSelectPressed);
+                this.handleSequencerAreaRepeatOperator (clip, notePosition, velocity, isSelectPressed);
             return true;
         }
 
-        return super.handleNoteAreaButtonCombinations (clip, channel, step, row, note, velocity, accentVelocity);
+        return super.handleSequencerAreaButtonCombinations (clip, notePosition, row, velocity, accentVelocity);
     }
 }

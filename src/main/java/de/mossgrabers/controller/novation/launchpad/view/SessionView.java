@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.novation.launchpad.view;
@@ -178,7 +178,7 @@ public class SessionView extends AbstractSessionView<LaunchpadControlSurface, La
             final IScene s = sceneBank.getItem (index);
 
             if (s.doesExist ())
-                return DAWColor.getColorIndex (s.getColor ());
+                return DAWColor.getColorID (s.getColor ());
         }
 
         return AbstractFeatureGroup.BUTTON_COLOR_OFF;

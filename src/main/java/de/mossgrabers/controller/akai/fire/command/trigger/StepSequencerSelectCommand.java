@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.fire.command.trigger;
@@ -34,7 +34,7 @@ public class StepSequencerSelectCommand extends ViewMultiSelectCommand<FireContr
      */
     public StepSequencerSelectCommand (final IModel model, final FireControlSurface surface)
     {
-        super (model, surface, true, Views.SEQUENCER, Views.POLY_SEQUENCER);
+        super (model, surface, true, ButtonEvent.UP, Views.SEQUENCER, Views.POLY_SEQUENCER);
     }
 
 
@@ -42,37 +42,44 @@ public class StepSequencerSelectCommand extends ViewMultiSelectCommand<FireContr
     @Override
     public void executeNormal (final ButtonEvent event)
     {
+        if (event != ButtonEvent.UP)
+            return;
+
         final ModeManager modeManager = this.surface.getModeManager ();
 
         // Toggle note mode
         if (this.surface.isPressed (ButtonID.ALT))
         {
-            if (event == ButtonEvent.DOWN)
-            {
-                this.surface.setTriggerConsumed (ButtonID.ALT);
-                if (modeManager.isActive (Modes.NOTE))
-                    modeManager.restore ();
-                else
-                    modeManager.setActive (Modes.NOTE);
-                this.surface.getDisplay ().notify ("Edit Notes: " + (modeManager.isActive (Modes.NOTE) ? "On" : "Off"));
-                ((INoteMode) modeManager.get (Modes.NOTE)).clearNotes ();
-            }
+            if (modeManager.isActive (Modes.NOTE))
+                modeManager.restore ();
+            else
+                modeManager.setActive (Modes.NOTE);
+            this.surface.getDisplay ().notify ("Edit Notes: " + (modeManager.isActive (Modes.NOTE) ? "On" : "Off"));
+            ((INoteMode) modeManager.get (Modes.NOTE)).clearNotes ();
             return;
+        }
+
+        ((INoteMode) modeManager.get (Modes.NOTE)).clearNotes ();
+
+        final ITrack cursorTrack = this.model.getCursorTrack ();
+        final boolean doesExist = cursorTrack.doesExist ();
+        final int position = cursorTrack.getPosition ();
+
+        final ViewManager viewManager = this.surface.getViewManager ();
+        if (viewManager.isActive (Views.SESSION, Views.MIX) && doesExist)
+        {
+            final Views preferredView = viewManager.getPreferredView (position);
+            if (preferredView != null && this.viewIds.contains (preferredView))
+            {
+                viewManager.setActive (preferredView);
+                return;
+            }
         }
 
         super.executeNormal (event);
 
-        if (event == ButtonEvent.UP)
-        {
-            ((INoteMode) modeManager.get (Modes.NOTE)).clearNotes ();
-
-            final ITrack cursorTrack = this.model.getCursorTrack ();
-            if (cursorTrack.doesExist ())
-            {
-                final ViewManager viewManager = this.surface.getViewManager ();
-                viewManager.setPreferredView (cursorTrack.getPosition (), viewManager.getActiveID ());
-            }
-        }
+        if (doesExist)
+            viewManager.setPreferredView (position, viewManager.getActiveID ());
     }
 
 

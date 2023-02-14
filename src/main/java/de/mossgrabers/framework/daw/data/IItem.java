@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.daw.data;
@@ -57,9 +57,15 @@ public interface IItem extends IObserverManagement
 
 
     /**
-     * Select the item.
+     * Select the item. Removes the selection state from other items.
      */
     void select ();
+
+
+    /**
+     * Toggles the selection state of the item. Keeps selection state of other items.
+     */
+    void toggleMultiSelect ();
 
 
     /**

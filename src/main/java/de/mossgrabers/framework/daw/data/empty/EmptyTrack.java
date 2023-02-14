@@ -1,13 +1,13 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.daw.data.empty;
 
 import de.mossgrabers.framework.daw.constants.RecordQuantization;
-import de.mossgrabers.framework.daw.data.IParameter;
 import de.mossgrabers.framework.daw.data.ITrack;
 import de.mossgrabers.framework.daw.data.bank.ISlotBank;
+import de.mossgrabers.framework.parameter.IParameter;
 
 
 /**
@@ -51,6 +51,14 @@ public class EmptyTrack extends EmptyChannel implements ITrack
     public boolean isGroupExpanded ()
     {
         return false;
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public void setGroupExpanded (final boolean isExpanded)
+    {
+        // Intentionally empty
     }
 
 
@@ -232,16 +240,16 @@ public class EmptyTrack extends EmptyChannel implements ITrack
 
     /** {@inheritDoc} */
     @Override
-    public void addEqualizerDevice ()
+    public boolean hasDrumDevice ()
     {
-        // Intentionally empty
+        return false;
     }
 
 
     /** {@inheritDoc} */
     @Override
-    public boolean hasDrumDevice ()
+    public void launchLastClipImmediately ()
     {
-        return false;
+        // Intentionally empty
     }
 }

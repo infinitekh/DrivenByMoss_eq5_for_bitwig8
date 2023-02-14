@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.novation.launchpad.view;
@@ -118,7 +118,7 @@ public class SendsView extends AbstractFaderView
     public void setupFader (final int index)
     {
         final ITrack track = this.model.getCurrentTrackBank ().getItem (index);
-        final int color = this.colorManager.getColorIndex (DAWColor.getColorIndex (track.getColor ()));
+        final int color = this.colorManager.getColorIndex (DAWColor.getColorID (track.getColor ()));
         this.surface.setupFader (index, color, false);
 
         final ISend send = track.getSendBank ().getItem (this.selectedSend);

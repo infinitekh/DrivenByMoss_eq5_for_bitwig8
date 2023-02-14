@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.apc.command.trigger;
@@ -9,6 +9,7 @@ import de.mossgrabers.controller.akai.apc.controller.APCControlSurface;
 import de.mossgrabers.framework.command.trigger.Direction;
 import de.mossgrabers.framework.command.trigger.mode.CursorCommand;
 import de.mossgrabers.framework.daw.IModel;
+import de.mossgrabers.framework.featuregroup.IMode;
 import de.mossgrabers.framework.mode.Modes;
 import de.mossgrabers.framework.utils.ButtonEvent;
 
@@ -58,5 +59,37 @@ public class APCCursorCommand extends CursorCommand<APCControlSurface, APCConfig
             return;
         }
         super.scrollDown ();
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    protected void scrollLeft ()
+    {
+        if (this.surface.isShiftPressed ())
+        {
+            this.model.getMarkerBank ().selectPreviousItem ();
+            return;
+        }
+
+        final IMode activeMode = this.surface.getModeManager ().getActive ();
+        if (activeMode != null)
+            activeMode.selectPreviousItemPage ();
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    protected void scrollRight ()
+    {
+        if (this.surface.isShiftPressed ())
+        {
+            this.model.getMarkerBank ().selectNextItem ();
+            return;
+        }
+
+        final IMode activeMode = this.surface.getModeManager ().getActive ();
+        if (activeMode != null)
+            activeMode.selectNextItemPage ();
     }
 }

@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.fire.view;
@@ -8,15 +8,16 @@ import de.mossgrabers.controller.akai.fire.FireConfiguration;
 import de.mossgrabers.controller.akai.fire.controller.FireControlSurface;
 import de.mossgrabers.framework.controller.ButtonID;
 import de.mossgrabers.framework.daw.IModel;
-import de.mossgrabers.framework.daw.INoteClip;
-import de.mossgrabers.framework.daw.StepState;
+import de.mossgrabers.framework.daw.clip.INoteClip;
+import de.mossgrabers.framework.daw.clip.NotePosition;
+import de.mossgrabers.framework.daw.clip.StepState;
 import de.mossgrabers.framework.daw.data.ITrack;
 import de.mossgrabers.framework.featuregroup.ModeManager;
 import de.mossgrabers.framework.mode.Modes;
 import de.mossgrabers.framework.scale.Scales;
 import de.mossgrabers.framework.utils.ButtonEvent;
-import de.mossgrabers.framework.view.AbstractNoteSequencerView;
 import de.mossgrabers.framework.view.Views;
+import de.mossgrabers.framework.view.sequencer.AbstractNoteSequencerView;
 
 
 /**
@@ -52,12 +53,11 @@ public class SequencerView extends AbstractNoteSequencerView<FireControlSurface,
             {
                 // Store existing note for editing
                 final INoteClip clip = this.getClip ();
-                final int channel = this.configuration.getMidiEditChannel ();
                 final int mappedY = this.keyManager.map (y);
-
-                final StepState state = clip.getStep (channel, x, mappedY).getState ();
+                final NotePosition notePosition = new NotePosition (this.configuration.getMidiEditChannel (), x, mappedY);
+                final StepState state = clip.getStep (notePosition).getState ();
                 if (state == StepState.START)
-                    this.editNote (clip, channel, x, mappedY, true);
+                    this.editNote (clip, notePosition, true);
                 return;
             }
         }
@@ -179,7 +179,7 @@ public class SequencerView extends AbstractNoteSequencerView<FireControlSurface,
             if (isAltPressed)
             {
                 this.scales.prevScaleOffset ();
-                this.mvHelper.delayDisplay ( () -> Scales.BASES.get (this.scales.getScaleOffset ()));
+                this.mvHelper.delayDisplay ( () -> Scales.BASES.get (this.scales.getScaleOffsetIndex ()));
             }
             else
             {
@@ -190,7 +190,7 @@ public class SequencerView extends AbstractNoteSequencerView<FireControlSurface,
         }
         else if (isAltPressed)
         {
-            this.setResolutionIndex (this.selectedResolutionIndex - 1);
+            this.setResolutionIndex (this.getResolutionIndex () - 1);
         }
         else
         {
@@ -208,7 +208,7 @@ public class SequencerView extends AbstractNoteSequencerView<FireControlSurface,
             if (isAltPressed)
             {
                 this.scales.nextScaleOffset ();
-                this.mvHelper.delayDisplay ( () -> Scales.BASES.get (this.scales.getScaleOffset ()));
+                this.mvHelper.delayDisplay ( () -> Scales.BASES.get (this.scales.getScaleOffsetIndex ()));
             }
             else
             {
@@ -219,7 +219,7 @@ public class SequencerView extends AbstractNoteSequencerView<FireControlSurface,
         }
         else if (isAltPressed)
         {
-            this.setResolutionIndex (this.selectedResolutionIndex + 1);
+            this.setResolutionIndex (this.getResolutionIndex () + 1);
         }
         else
         {
@@ -232,17 +232,17 @@ public class SequencerView extends AbstractNoteSequencerView<FireControlSurface,
 
     /** {@inheritDoc} */
     @Override
-    protected boolean handleSequencerAreaButtonCombinations (final INoteClip clip, final int channel, final int step, final int row, final int note, final int velocity)
+    protected boolean handleSequencerAreaButtonCombinations (final INoteClip clip, final NotePosition notePosition, final int row, final int velocity)
     {
         final boolean isUpPressed = this.surface.isPressed (ButtonID.ARROW_UP);
         if (isUpPressed || this.surface.isPressed (ButtonID.ARROW_DOWN))
         {
             this.surface.setTriggerConsumed (isUpPressed ? ButtonID.ARROW_UP : ButtonID.ARROW_DOWN);
             if (velocity > 0)
-                this.handleSequencerAreaRepeatOperator (clip, channel, step, note, velocity, isUpPressed);
+                this.handleSequencerAreaRepeatOperator (clip, notePosition, velocity, isUpPressed);
             return true;
         }
 
-        return super.handleSequencerAreaButtonCombinations (clip, channel, step, row, note, velocity);
+        return super.handleSequencerAreaButtonCombinations (clip, notePosition, row, velocity);
     }
 }

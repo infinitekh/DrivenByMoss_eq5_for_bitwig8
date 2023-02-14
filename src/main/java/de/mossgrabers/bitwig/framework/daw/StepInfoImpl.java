@@ -1,12 +1,13 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.bitwig.framework.daw;
 
-import de.mossgrabers.framework.daw.DefaultStepInfo;
-import de.mossgrabers.framework.daw.NoteOccurrenceType;
-import de.mossgrabers.framework.daw.StepState;
+import de.mossgrabers.framework.daw.clip.DefaultStepInfo;
+import de.mossgrabers.framework.daw.clip.IStepInfo;
+import de.mossgrabers.framework.daw.clip.NoteOccurrenceType;
+import de.mossgrabers.framework.daw.clip.StepState;
 
 import com.bitwig.extension.controller.api.NoteOccurrence;
 import com.bitwig.extension.controller.api.NoteStep;
@@ -25,6 +26,17 @@ public class StepInfoImpl extends DefaultStepInfo
     public StepInfoImpl ()
     {
         // Intentionally empty
+    }
+
+
+    /**
+     * Copy constructor.
+     *
+     * @param sourceInfo The source step info
+     */
+    protected StepInfoImpl (final StepInfoImpl sourceInfo)
+    {
+        super (sourceInfo);
     }
 
 
@@ -74,5 +86,13 @@ public class StepInfoImpl extends DefaultStepInfo
         this.repeatCurve = stepInfo.repeatCurve ();
         this.repeatVelocityCurve = stepInfo.repeatVelocityCurve ();
         this.repeatVelocityEnd = stepInfo.repeatVelocityEnd ();
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public IStepInfo createCopy ()
+    {
+        return new StepInfoImpl (this);
     }
 }

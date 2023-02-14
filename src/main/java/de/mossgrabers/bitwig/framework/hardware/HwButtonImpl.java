@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.bitwig.framework.hardware;
@@ -23,6 +23,9 @@ import com.bitwig.extension.controller.api.HardwareButton;
 public class HwButtonImpl extends AbstractHwButton
 {
     private final HardwareButton hardwareButton;
+
+    private int                  control;
+    private int                  value;
 
 
     /**
@@ -57,15 +60,7 @@ public class HwButtonImpl extends AbstractHwButton
     @Override
     public void bind (final IMidiInput input, final BindType type, final int channel, final int control)
     {
-        input.bind (this, type, channel, control);
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public void unbind (final IMidiInput input)
-    {
-        input.unbind (this);
+        this.bind (input, type, channel, control, -1);
     }
 
 
@@ -73,7 +68,39 @@ public class HwButtonImpl extends AbstractHwButton
     @Override
     public void bind (final IMidiInput input, final BindType type, final int channel, final int control, final int value)
     {
-        input.bind (this, type, channel, control, value);
+        this.input = input;
+        this.type = type;
+        this.channel = channel;
+        this.control = control;
+        this.value = value;
+
+        if (this.value < 0)
+            input.bind (this, type, channel, control);
+        else
+            input.bind (this, type, channel, control, value);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public void unbind ()
+    {
+        if (this.input != null)
+            this.input.unbind (this);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public void rebind ()
+    {
+        if (this.input == null)
+            return;
+
+        if (this.value < 0)
+            this.input.bind (this, this.type, this.channel, this.control);
+        else
+            this.input.bind (this, this.type, this.channel, this.control, this.value);
     }
 
 

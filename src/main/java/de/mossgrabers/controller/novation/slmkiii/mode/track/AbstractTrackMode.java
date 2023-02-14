@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.novation.slmkiii.mode.track;
@@ -233,7 +233,7 @@ public abstract class AbstractTrackMode extends BaseMode<ITrack>
         {
             if (t.isSelected ())
             {
-                final String colorIndex = DAWColor.getColorIndex (t.getColor ());
+                final String colorIndex = DAWColor.getColorID (t.getColor ());
                 return this.model.getColorManager ().getColorIndex (colorIndex);
             }
             return SLMkIIIColorManager.SLMKIII_WHITE_HALF;
@@ -281,7 +281,7 @@ public abstract class AbstractTrackMode extends BaseMode<ITrack>
             int color;
             if (t.isActivated ())
             {
-                final String colorIndex = DAWColor.getColorIndex (t.getColor ());
+                final String colorIndex = DAWColor.getColorID (t.getColor ());
                 color = this.model.getColorManager ().getColorIndex (colorIndex);
             }
             else
@@ -348,7 +348,7 @@ public abstract class AbstractTrackMode extends BaseMode<ITrack>
         {
             if (track.isActivated ())
             {
-                final String colorIndex = DAWColor.getColorIndex (track.getColor ());
+                final String colorIndex = DAWColor.getColorID (track.getColor ());
                 color = this.model.getColorManager ().getColorIndex (colorIndex);
             }
             else

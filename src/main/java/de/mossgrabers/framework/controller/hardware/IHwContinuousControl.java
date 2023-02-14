@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.controller.hardware;
@@ -7,8 +7,8 @@ package de.mossgrabers.framework.controller.hardware;
 import de.mossgrabers.framework.command.core.ContinuousCommand;
 import de.mossgrabers.framework.command.core.PitchbendCommand;
 import de.mossgrabers.framework.command.core.TriggerCommand;
-import de.mossgrabers.framework.daw.data.IParameter;
 import de.mossgrabers.framework.daw.midi.IMidiInput;
+import de.mossgrabers.framework.parameter.IParameter;
 
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
@@ -120,6 +120,18 @@ public interface IHwContinuousControl extends IHwInputControl
      * @param consumer Send the value to the hardware
      */
     void addOutput (IntSupplier supplier, IntConsumer consumer);
+
+
+    /**
+     * Clear the output cache state.
+     */
+    void forceFlush ();
+
+
+    /**
+     * Switch off the output.
+     */
+    void turnOff ();
 
 
     /**

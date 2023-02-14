@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ni.kontrol.mki.mode;
@@ -13,7 +13,7 @@ import de.mossgrabers.framework.daw.data.IItem;
 import de.mossgrabers.framework.daw.data.ITrack;
 import de.mossgrabers.framework.daw.data.bank.IBank;
 import de.mossgrabers.framework.daw.data.bank.ITrackBank;
-import de.mossgrabers.framework.featuregroup.AbstractMode;
+import de.mossgrabers.framework.featuregroup.AbstractParameterMode;
 import de.mossgrabers.framework.parameterprovider.IParameterProvider;
 
 import java.util.Optional;
@@ -26,7 +26,7 @@ import java.util.Optional;
  *
  * @author J&uuml;rgen Mo&szlig;graber
  */
-public abstract class AbstractKontrol1Mode<B extends IItem> extends AbstractMode<Kontrol1ControlSurface, Kontrol1Configuration, B> implements IKontrol1Mode
+public abstract class AbstractKontrol1Mode<B extends IItem> extends AbstractParameterMode<Kontrol1ControlSurface, Kontrol1Configuration, B> implements IKontrol1Mode
 {
     /**
      * Constructor.

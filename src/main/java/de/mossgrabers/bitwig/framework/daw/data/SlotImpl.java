@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.bitwig.framework.daw.data;
@@ -23,6 +23,7 @@ public class SlotImpl extends AbstractItemImpl implements ISlot
 {
     private final ITrack           track;
     private final ClipLauncherSlot slot;
+    private boolean                isLaunchedImmediately = false;
 
 
     /**
@@ -203,7 +204,27 @@ public class SlotImpl extends AbstractItemImpl implements ISlot
     @Override
     public void launch ()
     {
+        this.isLaunchedImmediately = false;
         this.slot.launch ();
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public void launchImmediately ()
+    {
+        this.isLaunchedImmediately = true;
+        this.slot.launchWithOptions ("none", "continue_immediately");
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean testAndClearLaunchedImmediately ()
+    {
+        final boolean isImmediately = this.isLaunchedImmediately;
+        this.isLaunchedImmediately = false;
+        return isImmediately;
     }
 
 

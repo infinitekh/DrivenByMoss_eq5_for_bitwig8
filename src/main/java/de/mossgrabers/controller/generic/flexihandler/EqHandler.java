@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.generic.flexihandler;
@@ -15,8 +15,8 @@ import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.constants.DeviceID;
 import de.mossgrabers.framework.daw.data.EqualizerBandType;
 import de.mossgrabers.framework.daw.data.IEqualizerDevice;
-import de.mossgrabers.framework.daw.data.IParameter;
 import de.mossgrabers.framework.daw.data.ITrack;
+import de.mossgrabers.framework.parameter.IParameter;
 
 
 /**
@@ -103,7 +103,7 @@ public class EqHandler extends AbstractHandler
             case EQ_SET_TYPE_6:
             case EQ_SET_TYPE_7:
             case EQ_SET_TYPE_8:
-                return equalizer.getType (command.ordinal () - FlexiCommand.EQ_SET_TYPE_1.ordinal ()).getValue ();
+                return equalizer.getTypeParameter (command.ordinal () - FlexiCommand.EQ_SET_TYPE_1.ordinal ()).getValue ();
 
             case EQ_SET_FREQ_1:
             case EQ_SET_FREQ_2:
@@ -113,7 +113,7 @@ public class EqHandler extends AbstractHandler
             case EQ_SET_FREQ_6:
             case EQ_SET_FREQ_7:
             case EQ_SET_FREQ_8:
-                return equalizer.getFrequency (command.ordinal () - FlexiCommand.EQ_SET_FREQ_1.ordinal ()).getValue ();
+                return equalizer.getFrequencyParameter (command.ordinal () - FlexiCommand.EQ_SET_FREQ_1.ordinal ()).getValue ();
 
             case EQ_SET_GAIN_1:
             case EQ_SET_GAIN_2:
@@ -123,7 +123,7 @@ public class EqHandler extends AbstractHandler
             case EQ_SET_GAIN_6:
             case EQ_SET_GAIN_7:
             case EQ_SET_GAIN_8:
-                return equalizer.getGain (command.ordinal () - FlexiCommand.EQ_SET_GAIN_1.ordinal ()).getValue ();
+                return equalizer.getGainParameter (command.ordinal () - FlexiCommand.EQ_SET_GAIN_1.ordinal ()).getValue ();
 
             case EQ_SET_Q_1:
             case EQ_SET_Q_2:
@@ -133,7 +133,7 @@ public class EqHandler extends AbstractHandler
             case EQ_SET_Q_6:
             case EQ_SET_Q_7:
             case EQ_SET_Q_8:
-                return equalizer.getQ (command.ordinal () - FlexiCommand.EQ_SET_Q_1.ordinal ()).getValue ();
+                return equalizer.getQParameter (command.ordinal () - FlexiCommand.EQ_SET_Q_1.ordinal ()).getValue ();
 
             default:
                 return -1;
@@ -169,7 +169,7 @@ public class EqHandler extends AbstractHandler
             case EQ_SET_TYPE_7:
             case EQ_SET_TYPE_8:
                 final int bandIndex1 = command.ordinal () - FlexiCommand.EQ_SET_TYPE_1.ordinal ();
-                final IParameter type = equalizer.getType (bandIndex1);
+                final IParameter type = equalizer.getTypeParameter (bandIndex1);
                 this.handleParameter (knobMode, type, value);
                 return;
 
@@ -183,7 +183,7 @@ public class EqHandler extends AbstractHandler
             case EQ_SET_FREQ_8:
                 final int bandIndex2 = command.ordinal () - FlexiCommand.EQ_SET_FREQ_1.ordinal ();
                 ensureBandIsOn (equalizer, bandIndex2);
-                final IParameter frequency = equalizer.getFrequency (bandIndex2);
+                final IParameter frequency = equalizer.getFrequencyParameter (bandIndex2);
                 this.handleParameter (knobMode, frequency, value);
                 return;
 
@@ -197,7 +197,7 @@ public class EqHandler extends AbstractHandler
             case EQ_SET_GAIN_8:
                 final int bandIndex3 = command.ordinal () - FlexiCommand.EQ_SET_GAIN_1.ordinal ();
                 ensureBandIsOn (equalizer, bandIndex3);
-                final IParameter gain = equalizer.getGain (bandIndex3);
+                final IParameter gain = equalizer.getGainParameter (bandIndex3);
                 this.handleParameter (knobMode, gain, value);
                 return;
 
@@ -211,7 +211,7 @@ public class EqHandler extends AbstractHandler
             case EQ_SET_Q_8:
                 final int bandIndex4 = command.ordinal () - FlexiCommand.EQ_SET_Q_1.ordinal ();
                 ensureBandIsOn (equalizer, bandIndex4);
-                final IParameter q = equalizer.getQ (bandIndex4);
+                final IParameter q = equalizer.getQParameter (bandIndex4);
                 this.handleParameter (knobMode, q, value);
                 return;
 

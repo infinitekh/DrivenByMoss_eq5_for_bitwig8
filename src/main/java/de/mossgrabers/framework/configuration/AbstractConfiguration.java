@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.configuration;
@@ -24,13 +24,13 @@ import de.mossgrabers.framework.view.Views;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -41,141 +41,151 @@ import java.util.Set;
 public abstract class AbstractConfiguration implements Configuration
 {
     /** ID for scale setting. */
-    public static final Integer      SCALES_SCALE                      = Integer.valueOf (0);
+    public static final Integer      SCALES_SCALE                    = Integer.valueOf (0);
     /** ID for scale base note setting. */
-    public static final Integer      SCALES_BASE                       = Integer.valueOf (1);
+    public static final Integer      SCALES_BASE                     = Integer.valueOf (1);
     /** ID for scale in-key setting. */
-    public static final Integer      SCALES_IN_KEY                     = Integer.valueOf (2);
+    public static final Integer      SCALES_IN_KEY                   = Integer.valueOf (2);
     /** ID for scale layout setting. */
-    public static final Integer      SCALES_LAYOUT                     = Integer.valueOf (3);
+    public static final Integer      SCALES_LAYOUT                   = Integer.valueOf (3);
     /** ID for enabling VU meters setting. */
-    public static final Integer      ENABLE_VU_METERS                  = Integer.valueOf (4);
+    public static final Integer      ENABLE_VU_METERS                = Integer.valueOf (4);
     /** ID for behavior on stop setting. */
-    public static final Integer      BEHAVIOUR_ON_STOP                 = Integer.valueOf (5);
+    public static final Integer      BEHAVIOUR_ON_STOP               = Integer.valueOf (5);
+    /** ID for behavior on pause setting. */
+    public static final Integer      BEHAVIOUR_ON_PAUSE              = Integer.valueOf (6);
     /** ID for flipping the session grid setting. */
-    public static final Integer      FLIP_SESSION                      = Integer.valueOf (6);
+    public static final Integer      FLIP_SESSION                    = Integer.valueOf (7);
     /** ID for selecting the clip on launch setting. */
-    public static final Integer      SELECT_CLIP_ON_LAUNCH             = Integer.valueOf (7);
+    public static final Integer      SELECT_CLIP_ON_LAUNCH           = Integer.valueOf (8);
     /** ID for drawing record stripes setting. */
-    public static final Integer      DRAW_RECORD_STRIPE                = Integer.valueOf (8);
+    public static final Integer      DRAW_RECORD_STRIPE              = Integer.valueOf (9);
     /** ID for converting the aftertouch data setting. */
-    public static final Integer      CONVERT_AFTERTOUCH                = Integer.valueOf (9);
+    public static final Integer      CONVERT_AFTERTOUCH              = Integer.valueOf (10);
     /** ID for activating the fixed accent setting. */
-    public static final Integer      ACTIVATE_FIXED_ACCENT             = Integer.valueOf (10);
+    public static final Integer      ACTIVATE_FIXED_ACCENT           = Integer.valueOf (11);
     /** ID for the value of the fixed accent setting. */
-    public static final Integer      FIXED_ACCENT_VALUE                = Integer.valueOf (11);
+    public static final Integer      FIXED_ACCENT_VALUE              = Integer.valueOf (12);
     /** ID for the quantize amount setting. */
-    public static final Integer      QUANTIZE_AMOUNT                   = Integer.valueOf (12);
+    public static final Integer      QUANTIZE_AMOUNT                 = Integer.valueOf (13);
     /** ID for the flip recording setting. */
-    public static final Integer      FLIP_RECORD                       = Integer.valueOf (13);
-    /** Setting for automatic selecting the drum channel. */
-    public static final Integer      AUTO_SELECT_DRUM                  = Integer.valueOf (14);
+    public static final Integer      FLIP_RECORD                     = Integer.valueOf (14);
     /** Setting for new clip length. */
-    public static final Integer      NEW_CLIP_LENGTH                   = Integer.valueOf (15);
+    public static final Integer      NEW_CLIP_LENGTH                 = Integer.valueOf (15);
+    /** Setting for automatic selecting the drum channel. */
+    public static final Integer      AUTO_SELECT_DRUM                = Integer.valueOf (16);
     /** Setting for turning off empty drum pads (otherwise orange). */
-    public static final Integer      TURN_OFF_EMPTY_DRUM_PADS          = Integer.valueOf (16);
-    /** Setting for action for rec armed pad. */
-    public static final Integer      ACTION_FOR_REC_ARMED_PAD          = Integer.valueOf (17);
+    public static final Integer      TURN_OFF_EMPTY_DRUM_PADS        = Integer.valueOf (17);
+    /** Setting for sounding drum pads with or without Select combination. */
+    public static final Integer      SOUND_DRUM_PADS                 = Integer.valueOf (18);
+    /** Setting for action for record armed pad. */
+    public static final Integer      ACTION_FOR_REC_ARMED_PAD        = Integer.valueOf (19);
     /** Setting for displaying browser column 1. */
-    public static final Integer      BROWSER_DISPLAY_FILTER1           = Integer.valueOf (18);
+    public static final Integer      BROWSER_DISPLAY_FILTER1         = Integer.valueOf (20);
     /** Setting for displaying browser column 2. */
-    public static final Integer      BROWSER_DISPLAY_FILTER2           = Integer.valueOf (19);
+    public static final Integer      BROWSER_DISPLAY_FILTER2         = Integer.valueOf (21);
     /** Setting for displaying browser column 3. */
-    public static final Integer      BROWSER_DISPLAY_FILTER3           = Integer.valueOf (20);
+    public static final Integer      BROWSER_DISPLAY_FILTER3         = Integer.valueOf (22);
     /** Setting for displaying browser column 4. */
-    public static final Integer      BROWSER_DISPLAY_FILTER4           = Integer.valueOf (21);
+    public static final Integer      BROWSER_DISPLAY_FILTER4         = Integer.valueOf (23);
     /** Setting for displaying browser column 5. */
-    public static final Integer      BROWSER_DISPLAY_FILTER5           = Integer.valueOf (22);
+    public static final Integer      BROWSER_DISPLAY_FILTER5         = Integer.valueOf (24);
     /** Setting for displaying browser column 6. */
-    public static final Integer      BROWSER_DISPLAY_FILTER6           = Integer.valueOf (23);
+    public static final Integer      BROWSER_DISPLAY_FILTER6         = Integer.valueOf (25);
     /** Setting for displaying browser column 7. */
-    public static final Integer      BROWSER_DISPLAY_FILTER7           = Integer.valueOf (24);
+    public static final Integer      BROWSER_DISPLAY_FILTER7         = Integer.valueOf (26);
     /** Setting for displaying browser column 8. */
-    public static final Integer      BROWSER_DISPLAY_FILTER8           = Integer.valueOf (25);
+    public static final Integer      BROWSER_DISPLAY_FILTER8         = Integer.valueOf (27);
     /** The speed of a knob. */
-    public static final Integer      KNOB_SENSITIVITY_DEFAULT          = Integer.valueOf (26);
+    public static final Integer      KNOB_SENSITIVITY_DEFAULT        = Integer.valueOf (28);
     /** The speed of a knob in slow mode. */
-    public static final Integer      KNOB_SENSITIVITY_SLOW             = Integer.valueOf (27);
-    /** Turn noterepeat on/off. */
-    public static final Integer      NOTEREPEAT_ACTIVE                 = Integer.valueOf (28);
+    public static final Integer      KNOB_SENSITIVITY_SLOW           = Integer.valueOf (29);
+    /** Turn note repeat on/off. */
+    public static final Integer      NOTEREPEAT_ACTIVE               = Integer.valueOf (30);
     /** The note repeat period. */
-    public static final Integer      NOTEREPEAT_PERIOD                 = Integer.valueOf (29);
+    public static final Integer      NOTEREPEAT_PERIOD               = Integer.valueOf (31);
     /** The note repeat length. */
-    public static final Integer      NOTEREPEAT_LENGTH                 = Integer.valueOf (30);
+    public static final Integer      NOTEREPEAT_LENGTH               = Integer.valueOf (32);
     /** The note repeat mode. */
-    public static final Integer      NOTEREPEAT_MODE                   = Integer.valueOf (31);
+    public static final Integer      NOTEREPEAT_MODE                 = Integer.valueOf (33);
     /** The note repeat octave. */
-    public static final Integer      NOTEREPEAT_OCTAVE                 = Integer.valueOf (32);
+    public static final Integer      NOTEREPEAT_OCTAVE               = Integer.valueOf (34);
     /** The MIDI channel to use for editing sequencer notes. */
-    public static final Integer      MIDI_EDIT_CHANNEL                 = Integer.valueOf (33);
+    public static final Integer      MIDI_EDIT_CHANNEL               = Integer.valueOf (35);
     /** Setting for excluding deactivated tracks. */
-    public static final Integer      EXCLUDE_DEACTIVATED_ITEMS         = Integer.valueOf (34);
+    public static final Integer      EXCLUDE_DEACTIVATED_ITEMS       = Integer.valueOf (36);
     /** Setting for different record button functions. */
-    public static final Integer      RECORD_BUTTON_FUNCTION            = Integer.valueOf (35);
+    public static final Integer      RECORD_BUTTON_FUNCTION          = Integer.valueOf (37);
     /** Setting for different record button functions in combination with shift. */
-    public static final Integer      SHIFTED_RECORD_BUTTON_FUNCTION    = Integer.valueOf (36);
+    public static final Integer      SHIFTED_RECORD_BUTTON_FUNCTION  = Integer.valueOf (38);
     /** Show tracks hierarchical (instead of flat) if enabled. */
-    public static final Integer      HIERARCHICAL_TRACKS               = Integer.valueOf (37);
+    public static final Integer      HIERARCHICAL_TRACKS             = Integer.valueOf (39);
     /** Setting for the footswitch functionality. */
-    public static final Integer      FOOTSWITCH_1                      = Integer.valueOf (38);
+    public static final Integer      FOOTSWITCH_1                    = Integer.valueOf (40);
     /** Setting for the footswitch functionality. */
-    public static final Integer      FOOTSWITCH_2                      = Integer.valueOf (39);
+    public static final Integer      FOOTSWITCH_2                    = Integer.valueOf (41);
     /** Setting for the footswitch functionality. */
-    public static final Integer      FOOTSWITCH_3                      = Integer.valueOf (40);
+    public static final Integer      FOOTSWITCH_3                    = Integer.valueOf (42);
     /** Setting for the footswitch functionality. */
-    public static final Integer      FOOTSWITCH_4                      = Integer.valueOf (41);
+    public static final Integer      FOOTSWITCH_4                    = Integer.valueOf (43);
+    /** Preferred note view. */
+    public static final Integer      PREFERRED_NOTE_VIEW             = Integer.valueOf (44);
+    /** Start with session view if active. */
+    public static final Integer      START_WITH_SESSION_VIEW         = Integer.valueOf (45);
 
     // Implementation IDs start at 50
 
-    protected static final String    CATEGORY_DRUMS                    = "Drum Sequencer";
-    protected static final String    CATEGORY_SCALES                   = "Scales";
-    protected static final String    CATEGORY_SESSION                  = "Session";
-    protected static final String    CATEGORY_TRANSPORT                = "Transport";
-    protected static final String    CATEGORY_WORKFLOW                 = "Workflow";
-    protected static final String    CATEGORY_PADS                     = "Pads";
-    protected static final String    CATEGORY_PLAY_AND_SEQUENCE        = "Play and Sequence";
-    protected static final String    CATEGORY_HARDWARE_SETUP           = "Hardware Setup";
-    protected static final String    CATEGORY_DEBUG                    = "Debug";
-    protected static final String    CATEGORY_NOTEREPEAT               = "Note Repeat";
-    private static final String      CATEGORY_FAV_DEVICES              = "Add Track - favorite devices";
+    protected static final String    CATEGORY_DRUMS                  = "Drum Sequencer";
+    protected static final String    CATEGORY_SCALES                 = "Scales";
+    protected static final String    CATEGORY_SESSION                = "Session";
+    protected static final String    CATEGORY_TRANSPORT              = "Transport";
+    protected static final String    CATEGORY_WORKFLOW               = "Workflow";
+    protected static final String    CATEGORY_PADS                   = "Pads";
+    protected static final String    CATEGORY_PLAY_AND_SEQUENCE      = "Play and Sequence";
+    protected static final String    CATEGORY_HARDWARE_SETUP         = "Hardware Setup";
+    protected static final String    CATEGORY_DEBUG                  = "Debug";
+    protected static final String    CATEGORY_NOTEREPEAT             = "Note Repeat";
+    private static final String      CATEGORY_FAV_DEVICES            = "Add Track - favorite devices";
 
-    private static final String      SCALE_IN_KEY                      = "In Key";
-    private static final String      SCALE_CHROMATIC                   = "Chromatic";
+    private static final String      SCALE_IN_KEY                    = "In Key";
+    private static final String      SCALE_CHROMATIC                 = "Chromatic";
 
-    /** Use footswitch 2 for toggling play. */
-    public static final int          FOOTSWITCH_2_TOGGLE_PLAY          = 0;
-    /** Use footswitch 2 for toggling record. */
-    public static final int          FOOTSWITCH_2_TOGGLE_RECORD        = 1;
-    /** Use footswitch 2 for stopping all clips. */
-    public static final int          FOOTSWITCH_2_STOP_ALL_CLIPS       = 2;
-    /** Use footswitch 2 for toggling clip overdub. */
-    public static final int          FOOTSWITCH_2_TOGGLE_CLIP_OVERDUB  = 3;
-    /** Use footswitch 2 for undo. */
-    public static final int          FOOTSWITCH_2_UNDO                 = 4;
-    /** Use footswitch 2 for tapping tempo. */
-    public static final int          FOOTSWITCH_2_TAP_TEMPO            = 5;
-    /** Use footswitch 2 as the new button. */
-    public static final int          FOOTSWITCH_2_NEW_BUTTON           = 6;
-    /** Use footswitch 2 as clip based looper. */
-    public static final int          FOOTSWITCH_2_CLIP_BASED_LOOPER    = 7;
-    /** Use footswitch 2 to trigger the arrange layout. */
-    public static final int          FOOTSWITCH_2_PANEL_LAYOUT_ARRANGE = 8;
-    /** Use footswitch 2 to trigger the mix layout. */
-    public static final int          FOOTSWITCH_2_PANEL_LAYOUT_MIX     = 9;
-    /** Use footswitch 2 to trigger the edit layout. */
-    public static final int          FOOTSWITCH_2_PANEL_LAYOUT_EDIT    = 10;
-    /** Use footswitch 2 to add a new instrument track. */
-    public static final int          FOOTSWITCH_2_ADD_INSTRUMENT_TRACK = 11;
-    /** Use footswitch 2 to add a new audio track. */
-    public static final int          FOOTSWITCH_2_ADD_AUDIO_TRACK      = 12;
-    /** Use footswitch 2 to add a new effect track. */
-    public static final int          FOOTSWITCH_2_ADD_EFFECT_TRACK     = 13;
-    /** Use footswitch 2 to quantize the selected clip. */
-    public static final int          FOOTSWITCH_2_QUANTIZE             = 14;
+    /** Use footswitch for toggling play. */
+    public static final int          FOOTSWITCH_TOGGLE_PLAY          = 0;
+    /** Use footswitch for toggling record. */
+    public static final int          FOOTSWITCH_TOGGLE_RECORD        = 1;
+    /** Use footswitch for stopping all clips. */
+    public static final int          FOOTSWITCH_STOP_ALL_CLIPS       = 2;
+    /** Use footswitch for toggling clip overdub. */
+    public static final int          FOOTSWITCH_TOGGLE_CLIP_OVERDUB  = 3;
+    /** Use footswitch for undo. */
+    public static final int          FOOTSWITCH_UNDO                 = 4;
+    /** Use footswitch for tapping tempo. */
+    public static final int          FOOTSWITCH_TAP_TEMPO            = 5;
+    /** Use footswitch as the new button. */
+    public static final int          FOOTSWITCH_NEW_BUTTON           = 6;
+    /** Use footswitch as clip based looper. */
+    public static final int          FOOTSWITCH_CLIP_BASED_LOOPER    = 7;
+    /** Use footswitch to trigger the arrange layout. */
+    public static final int          FOOTSWITCH_PANEL_LAYOUT_ARRANGE = 8;
+    /** Use footswitch to trigger the mix layout. */
+    public static final int          FOOTSWITCH_PANEL_LAYOUT_MIX     = 9;
+    /** Use footswitch to trigger the edit layout. */
+    public static final int          FOOTSWITCH_PANEL_LAYOUT_EDIT    = 10;
+    /** Use footswitch to add a new instrument track. */
+    public static final int          FOOTSWITCH_ADD_INSTRUMENT_TRACK = 11;
+    /** Use footswitch to add a new audio track. */
+    public static final int          FOOTSWITCH_ADD_AUDIO_TRACK      = 12;
+    /** Use footswitch to add a new effect track. */
+    public static final int          FOOTSWITCH_ADD_EFFECT_TRACK     = 13;
+    /** Use footswitch to quantize the selected clip. */
+    public static final int          FOOTSWITCH_QUANTIZE             = 14;
+    /** Use footswitch as sustain pedal. */
+    public static final int          FOOTSWITCH_SUSTAIN_PEDAL        = 15;
     // Note: There are controllers who extend this list!
 
-    protected static final String [] OPTIONS_MIDI_CHANNEL              = new String [16];
-    protected static final String [] KNOB_SENSITIVITY                  = new String [201];
+    protected static final String [] OPTIONS_MIDI_CHANNEL            = new String [16];
+    protected static final String [] KNOB_SENSITIVITY                = new String [201];
     static
     {
         for (int i = 0; i < OPTIONS_MIDI_CHANNEL.length; i++)
@@ -203,16 +213,23 @@ public abstract class AbstractConfiguration implements Configuration
 
 
     /** The behavior when the stop button is pressed. */
-    public enum BehaviorOnStop
+    public enum TransportBehavior
     {
         /** Keep the play cursor at the current position on stop. */
-        MOVE_PLAY_CURSOR,
+        STOP,
         /** Move the cursor back to zero on stop. */
         RETURN_TO_ZERO,
         /** Only pause on stop. */
         PAUSE
     }
 
+
+    /** Aftertouch conversion is set to off. */
+    public static final int        AFTERTOUCH_CONVERT_OFF       = -3;
+    /** Aftertouch conversion is set to poly aftertouch. */
+    public static final int        AFTERTOUCH_CONVERT_POLY      = -2;
+    /** Aftertouch conversion is set to channel aftertouch. */
+    public static final int        AFTERTOUCH_CONVERT_CHANNEL   = -1;
 
     private static final String [] AFTERTOUCH_CONVERSION_VALUES = new String [131];
     static
@@ -237,9 +254,9 @@ public abstract class AbstractConfiguration implements Configuration
         "32 Bars"
     };
 
-    private static final String []   BEHAVIOUR_ON_STOP_VALUES    =
+    private static final String []   TRANSPORT_BEHAVIOUR_VALUES  =
     {
-        "Move play cursor",
+        "Stop",
         "Return to Zero",
         "Pause"
     };
@@ -267,7 +284,16 @@ public abstract class AbstractConfiguration implements Configuration
         "Add instrument track",
         "Add audio track",
         "Add effect track",
-        "Quantize"
+        "Quantize",
+        "Sustain Pedal"
+    };
+
+    private static final int []      FOOTSWITCH_DEFAULTS         =
+    {
+        15,
+        6,
+        4,
+        14
     };
 
     private static final String []   BROWSER_FILTER_COLUMN_NAMES =
@@ -308,10 +334,16 @@ public abstract class AbstractConfiguration implements Configuration
     {
         /** Record in arranger. */
         RECORD_ARRANGER,
+        /** Record in arranger and enable arranger automation writing. */
+        RECORD_ARRANGER_AND_ENABLE_AUTOMATION,
         /** Record in clip. */
         RECORD_CLIP,
+        /** Record in clip and enable clip automation writing. */
+        RECORD_CLIP_AND_ENABLE_AUTOMATION,
         /** Create a new clip, enable overdub and start playback. */
         NEW_CLIP,
+        /** ... and enable clip automation writing. */
+        NEW_CLIP_AND_ENABLE_AUTOMATION,
         /** Toggle arranger overdub. */
         TOGGLE_ARRANGER_OVERDUB,
         /** Toggle clip overdub. */
@@ -321,17 +353,20 @@ public abstract class AbstractConfiguration implements Configuration
     }
 
 
-    private static final String []                    RECORD_OPTIONS              =
+    private static final String []                    RECORD_OPTIONS                      =
     {
         "Record arranger",
+        "Record arranger + enable automation",
         "Record clip",
+        "Record clip + enable automation",
         "New clip",
+        "New clip + enable automation",
         "Toggle arranger overdub",
         "Toggle clip overdub",
         "Toggle rec arm",
     };
 
-    private static final int                          NUMBER_OF_FOOTSWITCHES      = 4;
+    private static final int                          NUMBER_OF_FOOTSWITCHES              = 4;
 
     protected final IHost                             host;
 
@@ -351,40 +386,41 @@ public abstract class AbstractConfiguration implements Configuration
     private IEnumSetting                              noteRepeatModeSetting;
     private IEnumSetting                              noteRepeatOctaveSetting;
     private IEnumSetting                              midiEditChannelSetting;
-    private final List<IEnumSetting>                  instrumentSettings          = new ArrayList<> (7);
-    private final List<IEnumSetting>                  audioSettings               = new ArrayList<> (3);
-    private final List<IEnumSetting>                  effectSettings              = new ArrayList<> (3);
+    private final List<IEnumSetting>                  instrumentSettings                  = new ArrayList<> (7);
+    private final List<IEnumSetting>                  audioSettings                       = new ArrayList<> (3);
+    private final List<IEnumSetting>                  effectSettings                      = new ArrayList<> (3);
 
     private String []                                 effectNames;
     private String []                                 instrumentNames;
 
-    private final Map<Integer, Set<ISettingObserver>> observers                   = new HashMap<> ();
-    protected final Set<Integer>                      dontNotifyAll               = new HashSet<> ();
-    protected final Set<Integer>                      isSettingActive             = new HashSet<> ();
+    private final Map<Integer, Set<ISettingObserver>> observers                           = new ConcurrentHashMap<> ();
+    protected final Set<Integer>                      dontNotifyAll                       = new HashSet<> ();
+    protected final Set<Integer>                      isSettingActive                     = new HashSet<> ();
     protected IValueChanger                           valueChanger;
 
-    private String                                    scale                       = "Major";
-    private String                                    scaleBase                   = "C";
-    private boolean                                   scaleInKey                  = true;
-    private String                                    scaleLayout                 = "4th ^";
-    private boolean                                   enableVUMeters              = false;
-    private BehaviorOnStop                            behaviorOnStop              = BehaviorOnStop.MOVE_PLAY_CURSOR;
-    protected boolean                                 flipSession                 = false;
-    protected boolean                                 selectClipOnLaunch          = true;
-    private boolean                                   drawRecordStripe            = true;
-    private int                                       convertAftertouch           = 0;
+    private String                                    scale                               = "Major";
+    private String                                    scaleBase                           = "C";
+    private boolean                                   scaleInKey                          = true;
+    private String                                    scaleLayout                         = "4th ^";
+    private boolean                                   enableVUMeters                      = false;
+    private TransportBehavior                         behaviorOnStop                      = TransportBehavior.STOP;
+    private TransportBehavior                         behaviorOnPause                     = TransportBehavior.PAUSE;
+    protected boolean                                 flipSession                         = false;
+    protected boolean                                 selectClipOnLaunch                  = true;
+    private boolean                                   drawRecordStripe                    = true;
+    private int                                       convertAftertouch                   = 0;
     /** Accent button active. */
-    private boolean                                   accentActive                = false;
+    private boolean                                   accentActive                        = false;
     /** Fixed velocity value for accent. */
-    private int                                       fixedAccentValue            = 127;
-    private int                                       quantizeAmount              = 100;
-    protected boolean                                 flipRecord                  = false;
-    private int                                       newClipLength               = 2;
-    private boolean                                   autoSelectDrum              = false;
-    private boolean                                   turnOffEmptyDrumPads        = false;
-    private int                                       actionForRecArmedPad        = 0;
-    private final int []                              footswitch                  = new int [NUMBER_OF_FOOTSWITCHES];
-    private final boolean []                          browserDisplayFilter        =
+    private int                                       fixedAccentValue                    = 127;
+    private int                                       quantizeAmount                      = 100;
+    protected boolean                                 flipRecord                          = false;
+    private int                                       newClipLength                       = 2;
+    private boolean                                   autoSelectDrum                      = false;
+    private boolean                                   turnOffEmptyDrumPads                = false;
+    private int                                       actionForRecArmedPad                = 0;
+    private final int []                              footswitch                          = new int [NUMBER_OF_FOOTSWITCHES];
+    private final boolean []                          browserDisplayFilter                =
     {
         true,
         true,
@@ -395,28 +431,32 @@ public abstract class AbstractConfiguration implements Configuration
         true,
         true
     };
-    private int                                       knobSpeedDefault            = 0;
-    private int                                       knobSpeedSlow               = -40;
+    private int                                       knobSpeedDefault                    = 0;
+    private int                                       knobSpeedSlow                       = -40;
 
-    private boolean                                   noteRepeatActive            = false;
-    private Resolution                                noteRepeatPeriod            = Resolution.RES_1_8;
-    private Resolution                                noteRepeatLength            = Resolution.RES_1_8;
+    private boolean                                   noteRepeatActive                    = false;
+    private Resolution                                noteRepeatPeriod                    = Resolution.RES_1_8;
+    private Resolution                                noteRepeatLength                    = Resolution.RES_1_8;
     private ArpeggiatorMode                           noteRepeatMode;
-    private int                                       noteRepeatOctave            = 0;
-    private int                                       midiEditChannel             = 0;
+    private int                                       noteRepeatOctave                    = 0;
+    private int                                       midiEditChannel                     = 0;
     private final List<ArpeggiatorMode>               arpeggiatorModes;
 
-    private boolean                                   includeMaster               = true;
-    private boolean                                   excludeDeactivatedItems     = false;
-    private boolean                                   isTrackNavigationFlat       = true;
+    private boolean                                   includeMaster                       = true;
+    private boolean                                   excludeDeactivatedItems             = false;
+    private boolean                                   isTrackNavigationFlat               = true;
 
-    private final String []                           userPageNames               = new String [8];
+    private final String []                           userPageNames                       = new String [8];
 
-    private boolean                                   isDeleteActive              = false;
-    private boolean                                   isDuplicateActive           = false;
+    private boolean                                   isDeleteActive                      = false;
+    private boolean                                   isDuplicateActive                   = false;
 
-    private RecordFunction                            recordButtonFunction        = RecordFunction.RECORD_ARRANGER;
-    private RecordFunction                            shiftedRecordButtonFunction = RecordFunction.NEW_CLIP;
+    private RecordFunction                            recordButtonFunction                = RecordFunction.RECORD_ARRANGER;
+    private RecordFunction                            shiftedRecordButtonFunction         = RecordFunction.NEW_CLIP;
+    private Views                                     preferredNoteView                   = Views.PLAY;
+    protected Views                                   preferredAudioView                  = Views.PLAY;
+    private boolean                                   startWithSessionView                = false;
+    private boolean                                   useCombinationButtonToSoundDrumPads = false;
 
 
     /**
@@ -437,7 +477,7 @@ public abstract class AbstractConfiguration implements Configuration
             this.userPageNames[i] = "Page " + (i + 1);
 
         for (int i = 0; i < this.footswitch.length; i++)
-            this.footswitch[i] = FOOTSWITCH_2_NEW_BUTTON;
+            this.footswitch[i] = FOOTSWITCH_NEW_BUTTON;
 
         Views.init ();
     }
@@ -631,9 +671,17 @@ public abstract class AbstractConfiguration implements Configuration
 
     /** {@inheritDoc} */
     @Override
-    public BehaviorOnStop getBehaviourOnStop ()
+    public TransportBehavior getBehaviourOnStop ()
     {
         return this.behaviorOnStop;
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public TransportBehavior getBehaviourOnPause ()
+    {
+        return this.behaviorOnPause;
     }
 
 
@@ -733,6 +781,14 @@ public abstract class AbstractConfiguration implements Configuration
     public boolean isTurnOffEmptyDrumPads ()
     {
         return this.turnOffEmptyDrumPads;
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isCombinationButtonToSoundDrumPads ()
+    {
+        return this.useCombinationButtonToSoundDrumPads;
     }
 
 
@@ -901,7 +957,7 @@ public abstract class AbstractConfiguration implements Configuration
     protected void activateScaleSetting (final ISettingsUI settingsUI)
     {
         final String [] scaleNames = Scale.getNames ();
-        this.scaleSetting = settingsUI.getEnumSetting ("Scale", CATEGORY_SCALES, scaleNames, scaleNames[0]);
+        this.scaleSetting = settingsUI.getEnumSetting ("Scale", CATEGORY_SCALES, scaleNames, Scale.MAJOR.getName ());
         this.scaleSetting.addValueObserver (value -> {
             this.scale = value;
             this.notifyObservers (SCALES_SCALE);
@@ -1015,13 +1071,30 @@ public abstract class AbstractConfiguration implements Configuration
      */
     protected void activateBehaviourOnStopSetting (final ISettingsUI settingsUI)
     {
-        final IEnumSetting behaviourOnStopSetting = settingsUI.getEnumSetting ("Behaviour on Stop", CATEGORY_TRANSPORT, BEHAVIOUR_ON_STOP_VALUES, BEHAVIOUR_ON_STOP_VALUES[0]);
+        final IEnumSetting behaviourOnStopSetting = settingsUI.getEnumSetting ("Behaviour on Stop", CATEGORY_TRANSPORT, TRANSPORT_BEHAVIOUR_VALUES, TRANSPORT_BEHAVIOUR_VALUES[0]);
         behaviourOnStopSetting.addValueObserver (value -> {
-            this.behaviorOnStop = BehaviorOnStop.values ()[lookupIndex (BEHAVIOUR_ON_STOP_VALUES, value)];
+            this.behaviorOnStop = TransportBehavior.values ()[lookupIndex (TRANSPORT_BEHAVIOUR_VALUES, value)];
             this.notifyObservers (BEHAVIOUR_ON_STOP);
         });
 
         this.isSettingActive.add (BEHAVIOUR_ON_STOP);
+    }
+
+
+    /**
+     * Activate the behavior on pause setting.
+     *
+     * @param settingsUI The settings
+     */
+    protected void activateBehaviourOnPauseSetting (final ISettingsUI settingsUI)
+    {
+        final IEnumSetting behaviourOnPauseSetting = settingsUI.getEnumSetting ("Behaviour on Pause", CATEGORY_TRANSPORT, TRANSPORT_BEHAVIOUR_VALUES, TRANSPORT_BEHAVIOUR_VALUES[2]);
+        behaviourOnPauseSetting.addValueObserver (value -> {
+            this.behaviorOnPause = TransportBehavior.values ()[lookupIndex (TRANSPORT_BEHAVIOUR_VALUES, value)];
+            this.notifyObservers (BEHAVIOUR_ON_PAUSE);
+        });
+
+        this.isSettingActive.add (BEHAVIOUR_ON_PAUSE);
     }
 
 
@@ -1049,7 +1122,7 @@ public abstract class AbstractConfiguration implements Configuration
      */
     protected void activateSelectClipOnLaunchSetting (final ISettingsUI settingsUI)
     {
-        final IEnumSetting selectClipOnLaunchSetting = settingsUI.getEnumSetting ("Select clip/scene on launch", CATEGORY_SESSION, ON_OFF_OPTIONS, ON_OFF_OPTIONS[0]);
+        final IEnumSetting selectClipOnLaunchSetting = settingsUI.getEnumSetting ("Select clip/scene on launch", CATEGORY_SESSION, ON_OFF_OPTIONS, ON_OFF_OPTIONS[1]);
         selectClipOnLaunchSetting.addValueObserver (value -> {
             this.selectClipOnLaunch = "On".equals (value);
             this.notifyObservers (SELECT_CLIP_ON_LAUNCH);
@@ -1293,6 +1366,23 @@ public abstract class AbstractConfiguration implements Configuration
 
 
     /**
+     * Activate the setting to sound drum pads with or without pressing Select button.
+     *
+     * @param settingsUI The settings
+     */
+    protected void activateUseCombinationButtonToSoundSetting (final ISettingsUI settingsUI)
+    {
+        final IEnumSetting useCombinationButtonToSoundSetting = settingsUI.getEnumSetting ("Use combination button to sound drum pads", CATEGORY_DRUMS, ON_OFF_OPTIONS, ON_OFF_OPTIONS[0]);
+        useCombinationButtonToSoundSetting.addValueObserver (value -> {
+            this.useCombinationButtonToSoundDrumPads = "On".equals (value);
+            this.notifyObservers (SOUND_DRUM_PADS);
+        });
+
+        this.isSettingActive.add (SOUND_DRUM_PADS);
+    }
+
+
+    /**
      * Activate a footswitch setting.
      *
      * @param settingsUI The settings
@@ -1303,7 +1393,7 @@ public abstract class AbstractConfiguration implements Configuration
     {
         final Integer id = Integer.valueOf (FOOTSWITCH_1.intValue () + index);
 
-        final IEnumSetting footswitchSetting = settingsUI.getEnumSetting (label, CATEGORY_WORKFLOW, FOOTSWITCH_VALUES, FOOTSWITCH_VALUES[6]);
+        final IEnumSetting footswitchSetting = settingsUI.getEnumSetting (label, CATEGORY_WORKFLOW, FOOTSWITCH_VALUES, FOOTSWITCH_VALUES[FOOTSWITCH_DEFAULTS[index]]);
         footswitchSetting.addValueObserver (value -> {
             this.footswitch[index] = lookupIndex (FOOTSWITCH_VALUES, value);
             this.notifyObservers (id);
@@ -1476,7 +1566,7 @@ public abstract class AbstractConfiguration implements Configuration
      */
     protected void activateShiftedRecordButtonSetting (final ISettingsUI settingsUI)
     {
-        final IEnumSetting shiftedRecordButtonSetting = settingsUI.getEnumSetting ("Shift + Record button", CATEGORY_TRANSPORT, RECORD_OPTIONS, RECORD_OPTIONS[0]);
+        final IEnumSetting shiftedRecordButtonSetting = settingsUI.getEnumSetting ("Shift + Record button", CATEGORY_TRANSPORT, RECORD_OPTIONS, RECORD_OPTIONS[5]);
         shiftedRecordButtonSetting.addValueObserver (value -> {
             for (int i = 0; i < RECORD_OPTIONS.length; i++)
             {
@@ -1518,6 +1608,45 @@ public abstract class AbstractConfiguration implements Configuration
             final IEnumSetting favSetting = settingsUI.getEnumSetting ("Effect " + (i + 1), CATEGORY_FAV_DEVICES, this.effectNames, this.effectNames[Math.min (this.effectNames.length - 1, i)]);
             this.effectSettings.add (favSetting);
         }
+    }
+
+
+    /**
+     * Activate the preferred note view setting.
+     *
+     * @param settingsUI The settings
+     * @param views The available views for selection
+     */
+    protected void activatePreferredNoteViewSetting (final ISettingsUI settingsUI, final Views [] views)
+    {
+        final String [] labels = new String [views.length];
+        for (int i = 0; i < views.length; i++)
+            labels[i] = Views.getViewName (views[i]);
+
+        final IEnumSetting preferredNoteViewSetting = settingsUI.getEnumSetting ("Default note view", CATEGORY_PLAY_AND_SEQUENCE, labels, labels[0]);
+        preferredNoteViewSetting.addValueObserver (value -> {
+            this.preferredNoteView = Views.getViewByName (value);
+            this.notifyObservers (PREFERRED_NOTE_VIEW);
+        });
+
+        this.isSettingActive.add (PREFERRED_NOTE_VIEW);
+    }
+
+
+    /**
+     * Activate the start with session view setting.
+     *
+     * @param settingsUI The settings
+     */
+    protected void activateStartWithSessionViewSetting (final ISettingsUI settingsUI)
+    {
+        final IEnumSetting startWithSessionViewSetting = settingsUI.getEnumSetting ("Start with session view", CATEGORY_PLAY_AND_SEQUENCE, ON_OFF_OPTIONS, ON_OFF_OPTIONS[0]);
+        startWithSessionViewSetting.addValueObserver (value -> {
+            this.startWithSessionView = "On".equals (value);
+            this.notifyObservers (START_WITH_SESSION_VIEW);
+        });
+
+        this.isSettingActive.add (START_WITH_SESSION_VIEW);
     }
 
 
@@ -1666,6 +1795,30 @@ public abstract class AbstractConfiguration implements Configuration
     public RecordFunction getShiftedRecordButtonFunction ()
     {
         return this.shiftedRecordButtonFunction;
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public Views getPreferredNoteView ()
+    {
+        return this.preferredNoteView;
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public Views getPreferredAudioView ()
+    {
+        return this.preferredAudioView;
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean shouldStartWithSessionView ()
+    {
+        return this.startWithSessionView;
     }
 
 

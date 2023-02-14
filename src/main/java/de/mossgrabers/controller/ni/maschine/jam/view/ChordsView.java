@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ni.maschine.jam.view;
@@ -59,7 +59,7 @@ public class ChordsView extends AbstractChordView<MaschineJamControlSurface, Mas
                     this.scales.nextScaleOffset ();
                 else
                     this.scales.prevScaleOffset ();
-                this.mvHelper.delayDisplay ( () -> "Scale Offset: " + Scales.BASES.get (this.scales.getScaleOffset ()));
+                this.mvHelper.delayDisplay ( () -> "Scale Offset: " + Scales.BASES.get (this.scales.getScaleOffsetIndex ()));
                 break;
 
             case TEMPORARY_LOCK:

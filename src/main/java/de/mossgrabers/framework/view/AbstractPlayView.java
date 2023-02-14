@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.view;
@@ -120,6 +120,20 @@ public abstract class AbstractPlayView<S extends IControlSurface<C>, C extends C
         final int note = this.keyManager.map (key);
         if (note != -1)
             this.keyManager.setAllKeysPressed (note, velocity);
+
+        this.playNote (note, velocity);
+    }
+
+
+    /**
+     * Hook for playing notes with grids which do not use MIDI notes.
+     *
+     * @param note The note to play (or stop)
+     * @param velocity The velocity of the note (0 = off)
+     */
+    protected void playNote (final int note, final int velocity)
+    {
+        // Intentionally empty
     }
 
 
@@ -214,6 +228,11 @@ public abstract class AbstractPlayView<S extends IControlSurface<C>, C extends C
     }
 
 
+    /**
+     * Get the scale matrix to apply to the mapping table. Allows to block specific notes.
+     *
+     * @return The matrix (size of 127)
+     */
     protected int [] getMapping ()
     {
         if (!this.model.canSelectedTrackHoldNotes ())
@@ -234,6 +253,11 @@ public abstract class AbstractPlayView<S extends IControlSurface<C>, C extends C
     }
 
 
+    /**
+     * Get the note mapping matrix as a table based on the current scale settings.
+     *
+     * @return The mapping table
+     */
     protected int [] getScaleMatrix ()
     {
         return this.scales.getNoteMatrix ();
@@ -258,7 +282,7 @@ public abstract class AbstractPlayView<S extends IControlSurface<C>, C extends C
         this.updateNoteMapping ();
         final C config = this.surface.getConfiguration ();
         config.setScale (this.scales.getScale ().getName ());
-        config.setScaleBase (Scales.BASES.get (this.scales.getScaleOffset ()));
+        config.setScaleBase (Scales.BASES.get (this.scales.getScaleOffsetIndex ()));
         config.setScaleInKey (!this.scales.isChromatic ());
         config.setScaleLayout (this.scales.getScaleLayout ().getName ());
     }

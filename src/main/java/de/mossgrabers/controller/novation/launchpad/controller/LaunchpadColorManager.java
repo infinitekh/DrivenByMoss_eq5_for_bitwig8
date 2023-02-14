@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.novation.launchpad.controller;
@@ -10,10 +10,12 @@ import de.mossgrabers.framework.controller.grid.IPadGrid;
 import de.mossgrabers.framework.daw.DAWColor;
 import de.mossgrabers.framework.featuregroup.AbstractFeatureGroup;
 import de.mossgrabers.framework.scale.Scales;
-import de.mossgrabers.framework.view.AbstractDrumView;
 import de.mossgrabers.framework.view.AbstractPlayView;
-import de.mossgrabers.framework.view.AbstractSequencerView;
 import de.mossgrabers.framework.view.BrowserView;
+import de.mossgrabers.framework.view.sequencer.AbstractDrumExView;
+import de.mossgrabers.framework.view.sequencer.AbstractDrumView;
+import de.mossgrabers.framework.view.sequencer.AbstractSequencerView;
+import de.mossgrabers.framework.view.sequencer.ClipLengthView;
 
 import java.util.List;
 
@@ -57,9 +59,9 @@ public class LaunchpadColorManager extends ColorManager
     public static final int           LAUNCHPAD_COLOR_SPRING           = 26;
     public static final int           LAUNCHPAD_COLOR_SPRING_LO        = 27;
     public static final int           LAUNCHPAD_COLOR_SPRING_TURQUOISE = 28;
-    public static final int           LAUNCHPAD_COLOR_TURQUOISE_LO     = 29;
+    public static final int           LAUNCHPAD_COLOR_TURQUOISE_HI     = 29;
     public static final int           LAUNCHPAD_COLOR_TURQUOISE        = 30;
-    public static final int           LAUNCHPAD_COLOR_TURQUOISE_HI     = 31;
+    public static final int           LAUNCHPAD_COLOR_TURQUOISE_LO     = 31;
     public static final int           LAUNCHPAD_COLOR_TURQUOISE_CYAN   = 32;
     public static final int           LAUNCHPAD_COLOR_CYAN_HI          = 33;
     public static final int           LAUNCHPAD_COLOR_CYAN             = 34;
@@ -90,6 +92,19 @@ public class LaunchpadColorManager extends ColorManager
     public static final int           LAUNCHPAD_COLOR_PINK_LO          = 59;
     public static final int           LAUNCHPAD_COLOR_ORANGE           = 60;
 
+    public static final int           COLOR_VIEW_OFF                   = LAUNCHPAD_COLOR_BLACK;
+    public static final int           COLOR_VIEW_SELECTED              = LAUNCHPAD_COLOR_GREEN;
+    public static final int           COLOR_VIEW_PLAY                  = LAUNCHPAD_COLOR_AMBER;
+    public static final int           COLOR_VIEW_DRUM_SEQUENCER        = LAUNCHPAD_COLOR_BLUE;
+    public static final int           COLOR_VIEW_NOTE_SEQUENCER        = LAUNCHPAD_COLOR_YELLOW;
+    public static final int           COLOR_VIEW_CLIP                  = LAUNCHPAD_COLOR_MAGENTA;
+    public static final int           COLOR_VIEW_MIXER                 = LAUNCHPAD_COLOR_LIME;
+    public static final int           COLOR_VIEW_DEVICE                = LAUNCHPAD_COLOR_TURQUOISE;
+    public static final int           COLOR_VIEW_PROJECT               = LAUNCHPAD_COLOR_CYAN_HI;
+    public static final int           COLOR_VIEW_SHIFT                 = LAUNCHPAD_COLOR_WHITE;
+    public static final int           COLOR_VIEW_TEMPO                 = LAUNCHPAD_COLOR_OCEAN_HI;
+    public static final int           COLOR_VIEW_SHUFFLE               = LAUNCHPAD_COLOR_PINK_HI;
+
     public static final List<Integer> DAW_INDICATOR_COLORS             = List.of (Integer.valueOf (LAUNCHPAD_COLOR_RED), Integer.valueOf (LAUNCHPAD_COLOR_AMBER), Integer.valueOf (LAUNCHPAD_COLOR_YELLOW), Integer.valueOf (LAUNCHPAD_COLOR_SPRING), Integer.valueOf (LAUNCHPAD_COLOR_CYAN), Integer.valueOf (LAUNCHPAD_COLOR_OCEAN), Integer.valueOf (LAUNCHPAD_COLOR_MAGENTA), Integer.valueOf (LAUNCHPAD_COLOR_PINK));
 
 
@@ -111,12 +126,12 @@ public class LaunchpadColorManager extends ColorManager
         this.registerColorIndex (AbstractSequencerView.COLOR_STEP_MUTED_CONT, LAUNCHPAD_COLOR_GREY_LO);
         this.registerColorIndex (AbstractSequencerView.COLOR_STEP_SELECTED, LAUNCHPAD_COLOR_WHITE);
         this.registerColorIndex (AbstractSequencerView.COLOR_NO_CONTENT, LAUNCHPAD_COLOR_BLACK);
+        this.registerColorIndex (AbstractSequencerView.COLOR_NO_CONTENT_4, LAUNCHPAD_COLOR_BLACK);
         this.registerColorIndex (AbstractSequencerView.COLOR_CONTENT, LAUNCHPAD_COLOR_BLUE_HI);
         this.registerColorIndex (AbstractSequencerView.COLOR_CONTENT_CONT, LAUNCHPAD_COLOR_BLUE_ORCHID);
         this.registerColorIndex (AbstractSequencerView.COLOR_PAGE, LAUNCHPAD_COLOR_WHITE);
         this.registerColorIndex (AbstractSequencerView.COLOR_ACTIVE_PAGE, LAUNCHPAD_COLOR_GREEN);
         this.registerColorIndex (AbstractSequencerView.COLOR_SELECTED_PAGE, LAUNCHPAD_COLOR_BLUE_ORCHID);
-
         this.registerColorIndex (AbstractSequencerView.COLOR_RESOLUTION, LAUNCHPAD_COLOR_GREEN);
         this.registerColorIndex (AbstractSequencerView.COLOR_RESOLUTION_SELECTED, LAUNCHPAD_COLOR_YELLOW);
         this.registerColorIndex (AbstractSequencerView.COLOR_RESOLUTION_OFF, LAUNCHPAD_COLOR_BLACK);
@@ -129,9 +144,29 @@ public class LaunchpadColorManager extends ColorManager
         this.registerColorIndex (AbstractDrumView.COLOR_PAD_HAS_CONTENT, LAUNCHPAD_COLOR_YELLOW_HI);
         this.registerColorIndex (AbstractDrumView.COLOR_PAD_NO_CONTENT, LAUNCHPAD_COLOR_YELLOW_LO);
 
+        this.registerColorIndex (AbstractDrumExView.COLOR_EX_SELECT_ON, LAUNCHPAD_COLOR_WHITE);
+        this.registerColorIndex (AbstractDrumExView.COLOR_EX_SELECT_OFF, LAUNCHPAD_COLOR_GREY_LO);
+        this.registerColorIndex (AbstractDrumExView.COLOR_EX_MUTE_ON, LAUNCHPAD_COLOR_YELLOW_HI);
+        this.registerColorIndex (AbstractDrumExView.COLOR_EX_MUTE_OFF, LAUNCHPAD_COLOR_YELLOW_LO);
+        this.registerColorIndex (AbstractDrumExView.COLOR_EX_SOLO_ON, LAUNCHPAD_COLOR_BLUE_HI);
+        this.registerColorIndex (AbstractDrumExView.COLOR_EX_SOLO_OFF, LAUNCHPAD_COLOR_BLUE_LO);
+        this.registerColorIndex (AbstractDrumExView.COLOR_EX_BROWSE_ON, LAUNCHPAD_COLOR_CYAN_HI);
+        this.registerColorIndex (AbstractDrumExView.COLOR_EX_BROWSE_OFF, LAUNCHPAD_COLOR_CYAN_LO);
+        this.registerColorIndex (AbstractDrumExView.COLOR_EX_NOTE_REPEAT_ON, LAUNCHPAD_COLOR_ORCHID_HI);
+        this.registerColorIndex (AbstractDrumExView.COLOR_EX_NOTE_REPEAT_OFF, LAUNCHPAD_COLOR_ORCHID_LO);
+        this.registerColorIndex (AbstractDrumExView.COLOR_EX_NOTE_REPEAT_PERIOD_ON, LAUNCHPAD_COLOR_SKY_HI);
+        this.registerColorIndex (AbstractDrumExView.COLOR_EX_NOTE_REPEAT_PERIOD_OFF, LAUNCHPAD_COLOR_SKY_LO);
+        this.registerColorIndex (AbstractDrumExView.COLOR_EX_NOTE_REPEAT_LENGTH_ON, LAUNCHPAD_COLOR_PINK_HI);
+        this.registerColorIndex (AbstractDrumExView.COLOR_EX_NOTE_REPEAT_LENGTH_OFF, LAUNCHPAD_COLOR_PINK_LO);
+        this.registerColorIndex (AbstractDrumExView.COLOR_EX_TOGGLE_ON, LAUNCHPAD_COLOR_RED_HI);
+        this.registerColorIndex (AbstractDrumExView.COLOR_EX_TOGGLE_OFF, LAUNCHPAD_COLOR_RED_LO);
+
         this.registerColorIndex (AbstractPlayView.COLOR_PLAY, LAUNCHPAD_COLOR_GREEN_HI);
         this.registerColorIndex (AbstractPlayView.COLOR_RECORD, LAUNCHPAD_COLOR_RED_HI);
         this.registerColorIndex (AbstractPlayView.COLOR_OFF, LAUNCHPAD_COLOR_BLACK);
+
+        this.registerColorIndex (ClipLengthView.COLOR_OUTSIDE, LAUNCHPAD_COLOR_BLACK);
+        this.registerColorIndex (ClipLengthView.COLOR_PART, LAUNCHPAD_COLOR_OCEAN);
 
         this.registerColorIndex (BrowserView.OFF, LAUNCHPAD_COLOR_BLACK);
         this.registerColorIndex (BrowserView.DISCARD, LAUNCHPAD_COLOR_RED);

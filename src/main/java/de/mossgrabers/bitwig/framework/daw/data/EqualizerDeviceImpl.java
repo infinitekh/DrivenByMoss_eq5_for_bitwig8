@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.bitwig.framework.daw.data;
@@ -8,14 +8,13 @@ import de.mossgrabers.framework.controller.valuechanger.IValueChanger;
 import de.mossgrabers.framework.daw.IHost;
 import de.mossgrabers.framework.daw.data.EqualizerBandType;
 import de.mossgrabers.framework.daw.data.IEqualizerDevice;
-import de.mossgrabers.framework.daw.data.IParameter;
+import de.mossgrabers.framework.parameter.IParameter;
 
 import com.bitwig.extension.controller.api.Device;
 import com.bitwig.extension.controller.api.Parameter;
 import com.bitwig.extension.controller.api.SpecificBitwigDevice;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,11 +29,15 @@ import java.util.UUID;
  */
 public class EqualizerDeviceImpl extends SpecificDeviceImpl implements IEqualizerDevice
 {
+<<<<<<< HEAD
     /** The ID of the Bitwig EQ5 plugin. */
     public static final UUID                                 ID_BITWIG_EQ_5 = UUID.fromString ("227e2e3c-75d5-46f3-960d-8fb5529fe29f");
+=======
+    /** The ID of the Bitwig EQ+ plugin. */
+    public static final UUID                            ID_BITWIG_EQ_PLUS = UUID.fromString ("e4815188-ba6f-4d14-bcfc-2dcb8f778ccb");
+>>>>>>> superorigin/master
 
-    private static final Map<String, EqualizerBandType>      EQ_TYPES          = new HashMap<> ();
-    private static final EnumMap<EqualizerBandType, Integer> EQ_TYPE_INDICES   = new EnumMap<> (EqualizerBandType.class);
+    private static final Map<String, EqualizerBandType> EQ_TYPES          = new HashMap<> ();
     static
     {
         EQ_TYPES.put ("Off", EqualizerBandType.OFF);
@@ -44,22 +47,18 @@ public class EqualizerDeviceImpl extends SpecificDeviceImpl implements IEqualize
         EQ_TYPES.put ("High-c", EqualizerBandType.HIGHCUT);
         EQ_TYPES.put ("High-s", EqualizerBandType.HIGHSHELF);
         EQ_TYPES.put ("Notch", EqualizerBandType.NOTCH);
-
-        EQ_TYPE_INDICES.put (EqualizerBandType.OFF, Integer.valueOf (0));
-        EQ_TYPE_INDICES.put (EqualizerBandType.LOWCUT, Integer.valueOf (3));
-        EQ_TYPE_INDICES.put (EqualizerBandType.LOWSHELF, Integer.valueOf (6));
-        EQ_TYPE_INDICES.put (EqualizerBandType.BELL, Integer.valueOf (7));
-        EQ_TYPE_INDICES.put (EqualizerBandType.HIGHCUT, Integer.valueOf (10));
-        EQ_TYPE_INDICES.put (EqualizerBandType.HIGHSHELF, Integer.valueOf (13));
-        EQ_TYPE_INDICES.put (EqualizerBandType.NOTCH, Integer.valueOf (14));
     }
 
+<<<<<<< HEAD
     private static final int       NUMBER_OF_BANDS = 5;
+=======
+    private static final int            NUMBER_OF_BANDS = 8;
+>>>>>>> superorigin/master
 
-    private final List<IParameter> types           = new ArrayList<> ();
-    private final List<IParameter> frequencies     = new ArrayList<> ();
-    private final List<IParameter> gains           = new ArrayList<> ();
-    private final List<IParameter> qs              = new ArrayList<> ();
+    private final List<EqTypeParameter> types           = new ArrayList<> ();
+    private final List<IParameter>      frequencies     = new ArrayList<> ();
+    private final List<IParameter>      gains           = new ArrayList<> ();
+    private final List<IParameter>      qs              = new ArrayList<> ();
 
 
     /**
@@ -82,7 +81,7 @@ public class EqualizerDeviceImpl extends SpecificDeviceImpl implements IEqualize
             final String index = Integer.toString (i + 1);
 
             final Parameter typeParameter = eqDevice.createParameter ("TYPE" + index);
-            this.types.add (new ParameterImpl (valueChanger, typeParameter, i));
+            this.types.add (new EqTypeParameter (valueChanger, typeParameter, i));
 
             final Parameter frequencyParameter = eqDevice.createParameter ("FREQ" + index);
             this.frequencies.add (new ParameterImpl (valueChanger, frequencyParameter, i));
@@ -122,15 +121,13 @@ public class EqualizerDeviceImpl extends SpecificDeviceImpl implements IEqualize
     @Override
     public void setType (final int index, final EqualizerBandType typeID)
     {
-        final IParameter param = this.types.get (index);
-        final Integer v = EQ_TYPE_INDICES.get (typeID);
-        ((ParameterImpl) param).getParameter ().set (v == null ? Integer.valueOf (0) : v, Integer.valueOf (15));
+        this.types.get (index).set (typeID);
     }
 
 
     /** {@inheritDoc} */
     @Override
-    public IParameter getType (final int index)
+    public IParameter getTypeParameter (final int index)
     {
         return this.types.get (index);
     }
@@ -138,7 +135,7 @@ public class EqualizerDeviceImpl extends SpecificDeviceImpl implements IEqualize
 
     /** {@inheritDoc} */
     @Override
-    public IParameter getFrequency (final int index)
+    public IParameter getFrequencyParameter (final int index)
     {
         return this.frequencies.get (index);
     }
@@ -146,7 +143,7 @@ public class EqualizerDeviceImpl extends SpecificDeviceImpl implements IEqualize
 
     /** {@inheritDoc} */
     @Override
-    public IParameter getGain (final int index)
+    public IParameter getGainParameter (final int index)
     {
         return this.gains.get (index);
     }
@@ -154,7 +151,7 @@ public class EqualizerDeviceImpl extends SpecificDeviceImpl implements IEqualize
 
     /** {@inheritDoc} */
     @Override
-    public IParameter getQ (final int index)
+    public IParameter getQParameter (final int index)
     {
         return this.qs.get (index);
     }

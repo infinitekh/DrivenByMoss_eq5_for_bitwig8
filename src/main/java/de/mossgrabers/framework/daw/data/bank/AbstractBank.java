@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.daw.data.bank;
@@ -39,9 +39,23 @@ public abstract class AbstractBank<T> implements IBank<T>
      */
     protected AbstractBank (final IHost host, final int pageSize)
     {
+        this (host, pageSize, new ArrayList<> (pageSize));
+    }
+
+
+    /**
+     * Constructor. The size of the elements to store/cache is identical to the page size. Use for
+     * pre-configured lists.
+     *
+     * @param host The DAW host
+     * @param pageSize The number of elements in a page of the bank
+     * @param items The bank items
+     */
+    protected AbstractBank (final IHost host, final int pageSize, final List<T> items)
+    {
         this.host = host;
         this.pageSize = pageSize;
-        this.items = new ArrayList<> (pageSize);
+        this.items = items;
     }
 
 

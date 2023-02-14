@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.mode;
@@ -10,7 +10,7 @@ import de.mossgrabers.framework.controller.ContinuousID;
 import de.mossgrabers.framework.controller.IControlSurface;
 import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.data.IItem;
-import de.mossgrabers.framework.featuregroup.AbstractMode;
+import de.mossgrabers.framework.featuregroup.AbstractParameterMode;
 import de.mossgrabers.framework.parameterprovider.special.FixedParameterProvider;
 
 import java.util.Collections;
@@ -24,7 +24,7 @@ import java.util.Collections;
  *
  * @author J&uuml;rgen Mo&szlig;graber
  */
-public class MasterVolumeMode<S extends IControlSurface<C>, C extends Configuration> extends AbstractMode<S, C, IItem>
+public class MasterVolumeMode<S extends IControlSurface<C>, C extends Configuration> extends AbstractParameterMode<S, C, IItem>
 {
     /**
      * Constructor.
@@ -39,5 +39,6 @@ public class MasterVolumeMode<S extends IControlSurface<C>, C extends Configurat
 
         this.setParameterProvider (new FixedParameterProvider (this.model.getMasterTrack ().getVolumeParameter ()));
         this.setParameterProvider (ButtonID.SHIFT, new FixedParameterProvider (this.model.getTransport ().getMetronomeVolumeParameter ()));
+        this.setParameterProvider (ButtonID.SELECT, new FixedParameterProvider (this.model.getApplication ().getZoomParameter ()));
     }
 }

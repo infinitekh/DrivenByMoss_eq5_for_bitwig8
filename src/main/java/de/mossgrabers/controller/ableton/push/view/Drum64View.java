@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ableton.push.view;
@@ -47,7 +47,7 @@ public class Drum64View extends AbstractDrum64View<PushControlSurface, PushConfi
     {
         if (this.isButtonCombination (ButtonID.BROWSE))
         {
-            final IDrumDevice primary = this.model.getDrumDevice64 ();
+            final IDrumDevice primary = this.model.getDrumDevice (64);
             if (primary.hasDrumPads ())
                 this.model.getBrowser ().replace (primary.getDrumPadBank ().getItem (playedPad));
             return;
@@ -72,7 +72,7 @@ public class Drum64View extends AbstractDrum64View<PushControlSurface, PushConfi
     protected void handleSelectButton (final int playedPad)
     {
         // Do we have drum pads?
-        final IDrumDevice primary = this.model.getDrumDevice64 ();
+        final IDrumDevice primary = this.model.getDrumDevice (64);
         if (!primary.hasDrumPads ())
             return;
         final ICursorDevice cd = this.model.getCursorDevice ();

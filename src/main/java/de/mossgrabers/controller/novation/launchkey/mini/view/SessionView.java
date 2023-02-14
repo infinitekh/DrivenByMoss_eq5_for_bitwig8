@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.novation.launchkey.mini.view;
@@ -204,9 +204,19 @@ public class SessionView extends AbstractSessionView<LaunchkeyMiniMk3ControlSurf
                 return;
 
             if (index == 0)
-                sceneBank.selectPreviousPage ();
+            {
+                if (this.padMode == null)
+                    sceneBank.selectPreviousPage ();
+                else
+                    sceneBank.scrollBackwards ();
+            }
             else
-                sceneBank.selectNextPage ();
+            {
+                if (this.padMode == null)
+                    sceneBank.selectNextPage ();
+                else
+                    sceneBank.scrollForwards ();
+            }
             return;
         }
 

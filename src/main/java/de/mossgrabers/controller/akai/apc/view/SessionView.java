@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.apc.view;
@@ -77,7 +77,7 @@ public class SessionView extends AbstractSessionView<APCControlSurface, APCConfi
         if (s.isSelected ())
             return AbstractSessionView.COLOR_SELECTED_SCENE;
 
-        return this.useClipColor ? DAWColor.getColorIndex (s.getColor ()) : AbstractSessionView.COLOR_SCENE;
+        return this.useClipColor ? DAWColor.getColorID (s.getColor ()) : AbstractSessionView.COLOR_SCENE;
     }
 
 

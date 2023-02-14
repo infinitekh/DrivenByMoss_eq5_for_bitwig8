@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ableton.push.parameterprovider;
@@ -7,11 +7,10 @@ package de.mossgrabers.controller.ableton.push.parameterprovider;
 import de.mossgrabers.controller.ableton.push.PushConfiguration;
 import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.data.IChannel;
-import de.mossgrabers.framework.daw.data.IParameter;
 import de.mossgrabers.framework.daw.data.ITrack;
 import de.mossgrabers.framework.daw.data.empty.EmptyParameter;
-import de.mossgrabers.framework.observer.IParametersAdjustObserver;
 import de.mossgrabers.framework.observer.ISettingObserver;
+import de.mossgrabers.framework.parameter.IParameter;
 import de.mossgrabers.framework.parameterprovider.track.SelectedTrackParameterProvider;
 
 
@@ -41,27 +40,6 @@ public class PushTrackParameterProvider extends SelectedTrackParameterProvider i
 
     /** {@inheritDoc} */
     @Override
-    public void addParametersObserver (final IParametersAdjustObserver observer)
-    {
-        super.addParametersObserver (observer);
-
-        this.configuration.addSettingObserver (PushConfiguration.TOGGLING_SENDS, this);
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public void removeParametersObserver (final IParametersAdjustObserver observer)
-    {
-        super.removeParametersObserver (observer);
-
-        if (this.hasObservers ())
-            this.configuration.removeSettingObserver (PushConfiguration.TOGGLING_SENDS, this);
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
     protected IParameter getInternal (final int index, final IChannel selectedChannel)
     {
         if (index < 2 || !this.configuration.isPush2 ())
@@ -74,8 +52,7 @@ public class PushTrackParameterProvider extends SelectedTrackParameterProvider i
             case 3:
                 return EmptyParameter.INSTANCE;
             default:
-                final int sendOffset = this.configuration.isSendsAreToggled () ? 0 : 4;
-                return this.handleSends (index - sendOffset, selectedChannel);
+                return this.getSend (index - 4, selectedChannel);
         }
     }
 

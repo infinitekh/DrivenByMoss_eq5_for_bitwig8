@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ableton.push;
@@ -61,9 +61,12 @@ public class PushControllerDefinition extends DefaultControllerDefinition
                     midiDiscoveryPairs.addAll (this.createWindowsDeviceDiscoveryPairs ("MIDIIN2 (%sAbleton Push)", "MIDIOUT2 (%sAbleton Push)"));
                 break;
 
-            case LINUX:
-            case MAC:
+            case LINUX, MAC:
                 midiDiscoveryPairs.add (this.addDeviceDiscoveryPair (this.isMkII ? "Ableton Push 2 Live Port" : "Ableton Push User Port"));
+                if (this.isMkII)
+                    midiDiscoveryPairs.addAll (this.createLinuxDeviceDiscoveryPairs ("A2", "A2"));
+                else
+                    midiDiscoveryPairs.addAll (this.createLinuxDeviceDiscoveryPairs ("Push", "Push", 1));
                 break;
 
             default:

@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.daw.data.bank;
@@ -41,25 +41,6 @@ public interface ITrackBank extends IChannelBank<ITrack>
      * @return True if one of the clips of the current bank page is recording
      */
     boolean isClipRecording ();
-
-
-    /**
-     * Check if there is a send at the given index, which can be edited.
-     *
-     * @param sendIndex The index of the send
-     * @return True if there is a send to edit
-     */
-    boolean canEditSend (int sendIndex);
-
-
-    /**
-     * DAWs which can put different sends in a slot can return here a name to be displayed for a
-     * slot.
-     *
-     * @param sendIndex The index of the send
-     * @return The name to display
-     */
-    String getEditSendName (int sendIndex);
 
 
     /**

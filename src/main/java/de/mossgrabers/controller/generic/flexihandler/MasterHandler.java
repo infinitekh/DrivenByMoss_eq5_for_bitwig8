@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.generic.flexihandler;
@@ -14,8 +14,8 @@ import de.mossgrabers.framework.controller.valuechanger.IValueChanger;
 import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.ITransport;
 import de.mossgrabers.framework.daw.data.IMasterTrack;
-import de.mossgrabers.framework.daw.data.IParameter;
 import de.mossgrabers.framework.daw.data.ITrack;
+import de.mossgrabers.framework.parameter.IParameter;
 
 
 /**
@@ -55,7 +55,8 @@ public class MasterHandler extends AbstractHandler
             FlexiCommand.MASTER_SET_SOLO,
             FlexiCommand.MASTER_TOGGLE_ARM,
             FlexiCommand.MASTER_SET_ARM,
-            FlexiCommand.MASTER_CROSSFADER
+            FlexiCommand.MASTER_CROSSFADER,
+            FlexiCommand.MASTER_SELECT
         };
     }
 
@@ -74,20 +75,20 @@ public class MasterHandler extends AbstractHandler
             case MASTER_SET_PANORAMA:
                 return masterTrack.getPan ();
 
-            case MASTER_TOGGLE_MUTE:
-            case MASTER_SET_MUTE:
+            case MASTER_TOGGLE_MUTE, MASTER_SET_MUTE:
                 return masterTrack.isMute () ? 127 : 0;
 
-            case MASTER_TOGGLE_SOLO:
-            case MASTER_SET_SOLO:
+            case MASTER_TOGGLE_SOLO, MASTER_SET_SOLO:
                 return masterTrack.isSolo () ? 127 : 0;
 
-            case MASTER_TOGGLE_ARM:
-            case MASTER_SET_ARM:
+            case MASTER_TOGGLE_ARM, MASTER_SET_ARM:
                 return masterTrack.isRecArm () ? 127 : 0;
 
             case MASTER_CROSSFADER:
                 return this.model.getTransport ().getCrossfade ();
+
+            case MASTER_SELECT:
+                return masterTrack.isSelected () ? 127 : 0;
 
             default:
                 return -1;
@@ -151,6 +152,15 @@ public class MasterHandler extends AbstractHandler
             // Master: Cross-fader
             case MASTER_CROSSFADER:
                 this.changeMasterCrossfader (knobMode, value);
+                break;
+
+            // Master: Select
+            case MASTER_SELECT:
+                if (isButtonPressed)
+                {
+                    this.model.getMasterTrack ().select ();
+                    this.mvHelper.notifySelectedTrack ();
+                }
                 break;
 
             default:

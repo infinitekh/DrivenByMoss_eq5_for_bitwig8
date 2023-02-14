@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.usb;
@@ -47,4 +47,10 @@ public interface IHidDevice
      * @return The number of bytes scheduled for transmission or -1 if the call failed
      */
     int sendFeatureReport (byte reportID, IMemoryBlock memoryBlock);
+
+
+    /**
+     * Closes the device.
+     */
+    void close ();
 }

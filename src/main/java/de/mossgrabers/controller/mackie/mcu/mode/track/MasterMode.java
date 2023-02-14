@@ -1,9 +1,10 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.mackie.mcu.mode.track;
 
+import de.mossgrabers.controller.mackie.mcu.MCUConfiguration;
 import de.mossgrabers.controller.mackie.mcu.controller.MCUControlSurface;
 import de.mossgrabers.controller.mackie.mcu.mode.BaseMode;
 import de.mossgrabers.framework.controller.color.ColorEx;
@@ -83,17 +84,18 @@ public class MasterMode extends BaseMode<ITrack>
             return;
         }
 
-        if (event != ButtonEvent.UP || row > 0)
+        final int extenderOffset = this.getExtenderOffset ();
+        if (extenderOffset > 0 || event != ButtonEvent.UP || row > 0)
             return;
 
         switch (index)
         {
             case 0:
-                this.model.getMasterTrack ().resetVolume ();
+                this.resetParameter (this.model.getMasterTrack ().getVolumeParameter ());
                 break;
 
             case 1:
-                this.model.getMasterTrack ().resetPan ();
+                this.resetParameter (this.model.getMasterTrack ().getPanParameter ());
                 break;
 
             case 2, 3, 4:
@@ -119,7 +121,8 @@ public class MasterMode extends BaseMode<ITrack>
     @Override
     public void updateDisplay ()
     {
-        if (!this.surface.getConfiguration ().hasDisplay1 ())
+        final MCUConfiguration conf = this.surface.getConfiguration ();
+        if (!conf.hasDisplay1 ())
             return;
 
         this.drawDisplay2 ();
@@ -129,22 +132,44 @@ public class MasterMode extends BaseMode<ITrack>
         final IMasterTrack master = this.model.getMasterTrack ();
 
         final ColorEx [] colors = new ColorEx [8];
-        colors[0] = master.getColor ();
-        colors[1] = master.getColor ();
-        colors[2] = ColorEx.SKY_BLUE;
-        colors[3] = ColorEx.SKY_BLUE;
-        colors[4] = ColorEx.SKY_BLUE;
-        colors[5] = ColorEx.WHITE;
-        colors[6] = ColorEx.WHITE;
-        colors[7] = ColorEx.WHITE;
-        this.surface.sendDisplayColor (colors);
 
-        final int textLength = this.getTextLength ();
-        final IApplication application = this.model.getApplication ();
-        d.setCell (0, 0, "Volume").setCell (0, 1, "Pan").setBlock (0, 1, "Audio Engine:").setCell (0, 4, application.isEngineActive () ? " On" : " Off");
-        d.setCell (0, 5, "Prjct:").setBlock (0, 3, projectName);
-        d.setCell (1, 0, master.getVolumeStr (textLength)).setCell (1, 1, master.getPanStr (textLength)).setBlock (1, 1, application.isEngineActive () ? "  Turn off" : "  Turn on");
-        d.setCell (1, 6, " <<").setCell (1, 7, " >>").allDone ();
+        final int extenderOffset = this.getExtenderOffset ();
+        if (extenderOffset == 0)
+        {
+            final int textLength = this.getTextLength ();
+            final IApplication application = this.model.getApplication ();
+            d.setCell (0, 0, "Volume").setCell (0, 1, "Pan");
+            if (conf.shouldUse7Characters ())
+            {
+                d.setBlock (0, 1, "  AudioEngine:").setCell (0, 4, application.isEngineActive () ? "On" : "Off");
+                d.setCell (0, 5, "Prjct:").setBlock (0, 3, projectName);
+                d.setCell (1, 0, master.getVolumeStr (textLength)).setCell (1, 1, master.getPanStr (textLength)).setBlock (1, 1, application.isEngineActive () ? "   Turnoff" : "   Turnon");
+                d.setCell (1, 6, "   <<").setCell (1, 7, "   >>").allDone ();
+            }
+            else
+            {
+                d.setBlock (0, 1, "Audio Engine:").setCell (0, 4, application.isEngineActive () ? " On" : " Off");
+                d.setCell (0, 5, "Prjct:").setBlock (0, 3, projectName);
+                d.setCell (1, 0, master.getVolumeStr (textLength)).setCell (1, 1, master.getPanStr (textLength)).setBlock (1, 1, application.isEngineActive () ? "  Turn off" : "  Turn on");
+                d.setCell (1, 6, " <<").setCell (1, 7, " >>").allDone ();
+            }
+
+            colors[0] = master.getColor ();
+            colors[1] = master.getColor ();
+            colors[2] = ColorEx.SKY_BLUE;
+            colors[3] = ColorEx.SKY_BLUE;
+            colors[4] = ColorEx.SKY_BLUE;
+            colors[5] = ColorEx.WHITE;
+            colors[6] = ColorEx.WHITE;
+            colors[7] = ColorEx.WHITE;
+        }
+        else
+        {
+            for (int i = 0; i < 8; i++)
+                colors[i] = ColorEx.BLACK;
+        }
+
+        this.surface.sendDisplayColor (colors);
     }
 
 
@@ -160,6 +185,14 @@ public class MasterMode extends BaseMode<ITrack>
     @Override
     public void updateKnobLEDs ()
     {
+        final int extenderOffset = this.getExtenderOffset ();
+        if (extenderOffset > 0)
+        {
+            for (int i = 0; i < 8; i++)
+                this.surface.setKnobLED (i, MCUControlSurface.KNOB_LED_MODE_WRAP, 0, 0);
+            return;
+        }
+
         final IMasterTrack masterTrack = this.model.getMasterTrack ();
         final int upperBound = this.model.getValueChanger ().getUpperBound ();
         this.surface.setKnobLED (0, MCUControlSurface.KNOB_LED_MODE_WRAP, masterTrack.getVolume (), upperBound);
@@ -173,18 +206,6 @@ public class MasterMode extends BaseMode<ITrack>
     @Override
     protected void resetParameter (final int index)
     {
-        final IMasterTrack masterTrack = this.model.getMasterTrack ();
-        switch (index)
-        {
-            case 0:
-                masterTrack.resetVolume ();
-                break;
-            case 1:
-                masterTrack.resetPan ();
-                break;
-            default:
-                // Intentionally empty
-                break;
-        }
+        // Not used
     }
 }

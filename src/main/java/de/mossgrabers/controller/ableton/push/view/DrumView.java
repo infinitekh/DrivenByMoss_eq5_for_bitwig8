@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ableton.push.view;
@@ -8,7 +8,8 @@ import de.mossgrabers.controller.ableton.push.PushConfiguration;
 import de.mossgrabers.controller.ableton.push.controller.PushControlSurface;
 import de.mossgrabers.framework.controller.ButtonID;
 import de.mossgrabers.framework.daw.IModel;
-import de.mossgrabers.framework.daw.INoteClip;
+import de.mossgrabers.framework.daw.clip.INoteClip;
+import de.mossgrabers.framework.daw.clip.NotePosition;
 import de.mossgrabers.framework.daw.data.ICursorDevice;
 import de.mossgrabers.framework.daw.data.IDrumDevice;
 import de.mossgrabers.framework.daw.data.IDrumPad;
@@ -16,8 +17,8 @@ import de.mossgrabers.framework.daw.data.bank.IDrumPadBank;
 import de.mossgrabers.framework.featuregroup.ModeManager;
 import de.mossgrabers.framework.mode.Modes;
 import de.mossgrabers.framework.utils.ButtonEvent;
-import de.mossgrabers.framework.view.AbstractDrumView;
 import de.mossgrabers.framework.view.Views;
+import de.mossgrabers.framework.view.sequencer.AbstractDrumView;
 
 
 /**
@@ -58,9 +59,9 @@ public class DrumView extends AbstractDrumView<PushControlSurface, PushConfigura
         final int x = index % GRID_COLUMNS;
         final int stepX = GRID_COLUMNS * (this.allRows - 1 - y) + x;
         final int stepY = this.scales.getDrumOffset () + this.getSelectedPad ();
-        final int channel = this.configuration.getMidiEditChannel ();
-        final INoteClip clip = this.getClip ();
-        this.editNote (clip, channel, stepX, stepY, false);
+
+        final NotePosition notePosition = new NotePosition (this.configuration.getMidiEditChannel (), stepX, stepY);
+        this.editNote (this.getClip (), notePosition, false);
     }
 
 
@@ -106,9 +107,10 @@ public class DrumView extends AbstractDrumView<PushControlSurface, PushConfigura
             return;
         }
 
-        // Only activate layer mode if not one of the layer modes is already active
+        // Only activate layer mode if not one of the layer modes is already active and browser is
+        // off
         final ModeManager modeManager = this.surface.getModeManager ();
-        if (!Modes.isLayerMode (modeManager.getActiveID ()))
+        if (!Modes.isLayerMode (modeManager.getActiveID ()) && !this.model.getBrowser ().isActive ())
             modeManager.setActive (Modes.DEVICE_LAYER);
 
         drumPad.select ();
@@ -147,23 +149,23 @@ public class DrumView extends AbstractDrumView<PushControlSurface, PushConfigura
 
     /** {@inheritDoc} */
     @Override
-    protected boolean handleSequencerAreaButtonCombinations (final INoteClip clip, final int channel, final int step, final int note, final int velocity)
+    protected boolean handleSequencerAreaButtonCombinations (final INoteClip clip, final NotePosition notePosition, final int velocity)
     {
         final boolean isSelectPressed = this.surface.isSelectPressed ();
 
         if (this.surface.isShiftPressed ())
         {
             if (velocity > 0)
-                this.handleSequencerAreaRepeatOperator (clip, channel, step, note, velocity, !isSelectPressed);
+                this.handleSequencerAreaRepeatOperator (clip, notePosition, velocity, !isSelectPressed);
             return true;
         }
 
         if (isSelectPressed)
         {
-            this.editNote (clip, channel, step, note, true);
+            this.editNote (clip, notePosition, true);
             return true;
         }
 
-        return super.handleSequencerAreaButtonCombinations (clip, channel, step, note, velocity);
+        return super.handleSequencerAreaButtonCombinations (clip, notePosition, velocity);
     }
 }

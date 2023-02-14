@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ni.maschine.mk3.view;
@@ -81,7 +81,7 @@ public class SceneView extends BaseView
                 if (item.isSelected ())
                     padGrid.lightEx (x, y, MaschineColorManager.COLOR_WHITE);
                 else
-                    padGrid.lightEx (x, y, DAWColor.getColorIndex (item.getColor ()));
+                    padGrid.lightEx (x, y, DAWColor.getColorID (item.getColor ()));
             }
             else
                 padGrid.lightEx (x, y, AbstractFeatureGroup.BUTTON_COLOR_OFF);

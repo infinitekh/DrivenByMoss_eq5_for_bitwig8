@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.command.trigger.view;
@@ -37,12 +37,11 @@ public class ViewMultiSelectCommand<S extends IControlSurface<C>, C extends Conf
      *
      * @param model The model
      * @param surface The surface
-     * @param displayName Displays a popup with the views name if true
      * @param viewIds The list with IDs of the views to select
      */
-    public ViewMultiSelectCommand (final IModel model, final S surface, final boolean displayName, final Views... viewIds)
+    public ViewMultiSelectCommand (final IModel model, final S surface, final Views... viewIds)
     {
-        this (model, surface, displayName, ButtonEvent.DOWN, viewIds);
+        this (model, surface, true, ButtonEvent.DOWN, viewIds);
     }
 
 

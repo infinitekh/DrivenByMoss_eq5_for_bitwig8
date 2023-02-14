@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.command.trigger.view;
@@ -12,7 +12,7 @@ import de.mossgrabers.framework.featuregroup.ViewManager;
 import de.mossgrabers.framework.utils.ButtonEvent;
 import de.mossgrabers.framework.view.Views;
 
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,29 +36,14 @@ public class SelectPlayViewCommand<S extends IControlSurface<C>, C extends Confi
      *
      * @param model The model
      * @param surface The surface
-     * @param displayName Displays a popup with the views name if true
-     * @param viewIds The list with IDs of the views to select
-     */
-    public SelectPlayViewCommand (final IModel model, final S surface, final boolean displayName, final Views... viewIds)
-    {
-        this (model, surface, displayName, viewIds, viewIds);
-    }
-
-
-    /**
-     * Constructor.
-     *
-     * @param model The model
-     * @param surface The surface
-     * @param displayName Displays a popup with the views name if true
      * @param viewIds The list with IDs of the views to select
      * @param allViewIds The views for checking for previous play views
      */
-    public SelectPlayViewCommand (final IModel model, final S surface, final boolean displayName, final Views [] viewIds, final Views [] allViewIds)
+    public SelectPlayViewCommand (final IModel model, final S surface, final Views [] viewIds, final Collection<Views> allViewIds)
     {
-        super (model, surface, displayName, viewIds);
+        super (model, surface, viewIds);
 
-        this.allViewIds.addAll (Arrays.asList (allViewIds));
+        this.allViewIds.addAll (allViewIds);
     }
 
 

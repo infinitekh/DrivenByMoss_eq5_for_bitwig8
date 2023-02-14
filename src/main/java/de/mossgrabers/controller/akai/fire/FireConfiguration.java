@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.fire;
@@ -12,6 +12,7 @@ import de.mossgrabers.framework.controller.valuechanger.IValueChanger;
 import de.mossgrabers.framework.daw.IHost;
 import de.mossgrabers.framework.daw.constants.Capability;
 import de.mossgrabers.framework.daw.midi.ArpeggiatorMode;
+import de.mossgrabers.framework.view.Views;
 
 import java.util.List;
 
@@ -23,13 +24,23 @@ import java.util.List;
  */
 public class FireConfiguration extends AbstractConfiguration
 {
-    /** Setting for the pad brightness. */
-    public static final Integer PAD_BRIGHTNESS = Integer.valueOf (50);
-    /** Setting for the pad color saturation. */
-    public static final Integer PAD_SATURATION = Integer.valueOf (51);
+    private static final Views [] PREFERRED_NOTE_VIEWS =
+    {
+        Views.PLAY,
+        Views.PIANO,
+        Views.DRUM64,
+        Views.DRUM4,
+        Views.SEQUENCER,
+        Views.POLY_SEQUENCER
+    };
 
-    private int                 padBrightness  = 100;
-    private int                 padSaturation  = 100;
+    /** Setting for the pad brightness. */
+    public static final Integer   PAD_BRIGHTNESS       = Integer.valueOf (50);
+    /** Setting for the pad color saturation. */
+    public static final Integer   PAD_SATURATION       = Integer.valueOf (51);
+
+    private int                   padBrightness        = 100;
+    private int                   padSaturation        = 100;
 
 
     /**
@@ -73,6 +84,7 @@ public class FireConfiguration extends AbstractConfiguration
         // Transport
 
         this.activateBehaviourOnStopSetting (globalSettings);
+        this.activateBehaviourOnPauseSetting (globalSettings);
 
         // Corrected label (removed automation)
         final IEnumSetting flipRecordSetting = globalSettings.getEnumSetting ("Flip arranger and clip record", CATEGORY_TRANSPORT, ON_OFF_OPTIONS, ON_OFF_OPTIONS[0]);
@@ -89,12 +101,15 @@ public class FireConfiguration extends AbstractConfiguration
         this.activateAccentValueSetting (globalSettings);
         this.activateQuantizeAmountSetting (globalSettings);
         this.activateMidiEditChannelSetting (documentSettings);
+        this.activatePreferredNoteViewSetting (globalSettings, PREFERRED_NOTE_VIEWS);
+        this.activateStartWithSessionViewSetting (globalSettings);
 
         ///////////////////////////
         // Drum Sequencer
 
         if (this.host.supports (Capability.HAS_DRUM_DEVICE))
             this.activateTurnOffEmptyDrumPadsSetting (globalSettings);
+        this.activateUseCombinationButtonToSoundSetting (globalSettings);
 
         ///////////////////////////
         // Workflow

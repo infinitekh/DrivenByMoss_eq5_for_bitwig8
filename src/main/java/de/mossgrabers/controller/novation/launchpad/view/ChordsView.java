@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.novation.launchpad.view;
@@ -132,14 +132,14 @@ public class ChordsView extends AbstractChordView<LaunchpadControlSurface, Launc
                 display.notify (isChromatic ? "Chromatic" : "In Key");
                 break;
             case SCENE7:
-                this.scales.setScaleOffset (this.scales.getScaleOffset () + 1);
-                name = Scales.BASES.get (this.scales.getScaleOffset ());
+                this.scales.setScaleOffsetByIndex (this.scales.getScaleOffsetIndex () + 1);
+                name = Scales.BASES.get (this.scales.getScaleOffsetIndex ());
                 this.surface.getConfiguration ().setScaleBase (name);
                 display.notify (name);
                 break;
             case SCENE8:
-                this.scales.setScaleOffset (this.scales.getScaleOffset () - 1);
-                name = Scales.BASES.get (this.scales.getScaleOffset ());
+                this.scales.setScaleOffsetByIndex (this.scales.getScaleOffsetIndex () - 1);
+                name = Scales.BASES.get (this.scales.getScaleOffsetIndex ());
                 this.surface.getConfiguration ().setScaleBase (name);
                 display.notify (name);
                 break;

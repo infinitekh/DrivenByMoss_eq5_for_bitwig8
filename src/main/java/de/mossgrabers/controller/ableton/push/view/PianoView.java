@@ -1,11 +1,10 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ableton.push.view;
 
 import de.mossgrabers.controller.ableton.push.controller.PushControlSurface;
-import de.mossgrabers.framework.controller.ButtonID;
 import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.scale.Scales;
 import de.mossgrabers.framework.utils.ButtonEvent;
@@ -89,28 +88,5 @@ public class PianoView extends PlayView
     {
         final int octave = this.scales.getPianoOctave ();
         return octave > -Scales.PIANO_OCTAVE_RANGE;
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public String getButtonColorID (final ButtonID buttonID)
-    {
-        if (ButtonID.isSceneButton (buttonID) && this.surface.isPressed (ButtonID.REPEAT))
-            return NoteRepeatSceneHelper.getButtonColorID (this.surface, buttonID);
-        return super.getButtonColorID (buttonID);
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public void onButton (final ButtonID buttonID, final ButtonEvent event, final int velocity)
-    {
-        if (!ButtonID.isSceneButton (buttonID) || event != ButtonEvent.DOWN)
-            return;
-
-        final int index = buttonID.ordinal () - ButtonID.SCENE1.ordinal ();
-        if (this.surface.isPressed (ButtonID.REPEAT))
-            NoteRepeatSceneHelper.handleNoteRepeatSelection (this.surface, 7 - index);
     }
 }

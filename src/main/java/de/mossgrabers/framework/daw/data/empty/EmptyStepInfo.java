@@ -1,12 +1,12 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.daw.data.empty;
 
-import de.mossgrabers.framework.daw.IStepInfo;
-import de.mossgrabers.framework.daw.NoteOccurrenceType;
-import de.mossgrabers.framework.daw.StepState;
+import de.mossgrabers.framework.daw.clip.IStepInfo;
+import de.mossgrabers.framework.daw.clip.NoteOccurrenceType;
+import de.mossgrabers.framework.daw.clip.StepState;
 
 
 /**
@@ -218,5 +218,13 @@ public class EmptyStepInfo implements IStepInfo
     public double getRepeatVelocityEnd ()
     {
         return 0;
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public IStepInfo createCopy ()
+    {
+        return INSTANCE;
     }
 }

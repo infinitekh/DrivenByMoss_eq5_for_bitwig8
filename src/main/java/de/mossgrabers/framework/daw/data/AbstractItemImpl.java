@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.daw.data;
@@ -106,6 +106,14 @@ public abstract class AbstractItemImpl implements IItem
     /** {@inheritDoc} */
     @Override
     public void select ()
+    {
+        // Cannot be selected but should also not crash
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public void toggleMultiSelect ()
     {
         // Cannot be selected but should also not crash
     }

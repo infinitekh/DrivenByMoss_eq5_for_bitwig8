@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ableton.push.mode;
@@ -36,7 +36,7 @@ public class NoteViewSelectMode extends BaseMode<IItem>
         Views.DRUM64,
         null,
         null,
-        Views.CLIP,
+        Views.CLIP_LENGTH,
         Views.PRG_CHANGE
     };
 

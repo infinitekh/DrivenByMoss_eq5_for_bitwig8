@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.arturia.beatstep.view;
@@ -57,7 +57,7 @@ public class PlayView extends AbstractPlayView<BeatstepControlSurface, BeatstepC
                     this.scales.nextScaleOffset ();
                 else
                     this.scales.prevScaleOffset ();
-                final String scaleBase = Scales.BASES.get (this.scales.getScaleOffset ());
+                final String scaleBase = Scales.BASES.get (this.scales.getScaleOffsetIndex ());
                 this.surface.getDisplay ().notify (scaleBase);
                 this.surface.getConfiguration ().setScaleBase (scaleBase);
                 break;

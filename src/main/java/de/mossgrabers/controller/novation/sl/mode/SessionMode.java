@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.novation.sl.mode;
@@ -11,7 +11,7 @@ import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.data.IItem;
 import de.mossgrabers.framework.daw.data.IScene;
 import de.mossgrabers.framework.daw.data.bank.ISceneBank;
-import de.mossgrabers.framework.featuregroup.AbstractMode;
+import de.mossgrabers.framework.featuregroup.AbstractParameterMode;
 import de.mossgrabers.framework.utils.StringUtils;
 
 
@@ -20,7 +20,7 @@ import de.mossgrabers.framework.utils.StringUtils;
  *
  * @author J&uuml;rgen Mo&szlig;graber
  */
-public class SessionMode extends AbstractMode<SLControlSurface, SLConfiguration, IItem>
+public class SessionMode extends AbstractParameterMode<SLControlSurface, SLConfiguration, IItem>
 {
     /**
      * Constructor.

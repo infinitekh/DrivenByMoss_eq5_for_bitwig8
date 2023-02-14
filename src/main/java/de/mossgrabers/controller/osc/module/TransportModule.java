@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.osc.module;
@@ -10,10 +10,10 @@ import de.mossgrabers.controller.osc.exception.IllegalParameterException;
 import de.mossgrabers.controller.osc.exception.MissingCommandException;
 import de.mossgrabers.controller.osc.exception.UnknownCommandException;
 import de.mossgrabers.framework.command.trigger.transport.PlayCommand;
-import de.mossgrabers.framework.daw.IClip;
 import de.mossgrabers.framework.daw.IHost;
 import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.ITransport;
+import de.mossgrabers.framework.daw.clip.IClip;
 import de.mossgrabers.framework.daw.constants.AutomationMode;
 import de.mossgrabers.framework.daw.constants.LaunchQuantization;
 import de.mossgrabers.framework.daw.constants.PostRecordingAction;
@@ -255,7 +255,7 @@ public class TransportModule extends AbstractModule
                 break;
 
             case TAG_PREROLL:
-                this.transport.setPrerollAsBars (toInteger (value));
+                this.transport.setPrerollMeasures (toInteger (value));
                 break;
 
             case TAG_LAUNCHER:
@@ -299,7 +299,7 @@ public class TransportModule extends AbstractModule
         this.writer.sendOSC ("/click/volume", this.transport.getMetronomeVolume (), dump);
         this.writer.sendOSC ("/click/volumeStr", this.transport.getMetronomeVolumeStr (), dump);
         this.writer.sendOSC ("/click/preroll", this.transport.isPrerollMetronomeEnabled (), dump);
-        this.writer.sendOSC ("/preroll", this.transport.getPrerollAsBars (), dump);
+        this.writer.sendOSC ("/preroll", this.transport.getPrerollMeasures (), dump);
         this.writer.sendOSC ("/tempo/raw", this.transport.getTempo (), dump);
         this.writer.sendOSC ("/crossfade", this.transport.getCrossfade (), dump);
         this.writer.sendOSC ("/autowrite", this.transport.isWritingArrangerAutomation (), dump);

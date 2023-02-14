@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.mackie.mcu.mode.device;
@@ -9,8 +9,8 @@ import de.mossgrabers.controller.mackie.mcu.mode.BaseMode;
 import de.mossgrabers.framework.controller.color.ColorEx;
 import de.mossgrabers.framework.controller.display.ITextDisplay;
 import de.mossgrabers.framework.daw.IModel;
-import de.mossgrabers.framework.daw.data.IParameter;
 import de.mossgrabers.framework.daw.data.bank.IParameterBank;
+import de.mossgrabers.framework.parameter.IParameter;
 import de.mossgrabers.framework.parameterprovider.device.BankParameterProvider;
 import de.mossgrabers.framework.parameterprovider.special.RangeFilterParameterProvider;
 import de.mossgrabers.framework.utils.StringUtils;
@@ -23,19 +23,6 @@ import de.mossgrabers.framework.utils.StringUtils;
  */
 public class UserMode extends BaseMode<IParameter>
 {
-    private static final ColorEx [] COLORS =
-    {
-        ColorEx.WHITE,
-        ColorEx.WHITE,
-        ColorEx.WHITE,
-        ColorEx.WHITE,
-        ColorEx.WHITE,
-        ColorEx.WHITE,
-        ColorEx.WHITE,
-        ColorEx.WHITE
-    };
-
-
     /**
      * Constructor.
      *
@@ -80,7 +67,7 @@ public class UserMode extends BaseMode<IParameter>
 
         final ITextDisplay d = this.surface.getTextDisplay ().clear ();
 
-        this.surface.sendDisplayColor (COLORS);
+        final ColorEx [] colors = new ColorEx [8];
 
         // Row 1 & 2
         final int extenderOffset = this.surface.getExtenderOffset ();
@@ -90,9 +77,12 @@ public class UserMode extends BaseMode<IParameter>
         {
             final IParameter param = parameterBank.getItem (extenderOffset + i);
             d.setCell (0, i, param.doesExist () ? StringUtils.shortenAndFixASCII (param.getName (textLength), textLength) : "").setCell (1, i, StringUtils.shortenAndFixASCII (param.getDisplayedValue (textLength), textLength));
+            colors[i] = param.doesExist () ? ColorEx.WHITE : ColorEx.BLACK;
         }
 
         d.allDone ();
+
+        this.surface.sendDisplayColor (colors);
     }
 
 
@@ -116,6 +106,6 @@ public class UserMode extends BaseMode<IParameter>
     protected void resetParameter (final int index)
     {
         final int extenderOffset = this.surface.getExtenderOffset ();
-        this.model.getUserParameterBank ().getItem (extenderOffset + index).resetValue ();
+        this.resetParameter (this.model.getUserParameterBank ().getItem (extenderOffset + index));
     }
 }

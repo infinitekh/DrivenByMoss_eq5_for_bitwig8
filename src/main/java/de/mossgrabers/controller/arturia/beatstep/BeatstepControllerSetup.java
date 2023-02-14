@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.arturia.beatstep;
@@ -104,6 +104,15 @@ public class BeatstepControllerSetup extends AbstractControllerSetup<BeatstepCon
         final ModelSetup ms = new ModelSetup ();
         this.model = this.factory.createModel (this.configuration, this.colorManager, this.valueChanger, this.scales, ms);
         this.model.getTrackBank ().addSelectionObserver ( (index, value) -> this.handleTrackChange (value));
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    protected void recallLastView ()
+    {
+        // Prevent view change on track change, which is confusing on the Beatstep since it leaves
+        // Track view
     }
 
 
@@ -326,26 +335,5 @@ public class BeatstepControllerSetup extends AbstractControllerSetup<BeatstepCon
 
             parameterBank.getItem (i).setIndication (isDevice);
         }
-    }
-
-
-    /**
-     * Handle a track selection change.
-     *
-     * @param isSelected Has the track been selected?
-     */
-    private void handleTrackChange (final boolean isSelected)
-    {
-        if (!isSelected)
-            return;
-
-        final ViewManager viewManager = this.getSurface ().getViewManager ();
-        if (viewManager.isActive (Views.PLAY))
-            viewManager.getActive ().updateNoteMapping ();
-
-        // Reset drum octave because the drum pad bank is also reset
-        this.scales.resetDrumOctave ();
-        if (viewManager.isActive (Views.DRUM))
-            viewManager.get (Views.DRUM).updateNoteMapping ();
     }
 }

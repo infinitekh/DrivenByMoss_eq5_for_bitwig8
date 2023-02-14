@@ -1,14 +1,17 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ni.maschine.mk3.mode;
 
 import de.mossgrabers.controller.ni.maschine.mk3.MaschineConfiguration;
 import de.mossgrabers.controller.ni.maschine.mk3.controller.MaschineControlSurface;
+import de.mossgrabers.framework.controller.ContinuousID;
 import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.data.IItem;
-import de.mossgrabers.framework.featuregroup.AbstractMode;
+import de.mossgrabers.framework.featuregroup.AbstractParameterMode;
+
+import java.util.List;
 
 
 /**
@@ -16,7 +19,7 @@ import de.mossgrabers.framework.featuregroup.AbstractMode;
  *
  * @author J&uuml;rgen Mo&szlig;graber
  */
-public abstract class BaseMode extends AbstractMode<MaschineControlSurface, MaschineConfiguration, IItem>
+public abstract class BaseMode extends AbstractParameterMode<MaschineControlSurface, MaschineConfiguration, IItem>
 {
     protected int selectedParam = 0;
 
@@ -31,6 +34,20 @@ public abstract class BaseMode extends AbstractMode<MaschineControlSurface, Masc
     protected BaseMode (final String name, final MaschineControlSurface surface, final IModel model)
     {
         super (name, surface, model, false);
+    }
+
+
+    /**
+     * Constructor.
+     *
+     * @param name The name of the mode
+     * @param surface The control surface
+     * @param model The model
+     * @param controls The IDs of the knobs or faders to control this mode
+     */
+    protected BaseMode (final String name, final MaschineControlSurface surface, final IModel model, final List<ContinuousID> controls)
+    {
+        super (name, surface, model, false, null, controls);
     }
 
 

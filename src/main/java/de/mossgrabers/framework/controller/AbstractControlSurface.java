@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.controller;
@@ -236,7 +236,7 @@ public abstract class AbstractControlSurface<C extends Configuration> implements
     {
         final int size = this.padGrid.getRows () * this.padGrid.getCols ();
         for (int i = 0; i < size; i++)
-            this.getButton (ButtonID.get (ButtonID.PAD1, i)).unbind (this.input);
+            this.getButton (ButtonID.get (ButtonID.PAD1, i)).unbind ();
     }
 
 
@@ -489,6 +489,28 @@ public abstract class AbstractControlSurface<C extends Configuration> implements
 
     /** {@inheritDoc} */
     @Override
+    public void unbindAllInputControls ()
+    {
+        for (final IHwContinuousControl control: this.continuous.values ())
+            control.unbind ();
+        for (final IHwButton button: this.buttons.values ())
+            button.unbind ();
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public void rebindAllInputControls ()
+    {
+        for (final IHwContinuousControl control: this.continuous.values ())
+            control.rebind ();
+        for (final IHwButton button: this.buttons.values ())
+            button.rebind ();
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
     public boolean isShiftPressed ()
     {
         return this.isPressed (ButtonID.SHIFT);
@@ -629,7 +651,18 @@ public abstract class AbstractControlSurface<C extends Configuration> implements
     @Override
     public void setTrigger (final int channel, final int cc, final int state)
     {
-        // Overwrite to support trigger LEDs
+        this.setTrigger (null, channel, cc, state);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public void setTrigger (final BindType bindType, final int channel, final int cc, final int value)
+    {
+        if (bindType == BindType.NOTE)
+            this.output.sendNoteEx (channel, cc, value);
+        else
+            this.output.sendCCEx (channel, cc, value);
     }
 
 
@@ -661,6 +694,9 @@ public abstract class AbstractControlSurface<C extends Configuration> implements
             if (light != null)
                 light.turnOff ();
         });
+
+        this.continuous.forEach ( (id, control) -> control.turnOff ());
+
         this.surfaceFactory.flush ();
     }
 
@@ -692,6 +728,9 @@ public abstract class AbstractControlSurface<C extends Configuration> implements
                 light.forceFlush ();
         });
 
+        // Refresh all knob/fader LEDs
+        this.continuous.forEach ( (id, control) -> control.forceFlush ());
+
         // Flush additional lights which are not assigned to a button
         this.lights.forEach ( (outputID, light) -> light.forceFlush ());
 
@@ -710,9 +749,7 @@ public abstract class AbstractControlSurface<C extends Configuration> implements
 
         try
         {
-            this.updateViewControls ();
-            this.updateGrid ();
-            this.flushHardware ();
+            this.internalFlushHandler ();
         }
         catch (final RuntimeException ex)
         {
@@ -729,6 +766,14 @@ public abstract class AbstractControlSurface<C extends Configuration> implements
             else
                 this.updateCounter = 0;
         }
+    }
+
+
+    protected void internalFlushHandler ()
+    {
+        this.updateViewControls ();
+        this.updateGrid ();
+        this.flushHardware ();
     }
 
 
@@ -834,7 +879,7 @@ public abstract class AbstractControlSurface<C extends Configuration> implements
      */
     protected void handlePitchbend (final int data1, final int data2)
     {
-        this.host.error ("Pitchbend should be handled in framework...");
+        this.host.error ("Pitchbend" + SHOULD_BE_HANDLED_IN_FRAMEWORK);
     }
 
 
@@ -846,8 +891,9 @@ public abstract class AbstractControlSurface<C extends Configuration> implements
      */
     protected void handleNoteOff (final int data1, final int data2)
     {
-        // Handled by bind framework
-        this.host.error ("Midi Note off " + data1 + SHOULD_BE_HANDLED_IN_FRAMEWORK);
+        // Handled by bind framework.
+        // Since Bitwig 4.1 notes are also sent to this method no matter if bound or not, therefore
+        // do not show the warning message any more...
     }
 
 
@@ -951,6 +997,17 @@ public abstract class AbstractControlSurface<C extends Configuration> implements
     public IHwSurfaceFactory getSurfaceFactory ()
     {
         return this.surfaceFactory;
+    }
+
+
+    /**
+     * Get the host.
+     *
+     * @return The host
+     */
+    public IHost getHost ()
+    {
+        return this.host;
     }
 
 

@@ -1,15 +1,18 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.parameterprovider.track;
 
+import de.mossgrabers.framework.controller.color.ColorEx;
 import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.data.bank.ITrackBank;
 import de.mossgrabers.framework.observer.IBankPageObserver;
 import de.mossgrabers.framework.observer.IParametersAdjustObserver;
 import de.mossgrabers.framework.observer.IValueObserver;
 import de.mossgrabers.framework.parameterprovider.AbstractParameterProvider;
+
+import java.util.Optional;
 
 
 /**
@@ -129,5 +132,13 @@ public abstract class AbstractTrackParameterProvider extends AbstractParameterPr
         this.bank = bank;
 
         this.notifyParametersObservers ();
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public Optional<ColorEx> getColor (final int index)
+    {
+        return Optional.of (this.bank.getItem (index).getColor ());
     }
 }

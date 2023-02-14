@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.arturia.beatstep.view;
@@ -84,10 +84,7 @@ public class TrackEditing
                 break;
 
             // Send 1 - 4
-            case 8:
-            case 9:
-            case 10:
-            case 11:
+            case 8, 9, 10, 11:
                 if (!this.model.isEffectTrackBankActive ())
                     selectedTrack.get ().getSendBank ().getItem (index - 8).changeValue (value);
                 break;

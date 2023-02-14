@@ -1,10 +1,11 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.fire.controller;
 
 import de.mossgrabers.framework.controller.ButtonID;
+import de.mossgrabers.framework.controller.color.ColorEx;
 import de.mossgrabers.framework.controller.color.ColorManager;
 import de.mossgrabers.framework.controller.grid.BlinkingPadGrid;
 import de.mossgrabers.framework.controller.grid.LightInfo;
@@ -90,7 +91,11 @@ public class FirePadGrid extends BlinkingPadGrid
 
             final int index = note - 54;
             // Note: The exact PADx is not needed for getting the color
-            final int [] c = this.colorManager.getColor (info.getColor (), ButtonID.PAD1).scale (this.padBrightness, this.padSaturation).toIntRGB127 ();
+            ColorEx color = this.colorManager.getColor (info.getColor (), ButtonID.PAD1);
+            // Do not scale black!
+            if (!color.equals (ColorEx.BLACK))
+                color = color.scale (this.padBrightness, this.padSaturation);
+            final int [] c = color.toIntRGB127 ();
             sb.append (StringUtils.toHexStr (index)).append (' ');
             sb.append (StringUtils.toHexStr (c[0])).append (' ');
             sb.append (StringUtils.toHexStr (c[1])).append (' ');

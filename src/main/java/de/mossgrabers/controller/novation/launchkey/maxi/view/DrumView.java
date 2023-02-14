@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.novation.launchkey.maxi.view;
@@ -11,13 +11,14 @@ import de.mossgrabers.framework.controller.ButtonID;
 import de.mossgrabers.framework.controller.color.ColorEx;
 import de.mossgrabers.framework.controller.grid.IPadGrid;
 import de.mossgrabers.framework.daw.IModel;
-import de.mossgrabers.framework.daw.INoteClip;
-import de.mossgrabers.framework.daw.IStepInfo;
-import de.mossgrabers.framework.daw.data.GridStep;
+import de.mossgrabers.framework.daw.clip.INoteClip;
+import de.mossgrabers.framework.daw.clip.IStepInfo;
+import de.mossgrabers.framework.daw.clip.NotePosition;
 import de.mossgrabers.framework.daw.data.IDrumDevice;
+import de.mossgrabers.framework.daw.data.bank.IDrumPadBank;
 import de.mossgrabers.framework.utils.ButtonEvent;
-import de.mossgrabers.framework.view.AbstractDrumView;
 import de.mossgrabers.framework.view.Views;
+import de.mossgrabers.framework.view.sequencer.AbstractDrumView;
 
 import java.util.List;
 import java.util.Optional;
@@ -93,6 +94,8 @@ public class DrumView extends AbstractDrumView<LaunchkeyMk3ControlSurface, Launc
     {
         final IPadGrid padGrid = this.surface.getPadGrid ();
         final IDrumDevice primary = this.model.getDrumDevice ();
+        final IDrumPadBank drumPadBank = primary.getDrumPadBank ();
+
         if (this.isPlayMode)
         {
             for (int y = 0; y < 2; y++)
@@ -100,7 +103,7 @@ public class DrumView extends AbstractDrumView<LaunchkeyMk3ControlSurface, Launc
                 for (int x = 0; x < 8; x++)
                 {
                     final int index = 8 * y + x;
-                    padGrid.lightEx (x, 1 - y, this.getDrumPadColor (index, primary, false));
+                    padGrid.lightEx (x, 1 - y, this.getDrumPadColor (index, drumPadBank, false));
                 }
             }
             return;
@@ -117,19 +120,22 @@ public class DrumView extends AbstractDrumView<LaunchkeyMk3ControlSurface, Launc
         final int step = clip.getCurrentStep ();
         final int hiStep = this.isInXRange (step) ? step % this.sequencerSteps : -1;
         final int offsetY = this.scales.getDrumOffset ();
-        final int editMidiChannel = this.configuration.getMidiEditChannel ();
+        final int channel = this.configuration.getMidiEditChannel ();
         final int selPad = this.getSelectedPad ();
-        final List<GridStep> editNotes = this.getEditNotes ();
+        final List<NotePosition> editNotes = this.getEditNotes ();
+        final NotePosition notePosition = new NotePosition (channel, 0, 0);
         for (int col = 0; col < DrumView.NUM_DISPLAY_COLS; col++)
         {
             final int noteRow = offsetY + selPad;
-            final IStepInfo stepInfo = clip.getStep (editMidiChannel, col, noteRow);
+            notePosition.setStep (col);
+            notePosition.setNote (noteRow);
+            final IStepInfo stepInfo = clip.getStep (notePosition);
             final boolean hilite = col == hiStep;
             final int x = col % GRID_COLUMNS;
             final int y = col / GRID_COLUMNS;
 
             final Optional<ColorEx> rowColor = this.getPadColor (primary, this.selectedPad);
-            padGrid.lightEx (x, y, this.getStepColor (stepInfo, hilite, rowColor, editMidiChannel, col, noteRow, editNotes));
+            padGrid.lightEx (x, y, this.getStepColor (stepInfo, hilite, rowColor, channel, col, noteRow, editNotes));
         }
     }
 

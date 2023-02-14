@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.bitwig.framework.daw.data;
@@ -12,12 +12,12 @@ import de.mossgrabers.framework.controller.valuechanger.IValueChanger;
 import de.mossgrabers.framework.daw.IHost;
 import de.mossgrabers.framework.daw.data.IChannel;
 import de.mossgrabers.framework.daw.data.IDeviceMetadata;
-import de.mossgrabers.framework.daw.data.IParameter;
 import de.mossgrabers.framework.daw.data.bank.ISendBank;
 import de.mossgrabers.framework.daw.data.empty.EmptyParameter;
 import de.mossgrabers.framework.daw.data.empty.EmptySendBank;
 import de.mossgrabers.framework.daw.resource.ChannelType;
 import de.mossgrabers.framework.observer.IValueObserver;
+import de.mossgrabers.framework.parameter.IParameter;
 
 import com.bitwig.extension.controller.api.Channel;
 import com.bitwig.extension.controller.api.InsertionPoint;
@@ -489,6 +489,14 @@ public class ChannelImpl extends AbstractDeviceChainImpl<Channel> implements ICh
 
     /** {@inheritDoc} */
     @Override
+    public void toggleMultiSelect ()
+    {
+        // Currently, no multi-select in Bitwig API
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
     public ISendBank getSendBank ()
     {
         return this.sendBank;
@@ -500,6 +508,15 @@ public class ChannelImpl extends AbstractDeviceChainImpl<Channel> implements ICh
     public void enter ()
     {
         // Intentionally empty
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public void addEqualizerDevice ()
+    {
+        if (this.doesExist ())
+            this.deviceChain.endOfDeviceChainInsertionPoint ().insertBitwigDevice (EqualizerDeviceImpl.ID_BITWIG_EQ_PLUS);
     }
 
 

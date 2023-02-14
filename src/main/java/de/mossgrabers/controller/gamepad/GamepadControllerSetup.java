@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.gamepad;
@@ -62,7 +62,7 @@ public class GamepadControllerSetup extends AbstractControllerSetup<GamepadContr
     protected void createModel ()
     {
         final ModelSetup ms = new ModelSetup ();
-        ms.enableDrumDevice (false);
+        ms.enableMainDrumDevice (false);
         ms.setNumTracks (1);
         ms.setNumScenes (100);
         ms.setNumSends (0);

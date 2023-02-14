@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.apcmini.view;
@@ -11,10 +11,11 @@ import de.mossgrabers.framework.command.trigger.clip.NewCommand;
 import de.mossgrabers.framework.command.trigger.transport.PlayCommand;
 import de.mossgrabers.framework.controller.ButtonID;
 import de.mossgrabers.framework.controller.color.ColorManager;
+import de.mossgrabers.framework.controller.display.IDisplay;
 import de.mossgrabers.framework.controller.grid.IPadGrid;
-import de.mossgrabers.framework.daw.IClip;
 import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.ITransport;
+import de.mossgrabers.framework.daw.clip.IClip;
 import de.mossgrabers.framework.daw.data.ICursorDevice;
 import de.mossgrabers.framework.daw.data.bank.IParameterBank;
 import de.mossgrabers.framework.daw.data.bank.ISceneBank;
@@ -79,7 +80,7 @@ public class ShiftView extends AbstractView<APCminiControlSurface, APCminiConfig
     public void drawGrid ()
     {
         // Draw the keyboard
-        final int scaleOffset = this.scales.getScaleOffset ();
+        final int scaleOffset = this.scales.getScaleOffsetIndex ();
         // 0'C', 1'G', 2'D', 3'A', 4'E', 5'B', 6'F', 7'Bb', 8'Eb', 9'Ab', 10'Db', 11'Gb'
         final IPadGrid padGrid = this.surface.getPadGrid ();
         for (int i = 7; i < 64; i++)
@@ -139,6 +140,9 @@ public class ShiftView extends AbstractView<APCminiControlSurface, APCminiConfig
             return;
 
         final ICursorDevice cursorDevice = this.model.getCursorDevice ();
+        final APCminiConfiguration configuration = this.surface.getConfiguration ();
+        final IDisplay display = this.surface.getDisplay ();
+
         final int n = this.surface.getPadGrid ().translateToController (note)[1];
         switch (n)
         {
@@ -162,39 +166,39 @@ public class ShiftView extends AbstractView<APCminiControlSurface, APCminiConfig
             // Last row transport
             case 63:
                 this.playCommand.executeNormal (ButtonEvent.UP);
-                this.surface.getDisplay ().notify ("Start/Stop");
+                display.notify ("Start/Stop");
                 break;
             case 55:
                 this.model.getTransport ().startRecording ();
-                this.surface.getDisplay ().notify ("Record");
+                display.notify ("Record");
                 break;
             case 47:
                 this.model.getTransport ().toggleLoop ();
-                this.surface.getDisplay ().notify ("Toggle Loop");
+                display.notify ("Toggle Loop");
                 break;
             case 39:
                 this.model.getTransport ().toggleMetronome ();
-                this.surface.getDisplay ().notify ("Toggle Click");
+                display.notify ("Toggle Click");
                 break;
 
             // Navigation
             case 62:
                 this.newCommand.execute ();
-                this.surface.getDisplay ().notify ("New clip");
+                display.notify ("New clip");
                 break;
             case 54:
                 this.model.getTransport ().toggleLauncherOverdub ();
-                this.surface.getDisplay ().notify ("Toggle Launcher Overdub");
+                display.notify ("Toggle Launcher Overdub");
                 break;
             case 46:
                 final IClip clip = this.model.getCursorClip ();
                 if (clip.doesExist ())
-                    clip.quantize (this.surface.getConfiguration ().getQuantizeAmount () / 100.0);
-                this.surface.getDisplay ().notify ("Quantize");
+                    clip.quantize (configuration.getQuantizeAmount () / 100.0);
+                display.notify ("Quantize");
                 break;
             case 38:
                 this.model.getApplication ().undo ();
-                this.surface.getDisplay ().notify ("Undo");
+                display.notify ("Undo");
                 break;
 
             // Device Parameters up/down
@@ -211,33 +215,34 @@ public class ShiftView extends AbstractView<APCminiControlSurface, APCminiConfig
                 if (cursorDevice.canSelectPrevious ())
                 {
                     cursorDevice.selectPrevious ();
-                    this.surface.getDisplay ().notify ("Device: " + cursorDevice.getName ());
+                    display.notify ("Device: " + cursorDevice.getName ());
                 }
                 break;
             case 33:
                 if (cursorDevice.canSelectNext ())
                 {
                     cursorDevice.selectNext ();
-                    this.surface.getDisplay ().notify ("Device: " + cursorDevice.getName ());
+                    display.notify ("Device: " + cursorDevice.getName ());
                 }
                 break;
 
             // Change the scale
             case 35:
                 this.scales.prevScale ();
-                final String name = this.scales.getScale ().getName ();
-                this.surface.getConfiguration ().setScale (name);
-                this.surface.getDisplay ().notify (name);
+                final String prevScale = this.scales.getScale ().getName ();
+                configuration.setScale (prevScale);
+                display.notify (prevScale);
                 break;
             case 36:
                 this.scales.nextScale ();
-                final String name2 = this.scales.getScale ().getName ();
-                this.surface.getConfiguration ().setScale (name2);
-                this.surface.getDisplay ().notify (name2);
+                final String nextScale = this.scales.getScale ().getName ();
+                configuration.setScale (nextScale);
+                display.notify (nextScale);
                 break;
             case 27:
-                this.scales.toggleChromatic ();
-                this.surface.getDisplay ().notify (this.scales.isChromatic () ? "Chromatic" : "In Key");
+                final boolean isChromatic = !configuration.isScaleInKey ();
+                configuration.setScaleInKey (isChromatic);
+                display.notify (isChromatic ? "Chromatic" : "In Key");
                 break;
 
             // Scale Base note selection
@@ -247,9 +252,9 @@ public class ShiftView extends AbstractView<APCminiControlSurface, APCminiConfig
                 final int pos = TRANSLATE[n];
                 if (pos == -1)
                     return;
-                this.scales.setScaleOffset (pos);
-                this.surface.getConfiguration ().setScaleBase (Scales.BASES.get (pos));
-                this.surface.getDisplay ().notify (Scales.BASES.get (pos));
+                this.scales.setScaleOffsetByIndex (pos);
+                configuration.setScaleBase (Scales.BASES.get (pos));
+                display.notify (Scales.BASES.get (pos));
                 this.surface.getViewManager ().getActive ().updateNoteMapping ();
                 break;
         }

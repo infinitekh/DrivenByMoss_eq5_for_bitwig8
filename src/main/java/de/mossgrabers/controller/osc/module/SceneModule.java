@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.osc.module;
@@ -7,6 +7,7 @@ package de.mossgrabers.controller.osc.module;
 import de.mossgrabers.controller.osc.exception.IllegalParameterException;
 import de.mossgrabers.controller.osc.exception.MissingCommandException;
 import de.mossgrabers.controller.osc.exception.UnknownCommandException;
+import de.mossgrabers.framework.controller.color.ColorEx;
 import de.mossgrabers.framework.daw.IHost;
 import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.data.IScene;
@@ -133,6 +134,11 @@ public class SceneModule extends AbstractModule
             this.writer.sendOSC (sceneAddress + TAG_EXISTS, scene.doesExist (), dump);
             this.writer.sendOSC (sceneAddress + TAG_NAME, scene.getName (), dump);
             this.writer.sendOSC (sceneAddress + TAG_SELECTED, scene.isSelected (), dump);
+
+            ColorEx color = scene.getColor ();
+            if (color == null)
+                color = ColorEx.BLACK;
+            this.writer.sendOSCColor (sceneAddress + TAG_COLOR, color.getRed (), color.getGreen (), color.getBlue (), dump);
         }
     }
 }

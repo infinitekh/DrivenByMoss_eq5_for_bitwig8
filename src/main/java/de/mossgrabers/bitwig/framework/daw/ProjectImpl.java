@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.bitwig.framework.daw;
@@ -8,7 +8,7 @@ import de.mossgrabers.bitwig.framework.daw.data.ParameterImpl;
 import de.mossgrabers.bitwig.framework.daw.data.Util;
 import de.mossgrabers.framework.controller.valuechanger.IValueChanger;
 import de.mossgrabers.framework.daw.IProject;
-import de.mossgrabers.framework.daw.data.IParameter;
+import de.mossgrabers.framework.parameter.IParameter;
 
 import com.bitwig.extension.controller.api.Action;
 import com.bitwig.extension.controller.api.Application;
@@ -101,6 +101,15 @@ public class ProjectImpl implements IProject
     public void createSceneFromPlayingLauncherClips ()
     {
         this.project.createSceneFromPlayingLauncherClips ();
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isDirty ()
+    {
+        // Info not available in Bitwig
+        return true;
     }
 
 

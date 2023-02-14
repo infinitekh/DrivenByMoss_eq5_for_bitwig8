@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.apcmini.controller;
@@ -8,10 +8,10 @@ import de.mossgrabers.framework.controller.color.ColorEx;
 import de.mossgrabers.framework.controller.color.ColorManager;
 import de.mossgrabers.framework.controller.grid.IPadGrid;
 import de.mossgrabers.framework.scale.Scales;
-import de.mossgrabers.framework.view.AbstractDrumView;
 import de.mossgrabers.framework.view.AbstractPlayView;
-import de.mossgrabers.framework.view.AbstractSequencerView;
 import de.mossgrabers.framework.view.BrowserView;
+import de.mossgrabers.framework.view.sequencer.AbstractDrumView;
+import de.mossgrabers.framework.view.sequencer.AbstractSequencerView;
 
 
 /**
@@ -57,6 +57,7 @@ public class APCminiColorManager extends ColorManager
         this.registerColorIndex (AbstractSequencerView.COLOR_STEP_MUTED_CONT, APC_COLOR_GREEN);
         this.registerColorIndex (AbstractSequencerView.COLOR_STEP_SELECTED, APC_COLOR_GREEN);
         this.registerColorIndex (AbstractSequencerView.COLOR_NO_CONTENT, APC_COLOR_BLACK);
+        this.registerColorIndex (AbstractSequencerView.COLOR_NO_CONTENT_4, APC_COLOR_BLACK);
         this.registerColorIndex (AbstractSequencerView.COLOR_CONTENT, APC_COLOR_RED);
         this.registerColorIndex (AbstractSequencerView.COLOR_CONTENT_CONT, APC_COLOR_RED);
         this.registerColorIndex (AbstractSequencerView.COLOR_PAGE, APC_COLOR_YELLOW);

@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.acvs.mode;
@@ -20,7 +20,6 @@ import de.mossgrabers.framework.daw.ITransport;
 import de.mossgrabers.framework.daw.constants.LaunchQuantization;
 import de.mossgrabers.framework.daw.data.IChannel;
 import de.mossgrabers.framework.daw.data.ICursorDevice;
-import de.mossgrabers.framework.daw.data.IParameter;
 import de.mossgrabers.framework.daw.data.IScene;
 import de.mossgrabers.framework.daw.data.ISend;
 import de.mossgrabers.framework.daw.data.ISlot;
@@ -30,8 +29,9 @@ import de.mossgrabers.framework.daw.data.bank.ISceneBank;
 import de.mossgrabers.framework.daw.data.bank.ISendBank;
 import de.mossgrabers.framework.daw.data.bank.ISlotBank;
 import de.mossgrabers.framework.daw.data.bank.ITrackBank;
-import de.mossgrabers.framework.featuregroup.AbstractMode;
+import de.mossgrabers.framework.featuregroup.AbstractParameterMode;
 import de.mossgrabers.framework.mode.Modes;
+import de.mossgrabers.framework.parameter.IParameter;
 import de.mossgrabers.framework.parameterprovider.device.BankParameterProvider;
 import de.mossgrabers.framework.parameterprovider.special.CombinedParameterProvider;
 import de.mossgrabers.framework.parameterprovider.track.VolumeParameterProvider;
@@ -48,7 +48,7 @@ import java.util.Optional;
  *
  * @author J&uuml;rgen Mo&szlig;graber
  */
-public class ControlMode extends AbstractMode<ACVSControlSurface, ACVSConfiguration, IChannel>
+public class ControlMode extends AbstractParameterMode<ACVSControlSurface, ACVSConfiguration, IChannel>
 {
     private static final Map<Modes, Integer> MODE_COLORS = new EnumMap<> (Modes.class);
     static
@@ -96,7 +96,6 @@ public class ControlMode extends AbstractMode<ACVSControlSurface, ACVSConfigurat
         final ACVSConfiguration configuration = this.surface.getConfiguration ();
         final boolean isForce = configuration.isActiveACVSDevice (ACVSDevice.FORCE);
         final boolean isMPC = !isForce;
-        final boolean isMPC_X = configuration.isActiveACVSDevice (ACVSDevice.MPC_X);
 
         final ITrackBank tb = this.model.getCurrentTrackBank ();
         final ICursorDevice device = this.model.getCursorDevice ();
@@ -136,19 +135,20 @@ public class ControlMode extends AbstractMode<ACVSControlSurface, ACVSConfigurat
             d.setScreenItem (ScreenItem.get (ScreenItem.DEVICE_PARAM1_ENABLED, i), param.doesExist () ? 127 : 0);
             d.setScreenItem (ScreenItem.get (ScreenItem.DEVICE_PARAM1_VALUE, i), param.getValue ());
 
-            if (isForce || isMPC_X)
-            {
-                d.setScreenItem (ScreenItem.get (ScreenItem.KNOBSTYLE1_COLOR, 8 + i), param.doesExist () ? 1 : 0);
-                d.setScreenItem (ScreenItem.get (ScreenItem.KNOB_VALUE1, 8 + i), param.getValue ());
-                d.setRow (ACVSDisplay.ITEM_ID_DEVICE_PARAM_NAME1 + 8 + i, param.getName ());
-                d.setRow (ACVSDisplay.ITEM_ID_DEVICE_PARAM_VALUE1 + 8 + i, param.getDisplayedValue ());
+            // Labels for Q-Link knobs
 
-                final ITrack track = tb.getItem (i);
-                d.setScreenItem (ScreenItem.get (ScreenItem.KNOBSTYLE1_COLOR, i), track.doesExist () ? 1 : 0);
-                d.setScreenItem (ScreenItem.get (ScreenItem.KNOB_VALUE1, i), track.getVolume ());
-                d.setRow (ACVSDisplay.ITEM_ID_DEVICE_PARAM_NAME1 + i, track.getName ());
-                d.setRow (ACVSDisplay.ITEM_ID_DEVICE_PARAM_VALUE1 + i, track.getVolumeStr ());
-            }
+            // Q-Link rows 3 + 4 are device parameters
+            d.setScreenItem (ScreenItem.get (ScreenItem.KNOBSTYLE1_COLOR, 8 + i), param.doesExist () ? 1 : 0);
+            d.setScreenItem (ScreenItem.get (ScreenItem.KNOB_VALUE1, 8 + i), param.getValue ());
+            d.setRow (ACVSDisplay.ITEM_ID_DEVICE_PARAM_NAME1 + 8 + i, param.getName ());
+            d.setRow (ACVSDisplay.ITEM_ID_DEVICE_PARAM_VALUE1 + 8 + i, param.getDisplayedValue ());
+
+            // Q-Link rows 1 + 2 are track levels
+            final ITrack track = tb.getItem (i);
+            d.setScreenItem (ScreenItem.get (ScreenItem.KNOBSTYLE1_COLOR, i), track.doesExist () ? 1 : 0);
+            d.setScreenItem (ScreenItem.get (ScreenItem.KNOB_VALUE1, i), track.getVolume ());
+            d.setRow (ACVSDisplay.ITEM_ID_DEVICE_PARAM_NAME1 + i, track.getName ());
+            d.setRow (ACVSDisplay.ITEM_ID_DEVICE_PARAM_VALUE1 + i, track.getVolumeStr ());
         }
 
         // Set transport data
@@ -305,7 +305,7 @@ public class ControlMode extends AbstractMode<ACVSControlSurface, ACVSConfigurat
             for (int sceneIndex = 0; sceneIndex < 8; sceneIndex++)
             {
                 final IScene scene = sceneBank.getItem (sceneIndex);
-                final int sceneColor = scene.doesExist () ? this.colorManager.getColorIndex (DAWColor.getColorIndex (scene.getColor ())) : ACVSColorManager.COLOR_BLACK;
+                final int sceneColor = scene.doesExist () ? this.colorManager.getColorIndex (DAWColor.getColorID (scene.getColor ())) : ACVSColorManager.COLOR_BLACK;
                 final int offset = sceneIndex < 4 ? 0 : 4;
                 d.setScreenItem (ScreenItem.get (ScreenItem.MPC_PAD1_STATE, offset + sceneIndex), 2);
                 d.setScreenItem (ScreenItem.get (ScreenItem.MPC_PAD1_COLOR, offset + sceneIndex), sceneColor);
@@ -394,7 +394,7 @@ public class ControlMode extends AbstractMode<ACVSControlSurface, ACVSConfigurat
                 if (!track.doesExist ())
                     color = ACVSColorManager.COLOR_BLACK;
                 else
-                    color = track.isSelected () ? ACVSColorManager.COLOR_SILVER : this.colorManager.getColorIndex (DAWColor.getColorIndex (track.getColor ()));
+                    color = track.isSelected () ? ACVSColorManager.COLOR_SILVER : this.colorManager.getColorIndex (DAWColor.getColorID (track.getColor ()));
             }
 
             d.setScreenItem (ScreenItem.get (ScreenItem.FORCE_TRACK1_COLOR, trackIndex), color);
@@ -503,8 +503,7 @@ public class ControlMode extends AbstractMode<ACVSControlSurface, ACVSConfigurat
             case HYBRID:
                 return 4;
 
-            case GROUP:
-            case GROUP_OPEN:
+            case GROUP, GROUP_OPEN:
                 return 7;
 
             case EFFECT:
@@ -564,7 +563,7 @@ public class ControlMode extends AbstractMode<ACVSControlSurface, ACVSConfigurat
             return ACVSColorManager.COLOR_BLACK;
 
         final ColorEx color = slot.getColor ();
-        return this.colorManager.getColorIndex (DAWColor.getColorIndex (color));
+        return this.colorManager.getColorIndex (DAWColor.getColorID (color));
     }
 
 

@@ -1,11 +1,12 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.daw;
 
 import de.mossgrabers.framework.controller.color.ColorManager;
 import de.mossgrabers.framework.controller.valuechanger.IValueChanger;
+import de.mossgrabers.framework.daw.clip.INoteClip;
 import de.mossgrabers.framework.daw.constants.DeviceID;
 import de.mossgrabers.framework.daw.data.ICursorDevice;
 import de.mossgrabers.framework.daw.data.ICursorTrack;
@@ -20,6 +21,7 @@ import de.mossgrabers.framework.daw.data.bank.ISceneBank;
 import de.mossgrabers.framework.daw.data.bank.ITrackBank;
 import de.mossgrabers.framework.observer.IValueObserver;
 import de.mossgrabers.framework.scale.Scales;
+import de.mossgrabers.framework.utils.FrameworkException;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -42,7 +44,7 @@ public abstract class AbstractModel implements IModel
     protected final ColorManager                    colorManager;
     protected final IValueChanger                   valueChanger;
     protected final ModelSetup                      modelSetup;
-    protected final Set<IValueObserver<ITrackBank>> trackBankObservers = new HashSet<> ();
+    protected final Set<IValueObserver<ITrackBank>> trackBankObservers    = new HashSet<> ();
 
     protected IApplication                          application;
     protected IMixer                                mixer;
@@ -59,10 +61,10 @@ public abstract class AbstractModel implements IModel
     protected IMasterTrack                          masterTrack;
     protected ICursorDevice                         cursorDevice;
     protected IDrumDevice                           drumDevice;
-    protected IDrumDevice                           drumDevice64;
+    protected Map<Integer, IDrumDevice>             additionalDrumDevices = new HashMap<> ();
     protected IParameterBank                        userParameterBank;
-    protected Map<String, INoteClip>                cursorClips        = new HashMap<> ();
-    protected final Map<DeviceID, ISpecificDevice>  specificDevices    = new EnumMap<> (DeviceID.class);
+    protected Map<String, INoteClip>                cursorClips           = new HashMap<> ();
+    protected final Map<DeviceID, ISpecificDevice>  specificDevices       = new EnumMap<> (DeviceID.class);
 
     private int                                     lastSelection;
 
@@ -206,9 +208,12 @@ public abstract class AbstractModel implements IModel
 
     /** {@inheritDoc} */
     @Override
-    public IDrumDevice getDrumDevice64 ()
+    public IDrumDevice getDrumDevice (final int pageSize)
     {
-        return this.drumDevice64;
+        final IDrumDevice additionalDrumDevice = this.additionalDrumDevices.get (Integer.valueOf (pageSize));
+        if (additionalDrumDevice == null)
+            throw new FrameworkException ("Additional drum device of size " + pageSize + " was not configured!");
+        return additionalDrumDevice;
     }
 
 

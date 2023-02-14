@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.bitwig.framework.daw.data.bank;
@@ -19,7 +19,6 @@ import de.mossgrabers.framework.daw.data.bank.ITrackBank;
 import de.mossgrabers.framework.daw.resource.ChannelType;
 import de.mossgrabers.framework.observer.IIndexedValueObserver;
 
-import com.bitwig.extension.controller.api.ClipLauncherSlotBank;
 import com.bitwig.extension.controller.api.CursorTrack;
 import com.bitwig.extension.controller.api.Track;
 import com.bitwig.extension.controller.api.TrackBank;
@@ -94,13 +93,7 @@ public abstract class AbstractTrackBankImpl extends AbstractChannelBankImpl<Trac
             return;
 
         final TrackBank trackBank = this.bank.get ();
-
-        for (int index = 0; index < this.getPageSize (); index++)
-        {
-            final ClipLauncherSlotBank bank = trackBank.getItemAt (index).clipLauncherSlotBank ();
-            if (bank != null)
-                bank.setIndication (enable);
-        }
+        trackBank.setShouldShowClipLauncherFeedback (enable);
     }
 
 
@@ -140,9 +133,6 @@ public abstract class AbstractTrackBankImpl extends AbstractChannelBankImpl<Trac
      */
     private void handleBankSelection (final int index)
     {
-        if (index < 0)
-            return;
-
         for (int i = 0; i < this.getPageSize (); i++)
         {
             final boolean isSelected = index == i;

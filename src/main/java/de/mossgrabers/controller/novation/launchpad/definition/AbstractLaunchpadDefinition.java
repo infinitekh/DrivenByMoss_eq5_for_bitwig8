@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.novation.launchpad.definition;
@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -140,5 +141,13 @@ public abstract class AbstractLaunchpadDefinition extends DefaultControllerDefin
             }
         }
         return Collections.singletonList (sb.append ("F7").toString ());
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public Optional<String> getBrightnessSysex ()
+    {
+        return Optional.empty ();
     }
 }

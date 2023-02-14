@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.daw.data;
@@ -82,6 +82,20 @@ public interface ISlot extends IItem
      * Launch a clip.
      */
     void launch ();
+
+
+    /**
+     * Launch the clip immediately without any quantization.
+     */
+    void launchImmediately ();
+
+
+    /**
+     * Check if the slot was launched with immediately option and resets that state.
+     *
+     * @return True if it was launched with immediately option
+     */
+    boolean testAndClearLaunchedImmediately ();
 
 
     /**

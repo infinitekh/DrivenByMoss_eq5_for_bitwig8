@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.novation.launchpad.view;
@@ -9,7 +9,7 @@ import de.mossgrabers.controller.novation.launchpad.controller.LaunchpadColorMan
 import de.mossgrabers.controller.novation.launchpad.controller.LaunchpadControlSurface;
 import de.mossgrabers.framework.controller.ButtonID;
 import de.mossgrabers.framework.daw.IModel;
-import de.mossgrabers.framework.view.AbstractRaindropsView;
+import de.mossgrabers.framework.view.sequencer.AbstractRaindropsView;
 
 
 /**
@@ -43,6 +43,6 @@ public class RaindropsView extends AbstractRaindropsView<LaunchpadControlSurface
             return 0;
 
         final int scene = buttonID.ordinal () - ButtonID.SCENE1.ordinal ();
-        return scene == 7 - this.selectedResolutionIndex ? LaunchpadColorManager.LAUNCHPAD_COLOR_YELLOW : LaunchpadColorManager.LAUNCHPAD_COLOR_GREEN;
+        return scene == 7 - this.getResolutionIndex () ? LaunchpadColorManager.LAUNCHPAD_COLOR_YELLOW : LaunchpadColorManager.LAUNCHPAD_COLOR_GREEN;
     }
 }

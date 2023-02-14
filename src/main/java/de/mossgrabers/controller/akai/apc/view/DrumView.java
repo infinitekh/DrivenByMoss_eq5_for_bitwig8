@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.apc.view;
@@ -11,14 +11,17 @@ import de.mossgrabers.framework.controller.ButtonID;
 import de.mossgrabers.framework.controller.color.ColorManager;
 import de.mossgrabers.framework.daw.DAWColor;
 import de.mossgrabers.framework.daw.IModel;
-import de.mossgrabers.framework.daw.INoteClip;
-import de.mossgrabers.framework.daw.StepState;
+import de.mossgrabers.framework.daw.clip.INoteClip;
+import de.mossgrabers.framework.daw.clip.NotePosition;
+import de.mossgrabers.framework.daw.clip.StepState;
+import de.mossgrabers.framework.daw.constants.Resolution;
 import de.mossgrabers.framework.daw.data.IChannel;
 import de.mossgrabers.framework.daw.midi.MidiConstants;
 import de.mossgrabers.framework.featuregroup.ModeManager;
 import de.mossgrabers.framework.mode.Modes;
 import de.mossgrabers.framework.utils.ButtonEvent;
-import de.mossgrabers.framework.view.AbstractDrumView;
+import de.mossgrabers.framework.view.sequencer.AbstractDrumExView;
+import de.mossgrabers.framework.view.sequencer.AbstractDrumView;
 
 
 /**
@@ -26,7 +29,7 @@ import de.mossgrabers.framework.view.AbstractDrumView;
  *
  * @author J&uuml;rgen Mo&szlig;graber
  */
-public class DrumView extends AbstractDrumView<APCControlSurface, APCConfiguration>
+public class DrumView extends AbstractDrumExView<APCControlSurface, APCConfiguration>
 {
     /**
      * Constructor.
@@ -37,6 +40,13 @@ public class DrumView extends AbstractDrumView<APCControlSurface, APCConfigurati
     public DrumView (final APCControlSurface surface, final IModel model)
     {
         super ("Drum", surface, model, 2, 3, surface.isMkII ());
+
+        this.useExtraToggleButton = false;
+
+        this.buttonSelect = ButtonID.PAD13;
+        this.buttonMute = ButtonID.PAD14;
+        this.buttonSolo = ButtonID.PAD15;
+        this.buttonBrowse = ButtonID.PAD16;
     }
 
 
@@ -53,14 +63,13 @@ public class DrumView extends AbstractDrumView<APCControlSurface, APCConfigurati
         {
             // Turn on Note mode if an existing note is pressed
             final INoteClip cursorClip = this.getClip ();
-            final int channel = this.configuration.getMidiEditChannel ();
             final int step = this.numColumns * (this.allRows - 1 - y) + x;
-            final int note = offsetY + this.selectedPad;
-            final StepState state = cursorClip.getStep (channel, step, note).getState ();
+            final NotePosition notePosition = new NotePosition (this.configuration.getMidiEditChannel (), step, offsetY + this.selectedPad);
+            final StepState state = cursorClip.getStep (notePosition).getState ();
             if (state == StepState.START)
             {
                 final NoteMode noteMode = (NoteMode) modeManager.get (Modes.NOTE);
-                noteMode.setValues (cursorClip, channel, step, note);
+                noteMode.setValues (cursorClip, notePosition);
                 modeManager.setActive (Modes.NOTE);
             }
         }
@@ -85,15 +94,7 @@ public class DrumView extends AbstractDrumView<APCControlSurface, APCConfigurati
     @Override
     protected String getPadContentColor (final IChannel drumPad)
     {
-        return this.surface.isMkII () ? DAWColor.getColorIndex (drumPad.getColor ()) : AbstractDrumView.COLOR_PAD_HAS_CONTENT;
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public void playNote (final int note, final int velocity)
-    {
-        this.surface.sendMidiEvent (MidiConstants.CMD_NOTE_ON, note, velocity);
+        return this.surface.isMkII () ? DAWColor.getColorID (drumPad.getColor ()) : AbstractDrumView.COLOR_PAD_HAS_CONTENT;
     }
 
 
@@ -111,6 +112,9 @@ public class DrumView extends AbstractDrumView<APCControlSurface, APCConfigurati
                 break;
             case SCENE2:
                 this.changeOctave (event, false, 4);
+                break;
+            case SCENE3:
+                this.toggleExtraButtons ();
                 break;
             case SCENE4:
                 this.onOctaveUp (event);
@@ -130,24 +134,76 @@ public class DrumView extends AbstractDrumView<APCControlSurface, APCConfigurati
     public String getButtonColorID (final ButtonID buttonID)
     {
         if (buttonID == ButtonID.SCENE3)
-            return ColorManager.BUTTON_STATE_OFF;
+            return this.extraButtonsOn ? ColorManager.BUTTON_STATE_HI : ColorManager.BUTTON_STATE_OFF;
         return this.isActive () ? ColorManager.BUTTON_STATE_ON : ColorManager.BUTTON_STATE_OFF;
     }
 
 
     /** {@inheritDoc} */
     @Override
-    protected boolean handleSequencerAreaButtonCombinations (final INoteClip clip, final int channel, final int step, final int note, final int velocity)
+    protected boolean handleSequencerAreaButtonCombinations (final INoteClip clip, final NotePosition notePosition, final int velocity)
     {
         final boolean isUpPressed = this.surface.isPressed (ButtonID.ARROW_UP);
         if (isUpPressed || this.surface.isPressed (ButtonID.ARROW_DOWN))
         {
             this.surface.setTriggerConsumed (isUpPressed ? ButtonID.ARROW_UP : ButtonID.ARROW_DOWN);
             if (velocity > 0)
-                this.handleSequencerAreaRepeatOperator (clip, channel, step, note, velocity, isUpPressed);
+                this.handleSequencerAreaRepeatOperator (clip, notePosition, velocity, isUpPressed);
             return true;
         }
 
-        return super.handleSequencerAreaButtonCombinations (clip, channel, step, note, velocity);
+        return super.handleSequencerAreaButtonCombinations (clip, notePosition, velocity);
+    }
+
+
+    /**
+     * Handle the stop buttons.
+     *
+     * @param index The index of the button (0-7)
+     */
+    public void handleStopButtons (final int index)
+    {
+        if (this.noteRepeatPeriodOn)
+        {
+            this.configuration.setNoteRepeatPeriod (Resolution.values ()[index]);
+            this.mvHelper.delayDisplay ( () -> "Period: " + Resolution.getNameAt (index));
+            return;
+        }
+
+        if (this.noteRepeatLengthOn)
+        {
+            this.configuration.setNoteRepeatLength (Resolution.values ()[index]);
+            this.mvHelper.delayDisplay ( () -> "Note Length: " + Resolution.getNameAt (index));
+            return;
+        }
+
+        this.setResolutionIndex (index);
+    }
+
+
+    /**
+     * Get the color for the stop buttons.
+     *
+     * @param index THe index of the button
+     * @return The color index
+     */
+    public int getStopButtonColor (final int index)
+    {
+        if (this.noteRepeatPeriodOn)
+            return this.configuration.getNoteRepeatPeriod ().ordinal () == index ? 1 : 0;
+
+        if (this.noteRepeatLengthOn)
+            return this.configuration.getNoteRepeatLength ().ordinal () == index ? 1 : 0;
+
+        return this.getResolutionIndex () == index ? 1 : 0;
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    protected void playNote (final int drumPad, final int velocity)
+    {
+        if (!this.surface.isMkII ())
+            this.surface.sendMidiEvent (MidiConstants.CMD_NOTE_ON, drumPad, velocity);
     }
 }

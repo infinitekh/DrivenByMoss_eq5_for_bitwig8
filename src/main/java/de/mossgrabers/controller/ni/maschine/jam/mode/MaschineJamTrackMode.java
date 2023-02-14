@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ni.maschine.jam.mode;
@@ -53,7 +53,7 @@ public class MaschineJamTrackMode extends TrackMode<MaschineJamControlSurface, M
         if (!track.doesExist ())
             return FADER_OFF;
 
-        final String c = DAWColor.getColorIndex (track.getColor ());
+        final String c = DAWColor.getColorID (track.getColor ());
         final int color = this.colorManager.getColorIndex (c);
 
         switch (index)

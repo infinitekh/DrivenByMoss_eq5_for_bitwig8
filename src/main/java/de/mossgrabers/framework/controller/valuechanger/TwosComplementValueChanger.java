@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.controller.valuechanger;
@@ -168,9 +168,9 @@ public class TwosComplementValueChanger implements IValueChanger
 
     /** {@inheritDoc} */
     @Override
-    public double toNormalizedValue (final int value)
+    public double toNormalizedValue (final double value)
     {
-        return Math.min ((double) value / (this.getUpperBound () - 1), 1.0);
+        return Math.min (value / (this.getUpperBound () - 1), 1.0);
     }
 
 

@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.bitwig.framework.daw;
@@ -242,7 +242,7 @@ public class BrowserImpl extends AbstractBrowser
             return;
 
         // Delay a bit to give the previous browser the chance to shutdown
-        this.host.scheduleTask (insertionPoint::browse, 0);
+        this.host.scheduleTask (insertionPoint::browse, 100);
     }
 
 

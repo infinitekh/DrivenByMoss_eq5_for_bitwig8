@@ -1,14 +1,15 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.configuration;
 
-import de.mossgrabers.framework.configuration.AbstractConfiguration.BehaviorOnStop;
 import de.mossgrabers.framework.configuration.AbstractConfiguration.RecordFunction;
+import de.mossgrabers.framework.configuration.AbstractConfiguration.TransportBehavior;
 import de.mossgrabers.framework.daw.constants.Resolution;
 import de.mossgrabers.framework.daw.midi.ArpeggiatorMode;
 import de.mossgrabers.framework.observer.ISettingObserver;
+import de.mossgrabers.framework.view.Views;
 
 import java.util.List;
 
@@ -136,7 +137,15 @@ public interface Configuration
      *
      * @return The behavior
      */
-    BehaviorOnStop getBehaviourOnStop ();
+    TransportBehavior getBehaviourOnStop ();
+
+
+    /**
+     * Get the behavior when pause is pressed.
+     *
+     * @return The behavior
+     */
+    TransportBehavior getBehaviourOnPause ();
 
 
     /**
@@ -249,6 +258,14 @@ public interface Configuration
      * @return True if should turned off
      */
     boolean isTurnOffEmptyDrumPads ();
+
+
+    /**
+     * Should the drum pads sound with or without using a combination button?
+     *
+     * @return True if use combination button
+     */
+    boolean isCombinationButtonToSoundDrumPads ();
 
 
     /**
@@ -497,4 +514,28 @@ public interface Configuration
      * @return The function index
      */
     RecordFunction getShiftedRecordButtonFunction ();
+
+
+    /**
+     * Get the preferred note view.
+     *
+     * @return The preferred note view
+     */
+    Views getPreferredNoteView ();
+
+
+    /**
+     * Get the preferred audio view.
+     *
+     * @return The preferred note view
+     */
+    Views getPreferredAudioView ();
+
+
+    /**
+     * Should the session view be activated on startup (instead of a play view)?
+     *
+     * @return True if session view should be active
+     */
+    boolean shouldStartWithSessionView ();
 }

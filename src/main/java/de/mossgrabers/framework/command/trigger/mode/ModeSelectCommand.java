@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.command.trigger.mode;
@@ -23,9 +23,9 @@ import de.mossgrabers.framework.utils.ButtonEvent;
  */
 public class ModeSelectCommand<S extends IControlSurface<C>, C extends Configuration> extends AbstractTriggerCommand<S, C>
 {
-    private final ModeManager modeManager;
-    private final Modes       modeId;
-    private final boolean     toggle;
+    protected final ModeManager modeManager;
+    protected final Modes       modeId;
+    protected final boolean     toggle;
 
 
     /**

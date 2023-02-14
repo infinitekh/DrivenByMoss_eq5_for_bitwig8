@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ableton.push.view;
@@ -8,9 +8,10 @@ import de.mossgrabers.controller.ableton.push.PushConfiguration;
 import de.mossgrabers.controller.ableton.push.controller.PushControlSurface;
 import de.mossgrabers.framework.controller.ButtonID;
 import de.mossgrabers.framework.daw.IModel;
-import de.mossgrabers.framework.daw.INoteClip;
-import de.mossgrabers.framework.daw.StepState;
-import de.mossgrabers.framework.view.AbstractPolySequencerView;
+import de.mossgrabers.framework.daw.clip.INoteClip;
+import de.mossgrabers.framework.daw.clip.NotePosition;
+import de.mossgrabers.framework.daw.clip.StepState;
+import de.mossgrabers.framework.view.sequencer.AbstractPolySequencerView;
 
 
 /**
@@ -51,13 +52,14 @@ public class PolySequencerView extends AbstractPolySequencerView<PushControlSurf
 
         final INoteClip clip = this.getClip ();
         final int step = this.numColumns * (this.numRows - 1 - y) + x;
-        final int channel = this.configuration.getMidiEditChannel ();
+        final NotePosition notePosition = new NotePosition (this.configuration.getMidiEditChannel (), step, 0);
 
         this.clearEditNotes ();
         for (int row = 0; row < 128; row++)
         {
-            if (clip.getStep (channel, step, row).getState () == StepState.START)
-                this.editNote (clip, channel, step, row, true);
+            notePosition.setNote (row);
+            if (clip.getStep (notePosition).getState () == StepState.START)
+                this.editNote (clip, notePosition, true);
         }
     }
 
@@ -67,23 +69,28 @@ public class PolySequencerView extends AbstractPolySequencerView<PushControlSurf
     protected boolean handleSequencerAreaButtonCombinations (final INoteClip clip, final int channel, final int step)
     {
         final boolean isSelectPressed = this.surface.isSelectPressed ();
+        final NotePosition notePosition = new NotePosition (channel, step, 0);
 
+        // Change note repeat setting for step
         if (this.surface.isShiftPressed ())
         {
             for (int row = 0; row < 128; row++)
             {
-                if (clip.getStep (channel, step, row).getState () == StepState.START)
-                    this.handleSequencerAreaRepeatOperator (clip, channel, step, row, 127, !isSelectPressed);
+                notePosition.setNote (row);
+                if (clip.getStep (notePosition).getState () == StepState.START)
+                    this.handleSequencerAreaRepeatOperator (clip, notePosition, 127, !isSelectPressed);
             }
             return true;
         }
 
+        // Add note to edit notes with SELECT
         if (isSelectPressed)
         {
             for (int row = 0; row < 128; row++)
             {
-                if (clip.getStep (channel, step, row).getState () == StepState.START)
-                    this.editNote (clip, channel, step, row, true);
+                notePosition.setNote (row);
+                if (clip.getStep (notePosition).getState () == StepState.START)
+                    this.editNote (clip, notePosition, true);
             }
             return true;
         }

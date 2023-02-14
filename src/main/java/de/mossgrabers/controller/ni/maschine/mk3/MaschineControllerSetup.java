@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ni.maschine.mk3;
@@ -113,6 +113,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 
 
 /**
@@ -211,7 +212,7 @@ public class MaschineControllerSetup extends AbstractControllerSetup<MaschineCon
     {
         final IMidiAccess midiAccess = this.factory.createMidiAccess ();
         final IMidiOutput output = midiAccess.createOutput ();
-        final IMidiInput input = midiAccess.createInput (this.maschine.getName (), "80????", "90????", "A0????", "D0????");
+        final IMidiInput input = midiAccess.createInput (this.maschine.getName (), "80????", "90????");
         final MaschineControlSurface surface = new MaschineControlSurface (this.host, this.colorManager, this.maschine, this.configuration, output, input);
         this.surfaces.add (surface);
 
@@ -264,7 +265,7 @@ public class MaschineControllerSetup extends AbstractControllerSetup<MaschineCon
         final ViewManager viewManager = surface.getViewManager ();
 
         viewManager.register (Views.SCENE_PLAY, new SceneView (surface, this.model));
-        viewManager.register (Views.CLIP, new ClipView (surface, this.model));
+        viewManager.register (Views.SESSION, new ClipView (surface, this.model));
 
         final DrumView drumView = new DrumView (surface, this.model);
         viewManager.register (Views.DRUM, drumView);
@@ -317,7 +318,7 @@ public class MaschineControllerSetup extends AbstractControllerSetup<MaschineCon
         this.addButton (ButtonID.PLAY, "PLAY", new PlayCommand<> (this.model, surface), MaschineControlSurface.PLAY, t::isPlaying);
 
         final ConfiguredRecordCommand<MaschineControlSurface, MaschineConfiguration> recordCommand = new ConfiguredRecordCommand<> (this.model, surface);
-        this.addButton (ButtonID.RECORD, "RECORD", recordCommand, MaschineControlSurface.REC, recordCommand::isLit);
+        this.addButton (ButtonID.RECORD, "RECORD", recordCommand, MaschineControlSurface.REC, (BooleanSupplier) recordCommand::isLit);
         this.addButton (ButtonID.STOP, "STOP", new MaschineStopCommand (this.model, surface), MaschineControlSurface.STOP, () -> !t.isPlaying ());
         this.addButton (ButtonID.LOOP, "LOOP", new ToggleLoopCommand<> (this.model, surface), MaschineControlSurface.RESTART, t::isLoop);
         this.addButton (ButtonID.DELETE, "ERASE", NopCommand.INSTANCE, MaschineControlSurface.ERASE);
@@ -441,10 +442,10 @@ public class MaschineControllerSetup extends AbstractControllerSetup<MaschineCon
         // Pad modes
         this.addButton (ButtonID.ACCENT, "ACCENT", new ToggleFixedVelCommand (this.model, surface), MaschineControlSurface.FIXED_VEL, this.configuration::isAccentActive);
 
-        this.addButton (ButtonID.SCENE1, "SCENE", new ViewMultiSelectCommand<> (this.model, surface, true, Views.SCENE_PLAY), MaschineControlSurface.SCENE, () -> viewManager.isActive (Views.SCENE_PLAY));
-        this.addButton (ButtonID.CLIP, "PATTERN", new ViewMultiSelectCommand<> (this.model, surface, true, Views.CLIP), MaschineControlSurface.PATTERN, () -> viewManager.isActive (Views.CLIP));
+        this.addButton (ButtonID.SCENE1, "SCENE", new ViewMultiSelectCommand<> (this.model, surface, Views.SCENE_PLAY), MaschineControlSurface.SCENE, () -> viewManager.isActive (Views.SCENE_PLAY));
+        this.addButton (ButtonID.CLIP, "PATTERN", new ViewMultiSelectCommand<> (this.model, surface, Views.SESSION), MaschineControlSurface.PATTERN, () -> viewManager.isActive (Views.CLIP_LENGTH));
         this.addButton (ButtonID.NOTE, "EVENTS", new ModeSelectCommand<> (this.model, surface, Modes.NOTE, true), MaschineControlSurface.EVENTS, () -> modeManager.isActive (Modes.NOTE));
-        this.addButton (ButtonID.TOGGLE_DEVICE, this.maschine == Maschine.STUDIO || this.maschine == Maschine.MK2 ? "NAVIGATE" : "VARIATION", new ViewMultiSelectCommand<> (this.model, surface, true, Views.DEVICE), MaschineControlSurface.VARIATION, () -> viewManager.isActive (Views.DEVICE));
+        this.addButton (ButtonID.TOGGLE_DEVICE, this.maschine == Maschine.STUDIO || this.maschine == Maschine.MK2 ? "NAVIGATE" : "VARIATION", new ViewMultiSelectCommand<> (this.model, surface, Views.DEVICE), MaschineControlSurface.VARIATION, () -> viewManager.isActive (Views.DEVICE));
         this.addButton (ButtonID.DUPLICATE, "DUPLICATE", NopCommand.INSTANCE, MaschineControlSurface.DUPLICATE);
 
         if (this.maschine.hasGroupButtons ())
@@ -469,9 +470,9 @@ public class MaschineControllerSetup extends AbstractControllerSetup<MaschineCon
         }
         else
         {
-            this.addButton (ButtonID.SELECT, "SELECT", new ViewMultiSelectCommand<> (this.model, surface, true, Views.TRACK_SELECT), MaschineControlSurface.SELECT, () -> viewManager.isActive (Views.TRACK_SELECT));
-            this.addButton (ButtonID.SOLO, "SOLO", new ViewMultiSelectCommand<> (this.model, surface, true, Views.TRACK_SOLO), MaschineControlSurface.SOLO, () -> viewManager.isActive (Views.TRACK_SOLO));
-            this.addButton (ButtonID.MUTE, "MUTE", new ViewMultiSelectCommand<> (this.model, surface, true, Views.TRACK_MUTE), MaschineControlSurface.MUTE, () -> viewManager.isActive (Views.TRACK_MUTE));
+            this.addButton (ButtonID.SELECT, "SELECT", new ViewMultiSelectCommand<> (this.model, surface, Views.TRACK_SELECT), MaschineControlSurface.SELECT, () -> viewManager.isActive (Views.TRACK_SELECT));
+            this.addButton (ButtonID.SOLO, "SOLO", new ViewMultiSelectCommand<> (this.model, surface, Views.TRACK_SOLO), MaschineControlSurface.SOLO, () -> viewManager.isActive (Views.TRACK_SOLO));
+            this.addButton (ButtonID.MUTE, "MUTE", new ViewMultiSelectCommand<> (this.model, surface, Views.TRACK_MUTE), MaschineControlSurface.MUTE, () -> viewManager.isActive (Views.TRACK_MUTE));
         }
 
         final KeyboardCommand keyboardCommand = new KeyboardCommand (this.model, surface);
@@ -658,18 +659,10 @@ public class MaschineControllerSetup extends AbstractControllerSetup<MaschineCon
             case PAN:
                 return surface.isPressed (arrowButton) ? MaschineColorManager.COLOR_SKY : MaschineColorManager.COLOR_SKY_LO;
 
-            case SEND1:
-            case SEND2:
-            case SEND3:
-            case SEND4:
-            case SEND5:
-            case SEND6:
-            case SEND7:
-            case SEND8:
+            case SEND1, SEND2, SEND3, SEND4, SEND5, SEND6, SEND7, SEND8:
                 return surface.isPressed (arrowButton) ? MaschineColorManager.COLOR_WHITE : MaschineColorManager.COLOR_YELLOW;
 
-            case DEVICE_PARAMS:
-            case USER:
+            case DEVICE_PARAMS, USER:
                 return surface.isPressed (arrowButton) ? MaschineColorManager.COLOR_PINK : MaschineColorManager.COLOR_PINK_LO;
 
             case BROWSER:
@@ -772,8 +765,7 @@ public class MaschineControllerSetup extends AbstractControllerSetup<MaschineCon
             case MK2:
                 this.layoutMk2 ();
                 break;
-            case MK3:
-            case PLUS:
+            case MK3, PLUS:
                 this.layoutMk3 ();
                 break;
             case STUDIO:
@@ -1174,8 +1166,7 @@ public class MaschineControllerSetup extends AbstractControllerSetup<MaschineCon
                     case MASTER_PANORAMA:
                         value = this.valueChanger.toMidiValue (this.model.getMasterTrack ().getPan ());
                         break;
-                    case SELECTED_TRACK_VOLUME:
-                    case SELECTED_TRACK_PANORAMA:
+                    case SELECTED_TRACK_VOLUME, SELECTED_TRACK_PANORAMA:
                         final ITrack track;
                         final Optional<ITrack> trackOptional = this.model.getTrackBank ().getSelectedItem ();
                         if (trackOptional.isPresent ())
@@ -1216,28 +1207,6 @@ public class MaschineControllerSetup extends AbstractControllerSetup<MaschineCon
 
             midiOutput.sendCC (MaschineControlSurface.MONITOR_ENCODER, value);
         }
-    }
-
-
-    /**
-     * Handle a track selection change.
-     *
-     * @param isSelected Has the track been selected?
-     */
-    private void handleTrackChange (final boolean isSelected)
-    {
-        if (!isSelected)
-            return;
-
-        final MaschineControlSurface surface = this.getSurface ();
-        final ViewManager viewManager = surface.getViewManager ();
-        if (viewManager.isActive (Views.PLAY))
-            viewManager.getActive ().updateNoteMapping ();
-
-        // Reset drum octave because the drum pad bank is also reset
-        this.scales.resetDrumOctave ();
-        if (viewManager.isActive (Views.DRUM))
-            viewManager.get (Views.DRUM).updateNoteMapping ();
     }
 
 

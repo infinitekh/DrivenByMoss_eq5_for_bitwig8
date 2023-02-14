@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ni.maschine.core;
@@ -12,10 +12,10 @@ import de.mossgrabers.framework.daw.DAWColor;
 import de.mossgrabers.framework.featuregroup.AbstractFeatureGroup;
 import de.mossgrabers.framework.featuregroup.AbstractMode;
 import de.mossgrabers.framework.scale.Scales;
-import de.mossgrabers.framework.view.AbstractDrumView;
 import de.mossgrabers.framework.view.AbstractPlayView;
-import de.mossgrabers.framework.view.AbstractSequencerView;
 import de.mossgrabers.framework.view.BrowserView;
+import de.mossgrabers.framework.view.sequencer.AbstractDrumView;
+import de.mossgrabers.framework.view.sequencer.AbstractSequencerView;
 
 import java.util.List;
 
@@ -96,6 +96,7 @@ public class MaschineColorManager extends ColorManager
         this.registerColorIndex (AbstractSequencerView.COLOR_STEP_SELECTED, COLOR_YELLOW);
 
         this.registerColorIndex (AbstractSequencerView.COLOR_NO_CONTENT, COLOR_BLACK);
+        this.registerColorIndex (AbstractSequencerView.COLOR_NO_CONTENT_4, COLOR_BLACK);
         this.registerColorIndex (AbstractSequencerView.COLOR_CONTENT, COLOR_BLUE);
         this.registerColorIndex (AbstractSequencerView.COLOR_CONTENT_CONT, COLOR_BLUE_LO);
 
@@ -187,7 +188,7 @@ public class MaschineColorManager extends ColorManager
         this.registerColor (COLOR_ORANGE_LO, ColorEx.DARK_ORANGE);
         this.registerColor (COLOR_PURPLE, ColorEx.PURPLE);
         this.registerColor (COLOR_PURPLE_LO, ColorEx.PURPLE);
-        this.registerColor (COLOR_SKIN, ColorEx.SKIN);
+        this.registerColor (COLOR_SKIN, ColorEx.ROSE);
     }
 
 
@@ -201,7 +202,7 @@ public class MaschineColorManager extends ColorManager
      */
     public int dimOrHighlightColor (final ColorEx color, final boolean isSelected)
     {
-        final int colorIndex = this.getColorIndex (DAWColor.getColorIndex (color));
+        final int colorIndex = this.getColorIndex (DAWColor.getColorID (color));
         if (isSelected)
             return colorIndex == MaschineColorManager.COLOR_DARK_GREY ? MaschineColorManager.COLOR_WHITE : colorIndex;
         return colorIndex / 8 * 8 + 5;

@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.novation.launchpad.controller;
@@ -12,6 +12,7 @@ import de.mossgrabers.framework.controller.ButtonID;
 import de.mossgrabers.framework.controller.color.ColorManager;
 import de.mossgrabers.framework.controller.grid.IVirtualFader;
 import de.mossgrabers.framework.controller.grid.VirtualFaderImpl;
+import de.mossgrabers.framework.controller.hardware.BindType;
 import de.mossgrabers.framework.controller.hardware.IHwButton;
 import de.mossgrabers.framework.daw.IHost;
 import de.mossgrabers.framework.daw.midi.DeviceInquiry;
@@ -23,6 +24,7 @@ import de.mossgrabers.framework.utils.StringUtils;
 import de.mossgrabers.framework.view.Views;
 
 import java.util.Map.Entry;
+import java.util.Optional;
 
 
 /**
@@ -216,6 +218,21 @@ public class LaunchpadControlSurface extends AbstractControlSurface<LaunchpadCon
     }
 
 
+    /**
+     * Send the current brightness setting to the controller device.
+     */
+    public void updateBrightness ()
+    {
+        final Optional<String> brightnessSysex = this.definition.getBrightnessSysex ();
+        if (brightnessSysex.isEmpty ())
+            return;
+
+        final int padBrightness = this.configuration.getPadBrightness ();
+        final String sysexMessage = String.format (brightnessSysex.get (), Integer.valueOf (padBrightness));
+        this.output.sendSysex (sysexMessage);
+    }
+
+
     /** {@inheritDoc} */
     @Override
     protected void internalShutdown ()
@@ -239,7 +256,7 @@ public class LaunchpadControlSurface extends AbstractControlSurface<LaunchpadCon
 
     /** {@inheritDoc} */
     @Override
-    public void setTrigger (final int channel, final int cc, final int state)
+    public void setTrigger (final BindType bindType, final int channel, final int cc, final int state)
     {
         if (!this.isPro () && (cc == LAUNCHPAD_BUTTON_SCENE1 || cc == LAUNCHPAD_BUTTON_SCENE2 || cc == LAUNCHPAD_BUTTON_SCENE3 || cc == LAUNCHPAD_BUTTON_SCENE4 || cc == LAUNCHPAD_BUTTON_SCENE5 || cc == LAUNCHPAD_BUTTON_SCENE6 || cc == LAUNCHPAD_BUTTON_SCENE7 || cc == LAUNCHPAD_BUTTON_SCENE8))
             this.output.sendNote (cc, state);

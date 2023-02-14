@@ -1,11 +1,11 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.daw;
 
-import de.mossgrabers.framework.daw.data.IParameter;
 import de.mossgrabers.framework.observer.IObserverManagement;
+import de.mossgrabers.framework.parameter.IParameter;
 
 
 /**
@@ -48,6 +48,14 @@ public interface IProject extends IObserverManagement
      * currently playing in the clip launcher.
      */
     void createSceneFromPlayingLauncherClips ();
+
+
+    /**
+     * Returns true if the project was modified and needs to be saved.
+     *
+     * @return True if it needs to be saved
+     */
+    boolean isDirty ();
 
 
     /**

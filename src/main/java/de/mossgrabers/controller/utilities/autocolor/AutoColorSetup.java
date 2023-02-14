@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.utilities.autocolor;
@@ -72,7 +72,7 @@ public class AutoColorSetup extends AbstractControllerSetup<IControlSurface<Auto
     {
         final ModelSetup ms = new ModelSetup ();
 
-        ms.enableDrumDevice (false);
+        ms.enableMainDrumDevice (false);
 
         ms.setNumDeviceLayers (0);
         ms.setNumDevicesInBank (0);

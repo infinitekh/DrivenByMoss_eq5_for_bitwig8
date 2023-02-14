@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.arturia.beatstep.view;
@@ -8,7 +8,7 @@ import de.mossgrabers.controller.arturia.beatstep.BeatstepConfiguration;
 import de.mossgrabers.controller.arturia.beatstep.controller.BeatstepControlSurface;
 import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.constants.Resolution;
-import de.mossgrabers.framework.view.AbstractSequencerView;
+import de.mossgrabers.framework.view.sequencer.AbstractSequencerView;
 
 
 /**
@@ -58,7 +58,7 @@ public abstract class BaseSequencerView extends AbstractSequencerView<BeatstepCo
             return;
 
         final boolean isInc = value >= 65;
-        this.selectedResolutionIndex = Resolution.change (this.selectedResolutionIndex, isInc);
-        this.getClip ().setStepLength (Resolution.getValueAt (this.selectedResolutionIndex));
+        final int selectedResolutionIndex = Resolution.change (this.getResolutionIndex (), isInc);
+        this.getClip ().setStepLength (Resolution.getValueAt (selectedResolutionIndex));
     }
 }

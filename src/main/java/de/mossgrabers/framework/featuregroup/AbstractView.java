@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.featuregroup;
@@ -151,7 +151,7 @@ public abstract class AbstractView<S extends IControlSurface<C>, C extends Confi
         {
             if (track == null)
                 return Scales.SCALE_COLOR_OCTAVE;
-            final String c = DAWColor.getColorIndex (track.getColor ());
+            final String c = DAWColor.getColorID (track.getColor ());
             return c == null ? Scales.SCALE_COLOR_OCTAVE : c;
         }
         return colorID;
@@ -185,11 +185,27 @@ public abstract class AbstractView<S extends IControlSurface<C>, C extends Confi
 
 
     /**
-     * Simulate pressing a button by sending a button down and up event.
+     * Simulate pressing a button by sending a button down and up event to the execute method.
+     *
+     * @param buttonID The ID of the button to trigger
+     * @param velocity The velocity to use
+     */
+    protected void simulateButtonPress (final ButtonID buttonID, final int velocity)
+    {
+        final IHwButton button = this.surface.getButton (buttonID);
+        final AbstractTriggerCommand<?, ?> triggerCommand = (AbstractTriggerCommand<?, ?>) button.getCommand ();
+        triggerCommand.execute (ButtonEvent.DOWN, velocity);
+        if (velocity != 0)
+            triggerCommand.execute (ButtonEvent.UP, 0);
+    }
+
+
+    /**
+     * Simulate pressing a button by sending a button down and up event to the executeNormal method.
      *
      * @param buttonID The ID of the button to trigger
      */
-    protected void simulateButtonPress (final ButtonID buttonID)
+    protected void simulateNormalButtonPress (final ButtonID buttonID)
     {
         final IHwButton button = this.surface.getButton (buttonID);
         final AbstractTriggerCommand<?, ?> triggerCommand = (AbstractTriggerCommand<?, ?>) button.getCommand ();

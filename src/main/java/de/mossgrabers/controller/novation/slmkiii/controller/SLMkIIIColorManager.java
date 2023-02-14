@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.novation.slmkiii.controller;
@@ -12,10 +12,10 @@ import de.mossgrabers.framework.daw.DAWColor;
 import de.mossgrabers.framework.featuregroup.AbstractFeatureGroup;
 import de.mossgrabers.framework.featuregroup.AbstractMode;
 import de.mossgrabers.framework.scale.Scales;
-import de.mossgrabers.framework.view.AbstractDrumView;
 import de.mossgrabers.framework.view.AbstractPlayView;
-import de.mossgrabers.framework.view.AbstractSequencerView;
 import de.mossgrabers.framework.view.AbstractSessionView;
+import de.mossgrabers.framework.view.sequencer.AbstractDrumView;
+import de.mossgrabers.framework.view.sequencer.AbstractSequencerView;
 
 
 /**
@@ -118,6 +118,7 @@ public class SLMkIIIColorManager extends ColorManager
         this.registerColorIndex (AbstractSequencerView.COLOR_STEP_MUTED_CONT, SLMkIIIColorManager.SLMKIII_DARK_GREY);
         this.registerColorIndex (AbstractSequencerView.COLOR_STEP_SELECTED, SLMkIIIColorManager.SLMKIII_YELLOW);
         this.registerColorIndex (AbstractSequencerView.COLOR_NO_CONTENT, SLMkIIIColorManager.SLMKIII_BLACK);
+        this.registerColorIndex (AbstractSequencerView.COLOR_NO_CONTENT_4, SLMkIIIColorManager.SLMKIII_BLACK);
         this.registerColorIndex (AbstractSequencerView.COLOR_CONTENT, SLMkIIIColorManager.SLMKIII_BLUE);
         this.registerColorIndex (AbstractSequencerView.COLOR_CONTENT_CONT, SLMkIIIColorManager.SLMKIII_DARK_BLUE);
         this.registerColorIndex (AbstractSequencerView.COLOR_PAGE, SLMkIIIColorManager.SLMKIII_WHITE);
@@ -206,7 +207,7 @@ public class SLMkIIIColorManager extends ColorManager
         this.registerColor (SLMKIII_RED, ColorEx.RED);
         this.registerColor (SLMKIII_DARK_RED, ColorEx.DARK_RED);
         this.registerColor (SLMKIII_RED_HALF, ColorEx.evenDarker (ColorEx.RED));
-        this.registerColor (SLMKIII_ROSE, ColorEx.SKIN);
+        this.registerColor (SLMKIII_ROSE, ColorEx.ROSE);
         this.registerColor (SLMKIII_ORANGE, ColorEx.ORANGE);
         this.registerColor (SLMKIII_DARK_BROWN, ColorEx.DARK_BROWN);
         this.registerColor (SLMKIII_ORANGE_HALF, ColorEx.evenDarker (ColorEx.ORANGE));

@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.bitwig.framework.daw;
@@ -15,11 +15,12 @@ import de.mossgrabers.framework.daw.constants.AutomationMode;
 import de.mossgrabers.framework.daw.constants.LaunchQuantization;
 import de.mossgrabers.framework.daw.constants.PostRecordingAction;
 import de.mossgrabers.framework.daw.constants.TransportConstants;
-import de.mossgrabers.framework.daw.data.IParameter;
+import de.mossgrabers.framework.parameter.IParameter;
 import de.mossgrabers.framework.utils.StringUtils;
 
 import com.bitwig.extension.controller.api.BeatTimeFormatter;
 import com.bitwig.extension.controller.api.ControllerHost;
+import com.bitwig.extension.controller.api.SettableEnumValue;
 import com.bitwig.extension.controller.api.TimeSignatureValue;
 import com.bitwig.extension.controller.api.Transport;
 
@@ -33,6 +34,15 @@ import java.text.DecimalFormat;
  */
 public class TransportImpl implements ITransport
 {
+    /** No preroll. */
+    private static final String            PREROLL_NONE            = "none";
+    /** 1 bar preroll. */
+    private static final String            PREROLL_1_BAR           = "one_bar";
+    /** 2 bar preroll. */
+    private static final String            PREROLL_2_BARS          = "two_bars";
+    /** 4 bar preroll. */
+    private static final String            PREROLL_4_BARS          = "four_bars";
+
     private static final String            ACTION_JUMP_TO_END      = "jump_to_end_of_arrangement";
 
     private static final AutomationMode [] AUTOMATION_MODES        = new AutomationMode []
@@ -84,6 +94,7 @@ public class TransportImpl implements ITransport
         this.transport.isMetronomeAudibleDuringPreRoll ().markInterested ();
         this.transport.preRoll ().markInterested ();
         this.transport.getPosition ().markInterested ();
+        this.transport.playStartPosition ().markInterested ();
         this.transport.arrangerLoopStart ().markInterested ();
         this.transport.arrangerLoopDuration ().markInterested ();
         this.transport.clipLauncherPostRecordingAction ().markInterested ();
@@ -120,6 +131,7 @@ public class TransportImpl implements ITransport
         Util.setIsSubscribed (this.transport.isMetronomeAudibleDuringPreRoll (), enable);
         Util.setIsSubscribed (this.transport.preRoll (), enable);
         Util.setIsSubscribed (this.transport.getPosition (), enable);
+        Util.setIsSubscribed (this.transport.playStartPosition (), enable);
         Util.setIsSubscribed (this.transport.arrangerLoopStart (), enable);
         Util.setIsSubscribed (this.transport.arrangerLoopDuration (), enable);
         Util.setIsSubscribed (this.transport.clipLauncherPostRecordingAction (), enable);
@@ -482,7 +494,9 @@ public class TransportImpl implements ITransport
     @Override
     public void setPosition (final double beats)
     {
-        this.transport.getPosition ().set (beats);
+        this.transport.playStartPosition ().set (beats);
+        if (this.transport.isPlaying ().get ())
+            this.transport.jumpToPlayStartPosition ();
     }
 
 
@@ -491,7 +505,14 @@ public class TransportImpl implements ITransport
     public void changePosition (final boolean increase, final boolean slow)
     {
         final double frac = slow ? TransportConstants.INC_FRACTION_TIME_SLOW : TransportConstants.INC_FRACTION_TIME;
-        this.transport.getPosition ().inc (increase ? frac : -frac);
+        final double position = this.transport.playStartPosition ().get ();
+        double newPos = Math.max (0, position + (increase ? frac : -frac));
+
+        // Adjust to resolution
+        final double intPosition = Math.floor (newPos / frac);
+        newPos = intPosition * frac;
+
+        this.setPosition (newPos);
     }
 
 
@@ -705,25 +726,19 @@ public class TransportImpl implements ITransport
 
     /** {@inheritDoc} */
     @Override
-    public String getPreroll ()
+    public int getPrerollMeasures ()
     {
-        return this.transport.preRoll ().get ();
-    }
+        final String preroll = this.transport.preRoll ().get ();
 
-
-    /** {@inheritDoc} */
-    @Override
-    public int getPrerollAsBars ()
-    {
-        switch (this.getPreroll ())
+        switch (preroll)
         {
-            case TransportConstants.PREROLL_NONE:
+            case PREROLL_NONE:
                 return 0;
-            case TransportConstants.PREROLL_1_BAR:
+            case PREROLL_1_BAR:
                 return 1;
-            case TransportConstants.PREROLL_2_BARS:
+            case PREROLL_2_BARS:
                 return 2;
-            case TransportConstants.PREROLL_4_BARS:
+            case PREROLL_4_BARS:
                 return 4;
             default:
                 return 0;
@@ -733,29 +748,22 @@ public class TransportImpl implements ITransport
 
     /** {@inheritDoc} */
     @Override
-    public void setPreroll (final String preroll)
+    public void setPrerollMeasures (final int preroll)
     {
-        this.transport.preRoll ().set (preroll);
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public void setPrerollAsBars (final int preroll)
-    {
+        final SettableEnumValue preRollValue = this.transport.preRoll ();
         switch (preroll)
         {
             case 0:
-                this.setPreroll (TransportConstants.PREROLL_NONE);
+                preRollValue.set (PREROLL_NONE);
                 break;
             case 1:
-                this.setPreroll (TransportConstants.PREROLL_1_BAR);
+                preRollValue.set (PREROLL_1_BAR);
                 break;
             case 2:
-                this.setPreroll (TransportConstants.PREROLL_2_BARS);
+                preRollValue.set (PREROLL_2_BARS);
                 break;
             case 4:
-                this.setPreroll (TransportConstants.PREROLL_4_BARS);
+                preRollValue.set (PREROLL_4_BARS);
                 break;
             default:
                 this.host.errorln ("Unknown Preroll length: " + preroll);

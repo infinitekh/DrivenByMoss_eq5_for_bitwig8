@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.controller.hardware;
@@ -15,6 +15,11 @@ import de.mossgrabers.framework.daw.midi.IMidiInput;
  */
 public abstract class AbstractHwInputControl extends AbstractHwControl implements IHwInputControl
 {
+    protected IMidiInput input;
+    protected BindType   type;
+    protected int        channel;
+
+
     /**
      * Constructor.
      *

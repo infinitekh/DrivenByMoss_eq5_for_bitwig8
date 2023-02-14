@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.bitwig.framework.hardware;
@@ -11,10 +11,10 @@ import de.mossgrabers.framework.command.core.TriggerCommand;
 import de.mossgrabers.framework.controller.hardware.AbstractHwContinuousControl;
 import de.mossgrabers.framework.controller.hardware.BindType;
 import de.mossgrabers.framework.controller.hardware.IHwRelativeKnob;
-import de.mossgrabers.framework.controller.valuechanger.TwosComplementValueChanger;
 import de.mossgrabers.framework.controller.valuechanger.RelativeEncoding;
-import de.mossgrabers.framework.daw.data.IParameter;
+import de.mossgrabers.framework.controller.valuechanger.TwosComplementValueChanger;
 import de.mossgrabers.framework.daw.midi.IMidiInput;
+import de.mossgrabers.framework.parameter.IParameter;
 
 import com.bitwig.extension.controller.api.ControllerHost;
 import com.bitwig.extension.controller.api.HardwareBindable;
@@ -38,6 +38,7 @@ public class HwRelativeKnobImpl extends AbstractHwContinuousControl implements I
     private RelativeHardwareControlBinding       binding;
     private IParameter                           parameter;
     private boolean                              shouldAdaptSensitivity = true;
+    private int                                  control;
 
 
     /**
@@ -132,9 +133,32 @@ public class HwRelativeKnobImpl extends AbstractHwContinuousControl implements I
 
     /** {@inheritDoc} */
     @Override
-    public void bind (final IMidiInput input, final BindType type, final int channel, final int value)
+    public void bind (final IMidiInput input, final BindType type, final int channel, final int control)
     {
-        input.bind (this, type, channel, value, this.encoding);
+        this.input = input;
+        this.type = type;
+        this.channel = channel;
+        this.control = control;
+
+        input.bind (this, type, channel, control, this.encoding);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public void unbind ()
+    {
+        if (this.input != null)
+            this.input.unbind (this);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public void rebind ()
+    {
+        if (this.input != null)
+            this.input.bind (this, this.type, this.channel, this.control, this.encoding);
     }
 
 

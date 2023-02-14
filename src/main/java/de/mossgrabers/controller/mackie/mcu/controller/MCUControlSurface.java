@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.mackie.mcu.controller;
@@ -244,14 +244,6 @@ public class MCUControlSurface extends AbstractControlSurface<MCUConfiguration>
     }
 
 
-    /** {@inheritDoc} */
-    @Override
-    public void setTrigger (final int channel, final int cc, final int value)
-    {
-        this.output.sendNoteEx (channel, cc, value);
-    }
-
-
     /**
      * Check if a button should be updated by the main update routine.
      *
@@ -369,9 +361,16 @@ public class MCUControlSurface extends AbstractControlSurface<MCUConfiguration>
         if (!this.configuration.hasDisplayColors ())
             return;
 
+        ColorEx [] cs = colors;
+        if (this.isMainDevice && this.getTextDisplay ().isNotificationActive ())
+        {
+            cs = new ColorEx [8];
+            Arrays.fill (cs, ColorEx.WHITE);
+        }
+
         final byte [] displayColors = new byte [8];
         for (int i = 0; i < 8; i++)
-            displayColors[i] = toIndex (colors[i] == null ? ColorEx.BLACK : colors[i]);
+            displayColors[i] = toIndex (cs[i] == null ? ColorEx.BLACK : cs[i]);
 
         if (Arrays.compare (displayColors, this.currentDisplayColors) == 0)
             return;

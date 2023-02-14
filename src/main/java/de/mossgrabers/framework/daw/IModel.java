@@ -1,11 +1,12 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.daw;
 
 import de.mossgrabers.framework.controller.color.ColorManager;
 import de.mossgrabers.framework.controller.valuechanger.IValueChanger;
+import de.mossgrabers.framework.daw.clip.INoteClip;
 import de.mossgrabers.framework.daw.constants.DeviceID;
 import de.mossgrabers.framework.daw.data.ICursorDevice;
 import de.mossgrabers.framework.daw.data.ICursorTrack;
@@ -17,6 +18,7 @@ import de.mossgrabers.framework.daw.data.ITrack;
 import de.mossgrabers.framework.daw.data.bank.IMarkerBank;
 import de.mossgrabers.framework.daw.data.bank.IParameterBank;
 import de.mossgrabers.framework.daw.data.bank.ISceneBank;
+import de.mossgrabers.framework.daw.data.bank.ISlotBank;
 import de.mossgrabers.framework.daw.data.bank.ITrackBank;
 import de.mossgrabers.framework.observer.IValueObserver;
 import de.mossgrabers.framework.scale.Scales;
@@ -155,17 +157,18 @@ public interface IModel
     /**
      * Get the first drum device of the track.
      *
-     * @return The device, never null but needs to checked fore existence
+     * @return The device, never null but needs to checked for existence
      */
     IDrumDevice getDrumDevice ();
 
 
     /**
-     * Get the first drum device of the track and monitors 64 layers.
+     * Get the first drum device of the track which monitors the given number of drum pads.
      *
+     * @param pageSize The size of the drum pad page
      * @return The device
      */
-    IDrumDevice getDrumDevice64 ();
+    IDrumDevice getDrumDevice (int pageSize);
 
 
     /**
@@ -279,12 +282,22 @@ public interface IModel
 
 
     /**
-     * Creates a new bank for monitoring scenes.
+     * Get a new bank for monitoring scenes. Needs to be called once during initialization.
      *
      * @param numScenes The number of scenes in a bank page
      * @return The scene bank
      */
-    ISceneBank createSceneBank (final int numScenes);
+    ISceneBank getSceneBank (final int numScenes);
+
+
+    /**
+     * Get a new bank for monitoring slots on the cursor track. Needs to be called once during
+     * initialization.
+     *
+     * @param numSlots The number of slots in a bank page
+     * @return The slot bank
+     */
+    ISlotBank getSlotBank (int numSlots);
 
 
     /**

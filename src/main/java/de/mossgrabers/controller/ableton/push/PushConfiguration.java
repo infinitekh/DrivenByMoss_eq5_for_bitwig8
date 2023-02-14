@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ableton.push;
@@ -50,32 +50,27 @@ public class PushConfiguration extends AbstractConfiguration implements IGraphic
     /** Setting for the ribbon mode note repeat. */
     public static final Integer     RIBBON_MODE_NOTE_REPEAT         = Integer.valueOf (52);
 
-    /** Setting for toggling the sends. */
-    public static final Integer     TOGGLING_SENDS                  = Integer.valueOf (53);
-
     /** Setting for the velocity curve. */
-    public static final Integer     VELOCITY_CURVE                  = Integer.valueOf (54);
+    public static final Integer     VELOCITY_CURVE                  = Integer.valueOf (53);
     /** Setting for the pad threshold. */
-    public static final Integer     PAD_THRESHOLD                   = Integer.valueOf (55);
+    public static final Integer     PAD_THRESHOLD                   = Integer.valueOf (54);
     /** Setting for the display brightness. */
-    public static final Integer     DISPLAY_BRIGHTNESS              = Integer.valueOf (56);
+    public static final Integer     DISPLAY_BRIGHTNESS              = Integer.valueOf (55);
     /** Setting for the pad LED brightness. */
-    public static final Integer     LED_BRIGHTNESS                  = Integer.valueOf (57);
+    public static final Integer     LED_BRIGHTNESS                  = Integer.valueOf (56);
     /** Setting for the pad sensitivity. */
-    public static final Integer     PAD_SENSITIVITY                 = Integer.valueOf (58);
+    public static final Integer     PAD_SENSITIVITY                 = Integer.valueOf (57);
     /** Setting for the pad gain. */
-    public static final Integer     PAD_GAIN                        = Integer.valueOf (59);
+    public static final Integer     PAD_GAIN                        = Integer.valueOf (58);
     /** Setting for the pad dynamics. */
-    public static final Integer     PAD_DYNAMICS                    = Integer.valueOf (60);
+    public static final Integer     PAD_DYNAMICS                    = Integer.valueOf (59);
 
     /** Setting for stopping automation recording on knob release. */
-    public static final Integer     STOP_AUTOMATION_ON_KNOB_RELEASE = Integer.valueOf (61);
-    /** Setting for the default note view. */
-    public static final Integer     DEFAULT_NOTE_VIEW               = Integer.valueOf (62);
+    public static final Integer     STOP_AUTOMATION_ON_KNOB_RELEASE = Integer.valueOf (60);
     /** Mode debug. */
-    public static final Integer     DEBUG_MODE                      = Integer.valueOf (63);
+    public static final Integer     DEBUG_MODE                      = Integer.valueOf (61);
     /** Push 2 display debug window. */
-    public static final Integer     DEBUG_WINDOW                    = Integer.valueOf (64);
+    public static final Integer     DEBUG_WINDOW                    = Integer.valueOf (62);
 
     /** Background color of an element. */
     public static final Integer     COLOR_BACKGROUND                = Integer.valueOf (70);
@@ -152,6 +147,20 @@ public class PushConfiguration extends AbstractConfiguration implements IGraphic
         "Scenes"
     };
 
+    private static final Views []   PREFERRED_NOTE_VIEWS            =
+    {
+        Views.PLAY,
+        Views.CHORDS,
+        Views.PIANO,
+        Views.DRUM64,
+        Views.DRUM,
+        Views.DRUM4,
+        Views.DRUM8,
+        Views.SEQUENCER,
+        Views.RAINDROPS,
+        Views.POLY_SEQUENCER
+    };
+
     /** Debug modes. */
     private static final Set<Modes> DEBUG_MODES                     = EnumSet.noneOf (Modes.class);
 
@@ -214,7 +223,6 @@ public class PushConfiguration extends AbstractConfiguration implements IGraphic
     private boolean         isMuteLongPressed           = false;
     private boolean         isMuteSoloLocked            = false;
 
-    private Views           defaultNoteView             = Views.PLAY;
     private boolean         displayScenesClips;
     private boolean         isScenesClipView;
 
@@ -233,7 +241,6 @@ public class PushConfiguration extends AbstractConfiguration implements IGraphic
     private int             padThreshold                = 20;
 
     // Only Push 2
-    private boolean         sendsAreToggled             = false;
     private int             displayBrightness           = 255;
     private int             ledBrightness               = 127;
     private int             padSensitivity              = 5;
@@ -292,6 +299,7 @@ public class PushConfiguration extends AbstractConfiguration implements IGraphic
         super (host, valueChanger, arpeggiatorModes);
 
         this.isPush2 = isPush2;
+        this.preferredAudioView = Views.CLIP_LENGTH;
 
         this.dontNotifyAll.add (DEBUG_WINDOW);
     }
@@ -325,7 +333,7 @@ public class PushConfiguration extends AbstractConfiguration implements IGraphic
         ///////////////////////////
         // Transport
 
-        this.activateBehaviourOnStopSetting (globalSettings);
+        this.activateBehaviourOnPauseSetting (globalSettings);
         this.activateFlipRecordSetting (globalSettings);
 
         ///////////////////////////
@@ -334,7 +342,8 @@ public class PushConfiguration extends AbstractConfiguration implements IGraphic
         this.activateAccentActiveSetting (globalSettings);
         this.activateAccentValueSetting (globalSettings);
         this.activateQuantizeAmountSetting (globalSettings);
-        this.activateDefaultNoteViewSetting (globalSettings);
+        this.activatePreferredNoteViewSetting (globalSettings, PREFERRED_NOTE_VIEWS);
+        this.activateStartWithSessionViewSetting (globalSettings);
         this.activateMidiEditChannelSetting (documentSettings);
 
         ///////////////////////////
@@ -355,7 +364,6 @@ public class PushConfiguration extends AbstractConfiguration implements IGraphic
         this.activateStopAutomationOnKnobReleaseSetting (globalSettings);
         this.activateNewClipLengthSetting (globalSettings);
         this.activateKnobSpeedSetting (globalSettings);
-
         this.activateUserPageNamesSetting (documentSettings);
 
         ///////////////////////////
@@ -656,29 +664,6 @@ public class PushConfiguration extends AbstractConfiguration implements IGraphic
 
 
     /**
-     * Are the sends toggled (5-8)?
-     *
-     * @return True if toggled
-     */
-    public boolean isSendsAreToggled ()
-    {
-        return this.sendsAreToggled;
-    }
-
-
-    /**
-     * Set that the sends are toggled (5-8).
-     *
-     * @param sendsAreToggled True if toggled
-     */
-    public void setSendsAreToggled (final boolean sendsAreToggled)
-    {
-        this.sendsAreToggled = sendsAreToggled;
-        this.notifyObservers (TOGGLING_SENDS);
-    }
-
-
-    /**
      * Is mute long pressed?
      *
      * @return True if mute is long pressed
@@ -922,17 +907,6 @@ public class PushConfiguration extends AbstractConfiguration implements IGraphic
             }
         }
         return this.layerMode;
-    }
-
-
-    /**
-     * Get the default note view.
-     *
-     * @return The default note view
-     */
-    public Views getDefaultNoteView ()
-    {
-        return this.defaultNoteView;
     }
 
 
@@ -1234,22 +1208,6 @@ public class PushConfiguration extends AbstractConfiguration implements IGraphic
         this.padDynamicsSetting.addValueObserver (value -> {
             this.padDynamics = value.intValue ();
             this.notifyObservers (PAD_DYNAMICS);
-        });
-    }
-
-
-    /**
-     * Activate the default note view setting.
-     *
-     * @param settingsUI The settings
-     */
-    private void activateDefaultNoteViewSetting (final ISettingsUI settingsUI)
-    {
-        final String [] noteViewNames = Views.getNoteViewNames ();
-        final IEnumSetting defaultNoteViewSetting = settingsUI.getEnumSetting ("Default note view", CATEGORY_PLAY_AND_SEQUENCE, noteViewNames, Views.NAME_PLAY);
-        defaultNoteViewSetting.addValueObserver (value -> {
-            this.defaultNoteView = Views.getNoteView (value);
-            this.notifyObservers (DEFAULT_NOTE_VIEW);
         });
     }
 

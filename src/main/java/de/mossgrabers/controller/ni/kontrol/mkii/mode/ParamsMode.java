@@ -1,19 +1,20 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ni.kontrol.mkii.mode;
 
 import de.mossgrabers.controller.ni.kontrol.mkii.KontrolProtocolConfiguration;
 import de.mossgrabers.controller.ni.kontrol.mkii.TrackType;
+import de.mossgrabers.controller.ni.kontrol.mkii.controller.KontrolProtocol;
 import de.mossgrabers.controller.ni.kontrol.mkii.controller.KontrolProtocolControlSurface;
 import de.mossgrabers.framework.controller.ContinuousID;
 import de.mossgrabers.framework.controller.valuechanger.IValueChanger;
 import de.mossgrabers.framework.daw.IModel;
-import de.mossgrabers.framework.daw.data.IParameter;
 import de.mossgrabers.framework.daw.data.bank.IDeviceBank;
 import de.mossgrabers.framework.daw.data.bank.IParameterPageBank;
 import de.mossgrabers.framework.mode.device.ParameterMode;
+import de.mossgrabers.framework.parameter.IParameter;
 import de.mossgrabers.framework.parameterprovider.device.BankParameterProvider;
 import de.mossgrabers.framework.parameterprovider.special.CombinedParameterProvider;
 import de.mossgrabers.framework.utils.StringUtils;
@@ -105,11 +106,10 @@ public class ParamsMode extends ParameterMode<KontrolProtocolControlSurface, Kon
             this.surface.sendKontrolTrackSysEx (KontrolProtocolControlSurface.KONTROL_TRACK_AVAILABLE, TrackType.GENERIC, i);
             this.surface.sendKontrolTrackSysEx (KontrolProtocolControlSurface.KONTROL_TRACK_SELECTED, parameter.isSelected () ? 1 : 0, i);
             this.surface.sendKontrolTrackSysEx (KontrolProtocolControlSurface.KONTROL_TRACK_RECARM, 0, i);
-            final boolean exists = parameter.doesExist ();
-            final String info = exists ? parameter.getDisplayedValue (8) : " ";
+            final String info = parameter.doesExist () ? parameter.getDisplayedValue (8) : " ";
             this.surface.sendKontrolTrackSysEx (KontrolProtocolControlSurface.KONTROL_TRACK_VOLUME_TEXT, 0, i, info);
             this.surface.sendKontrolTrackSysEx (KontrolProtocolControlSurface.KONTROL_TRACK_PAN_TEXT, 0, i, info);
-            final String name = exists ? this.cursorDevice.getName (8) + "\n" + selectedPage + "\n" + parameter.getName (16) : "None";
+            final String name = this.getLabel (selectedPage, parameter);
             this.surface.sendKontrolTrackSysEx (KontrolProtocolControlSurface.KONTROL_TRACK_NAME, 0, i, name);
 
             final int j = 2 * i;
@@ -149,5 +149,16 @@ public class ParamsMode extends ParameterMode<KontrolProtocolControlSurface, Kon
     public void selectNextItemPage ()
     {
         this.cursorDevice.selectNext ();
+    }
+
+
+    private String getLabel (final String selectedPage, final IParameter parameter)
+    {
+        final String n = parameter.doesExist () ? parameter.getName (16) : "None";
+
+        if (this.surface.getProtocolVersion () == KontrolProtocol.VERSION_1)
+            return n;
+
+        return this.cursorDevice.getName (8) + "\n" + selectedPage + "\n" + n;
     }
 }

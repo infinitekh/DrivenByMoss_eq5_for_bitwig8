@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.novation.slmkiii.mode;
@@ -12,7 +12,7 @@ import de.mossgrabers.framework.controller.ButtonID;
 import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.data.IItem;
 import de.mossgrabers.framework.daw.data.bank.IBank;
-import de.mossgrabers.framework.featuregroup.AbstractMode;
+import de.mossgrabers.framework.featuregroup.AbstractParameterMode;
 import de.mossgrabers.framework.utils.ButtonEvent;
 
 
@@ -23,7 +23,7 @@ import de.mossgrabers.framework.utils.ButtonEvent;
  *
  * @author J&uuml;rgen Mo&szlig;graber
  */
-public abstract class BaseMode<B extends IItem> extends AbstractMode<SLMkIIIControlSurface, SLMkIIIConfiguration, B>
+public abstract class BaseMode<B extends IItem> extends AbstractParameterMode<SLMkIIIControlSurface, SLMkIIIConfiguration, B>
 {
     protected static final int SCROLL_RATE     = 8;
 

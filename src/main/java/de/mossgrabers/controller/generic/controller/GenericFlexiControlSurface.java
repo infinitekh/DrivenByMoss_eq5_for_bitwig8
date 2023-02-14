@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.generic.controller;
@@ -183,8 +183,7 @@ public class GenericFlexiControlSurface extends AbstractControlSurface<GenericFl
         switch (code)
         {
             // Note on/off
-            case MidiConstants.CMD_NOTE_OFF:
-            case MidiConstants.CMD_NOTE_ON:
+            case MidiConstants.CMD_NOTE_OFF, MidiConstants.CMD_NOTE_ON:
                 this.configuration.setLearnValues (GenericFlexiConfiguration.OPTIONS_TYPE.get (CommandSlot.TYPE_NOTE + 1), data1, channel, false);
                 this.handleCommand (this.configuration.getSlotCommand (CommandSlot.TYPE_NOTE, data1, channel), MidiValue.get (code == MidiConstants.CMD_NOTE_OFF ? 0 : data2, false));
                 break;

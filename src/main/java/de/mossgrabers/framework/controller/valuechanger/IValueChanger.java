@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.controller.valuechanger;
@@ -158,12 +158,13 @@ public interface IValueChanger
 
 
     /**
-     * Translate the value in the range from [0, max-1] to [0.0, 1.0].
+     * Translate the value in the range from [0, max-1] to [0.0, 1.0]. Allows doubles as input for
+     * calculating small offset values.
      *
      * @param value The DAW value
      * @return The MIDI value
      */
-    double toNormalizedValue (int value);
+    double toNormalizedValue (double value);
 
 
     /**

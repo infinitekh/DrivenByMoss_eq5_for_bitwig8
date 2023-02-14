@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.mode.device;
@@ -10,7 +10,7 @@ import de.mossgrabers.framework.controller.IControlSurface;
 import de.mossgrabers.framework.daw.IBrowser;
 import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.data.IItem;
-import de.mossgrabers.framework.featuregroup.AbstractMode;
+import de.mossgrabers.framework.featuregroup.AbstractParameterMode;
 
 import java.util.Optional;
 
@@ -23,7 +23,7 @@ import java.util.Optional;
  *
  * @author J&uuml;rgen Mo&szlig;graber
  */
-public class BrowserMode<S extends IControlSurface<C>, C extends Configuration> extends AbstractMode<S, C, IItem>
+public class BrowserMode<S extends IControlSurface<C>, C extends Configuration> extends AbstractParameterMode<S, C, IItem>
 {
     /**
      * Constructor. Changes are always relative.
@@ -44,15 +44,19 @@ public class BrowserMode<S extends IControlSurface<C>, C extends Configuration> 
         final IBrowser browser = this.model.getBrowser ();
         if (browser == null)
             return;
+
+        final boolean increase = this.model.getValueChanger ().isIncrease (value);
+
         if (index == 7)
         {
-            if (value > 0)
+            if (increase)
                 browser.selectNextResult ();
             else
                 browser.selectPreviousResult ();
             return;
         }
-        if (value > 0)
+
+        if (increase)
             browser.selectNextFilterItem (index);
         else
             browser.selectPreviousFilterItem (index);

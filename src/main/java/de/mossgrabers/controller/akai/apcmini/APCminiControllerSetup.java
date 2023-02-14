@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.apcmini;
@@ -120,7 +120,7 @@ public class APCminiControllerSetup extends AbstractControllerSetup<APCminiContr
     @Override
     protected void createScales ()
     {
-        this.scales = new APCminiScales (this.valueChanger, 36, 100, 8, 8);
+        this.scales = new APCminiScales (this.valueChanger);
     }
 
 
@@ -224,7 +224,7 @@ public class APCminiControllerSetup extends AbstractControllerSetup<APCminiContr
             final int index = i;
 
             final ButtonID buttonID = ButtonID.get (ButtonID.SCENE1, i);
-            this.addButton (buttonID, COL_NAMES[i], new ViewButtonCommand<> (buttonID, surface), APCminiControlSurface.APC_BUTTON_SCENE_BUTTON1 + i, () -> this.getViewColor (buttonID));
+            this.addButton (buttonID, COL_NAMES[i], new ViewButtonCommand<> (buttonID, surface), APCminiControlSurface.APC_BUTTON_SCENE_BUTTON1 + i, () -> this.getButtonColorFromActiveView (buttonID));
 
             this.addButton (ButtonID.get (ButtonID.ROW_SELECT_1, i), ROW_NAMES[i], new TrackSelectCommand (i, this.model, surface), APCminiControlSurface.APC_BUTTON_TRACK_BUTTON1 + i, () -> {
                 final IView view = viewManager.getActive ();
@@ -298,32 +298,7 @@ public class APCminiControllerSetup extends AbstractControllerSetup<APCminiContr
     {
         final APCminiControlSurface surface = this.getSurface ();
         surface.getModeManager ().setActive (Modes.VOLUME);
-        surface.getViewManager ().setActive (Views.PLAY);
+        surface.getViewManager ().setActive (this.configuration.shouldStartWithSessionView () ? Views.SESSION : this.configuration.getPreferredNoteView ());
         this.host.scheduleTask (surface.getPadGrid ()::forceFlush, 1000);
-    }
-
-
-    /**
-     * Handle a track selection change.
-     *
-     * @param isSelected Has the track been selected?
-     */
-    private void handleTrackChange (final boolean isSelected)
-    {
-        if (!isSelected)
-            return;
-
-        final APCminiControlSurface surface = this.getSurface ();
-        final ViewManager viewManager = surface.getViewManager ();
-        if (viewManager.isActive (Views.PLAY))
-            viewManager.getActive ().updateNoteMapping ();
-
-        if (viewManager.isActive (Views.PLAY))
-            viewManager.getActive ().updateNoteMapping ();
-
-        // Reset drum octave because the drum pad bank is also reset
-        this.scales.resetDrumOctave ();
-        if (viewManager.isActive (Views.DRUM))
-            viewManager.get (Views.DRUM).updateNoteMapping ();
     }
 }

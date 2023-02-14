@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.novation.launchkey.maxi;
@@ -53,7 +53,7 @@ import de.mossgrabers.framework.daw.midi.IMidiAccess;
 import de.mossgrabers.framework.daw.midi.IMidiInput;
 import de.mossgrabers.framework.daw.midi.IMidiOutput;
 import de.mossgrabers.framework.daw.midi.MidiConstants;
-import de.mossgrabers.framework.featuregroup.AbstractMode;
+import de.mossgrabers.framework.featuregroup.AbstractParameterMode;
 import de.mossgrabers.framework.featuregroup.ModeManager;
 import de.mossgrabers.framework.featuregroup.ViewManager;
 import de.mossgrabers.framework.mode.Modes;
@@ -65,6 +65,7 @@ import de.mossgrabers.framework.view.Views;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.IntSupplier;
 
 
@@ -188,11 +189,11 @@ public class LaunchkeyMk3ControllerSetup extends AbstractControllerSetup<Launchk
         final LaunchkeyMk3ControlSurface surface = this.getSurface ();
         final ModeManager modeManager = surface.getModeManager ();
 
-        modeManager.register (Modes.VOLUME, new LaunchkeyMk3VolumeMode (surface, this.model, AbstractMode.DEFAULT_KNOB_IDS));
-        modeManager.register (Modes.PAN, new LaunchkeyMk3PanoramaMode (surface, this.model, AbstractMode.DEFAULT_KNOB_IDS));
-        modeManager.register (Modes.SEND1, new LaunchkeyMk3SendMode (0, surface, this.model, AbstractMode.DEFAULT_KNOB_IDS));
-        modeManager.register (Modes.SEND2, new LaunchkeyMk3SendMode (1, surface, this.model, AbstractMode.DEFAULT_KNOB_IDS));
-        modeManager.register (Modes.DEVICE_PARAMS, new LaunchkeyMk3ParameterMode (surface, this.model, AbstractMode.DEFAULT_KNOB_IDS));
+        modeManager.register (Modes.VOLUME, new LaunchkeyMk3VolumeMode (surface, this.model, AbstractParameterMode.DEFAULT_KNOB_IDS));
+        modeManager.register (Modes.PAN, new LaunchkeyMk3PanoramaMode (surface, this.model, AbstractParameterMode.DEFAULT_KNOB_IDS));
+        modeManager.register (Modes.SEND1, new LaunchkeyMk3SendMode (0, surface, this.model, AbstractParameterMode.DEFAULT_KNOB_IDS));
+        modeManager.register (Modes.SEND2, new LaunchkeyMk3SendMode (1, surface, this.model, AbstractParameterMode.DEFAULT_KNOB_IDS));
+        modeManager.register (Modes.DEVICE_PARAMS, new LaunchkeyMk3ParameterMode (surface, this.model, AbstractParameterMode.DEFAULT_KNOB_IDS));
         // Layer send X IDs are used for custom modes
         modeManager.register (Modes.DEVICE_LAYER_SEND1, new CustomMode (1, surface, this.model));
         modeManager.register (Modes.DEVICE_LAYER_SEND2, new CustomMode (2, surface, this.model));
@@ -248,7 +249,7 @@ public class LaunchkeyMk3ControllerSetup extends AbstractControllerSetup<Launchk
         this.addButton (ButtonID.PLAY, "Play", new LaunchkeyMk3PlayCommand (this.model, surface), 15, LaunchkeyMk3ControlSurface.LAUNCHKEY_PLAY, t::isPlaying);
         this.addButton (ButtonID.STOP, "Stop", new StopCommand<> (this.model, surface), 15, LaunchkeyMk3ControlSurface.LAUNCHKEY_STOP, () -> !t.isPlaying ());
         final ConfiguredRecordCommand<LaunchkeyMk3ControlSurface, LaunchkeyMk3Configuration> recordCommand = new ConfiguredRecordCommand<> (this.model, surface);
-        this.addButton (ButtonID.RECORD, "Record", recordCommand, 15, LaunchkeyMk3ControlSurface.LAUNCHKEY_RECORD, recordCommand::isLit);
+        this.addButton (ButtonID.RECORD, "Record", recordCommand, 15, LaunchkeyMk3ControlSurface.LAUNCHKEY_RECORD, (BooleanSupplier) recordCommand::isLit);
         this.addButton (ButtonID.REPEAT, "Repeat", new ToggleLoopCommand<> (this.model, surface), 15, LaunchkeyMk3ControlSurface.LAUNCHKEY_LOOP, t::isLoop);
 
         this.addButton (ButtonID.NEW, "Capture MIDI", new NewCommand<> (this.model, surface), 15, LaunchkeyMk3ControlSurface.LAUNCHKEY_CAPTURE_MIDI);
@@ -350,7 +351,7 @@ public class LaunchkeyMk3ControllerSetup extends AbstractControllerSetup<Launchk
     private void createViewButton (final ButtonID buttonID, final OutputID outputID, final String label, final Views view, final int viewIndex)
     {
         final LaunchkeyMk3ControlSurface surface = this.getSurface ();
-        final ViewMultiSelectCommand<LaunchkeyMk3ControlSurface, LaunchkeyMk3Configuration> viewSelectCommand = new ViewMultiSelectCommand<> (this.model, surface, true, view);
+        final ViewMultiSelectCommand<LaunchkeyMk3ControlSurface, LaunchkeyMk3Configuration> viewSelectCommand = new ViewMultiSelectCommand<> (this.model, surface, view);
         this.addButton (surface, buttonID, label, (event, velocity) -> {
             viewSelectCommand.executeNormal (event);
             if (event == ButtonEvent.DOWN)

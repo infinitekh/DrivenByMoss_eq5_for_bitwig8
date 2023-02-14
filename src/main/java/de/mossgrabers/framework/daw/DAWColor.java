@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.daw;
@@ -145,24 +145,12 @@ public enum DAWColor
     /**
      * Get the color ID that is assigned to the given RGB values.
      *
-     * @param color The color
-     * @return The ID or the COLOR_OFF ID if none is mapped
-     */
-    public static String getColorIndex (final ColorEx color)
-    {
-        return getColorIndex (color.toDoubleRGB ());
-    }
-
-
-    /**
-     * Get the color ID that is assigned to the given RGB values.
-     *
      * @param rgb The red, green and blue value
      * @return The ID or the COLOR_OFF ID if none is mapped
      */
-    public static String getColorIndex (final double [] rgb)
+    public static String getColorID (final double [] rgb)
     {
-        return getColorIndex (rgb[0], rgb[1], rgb[2]);
+        return getColorID (rgb[0], rgb[1], rgb[2]);
     }
 
 
@@ -174,15 +162,26 @@ public enum DAWColor
      * @param blue The blue value
      * @return The ID or the COLOR_OFF ID if none is mapped
      */
-    public static String getColorIndex (final double red, final double green, final double blue)
+    public static String getColorID (final double red, final double green, final double blue)
+    {
+        return getColorID (new ColorEx (red, green, blue));
+    }
+
+
+    /**
+     * Get the color ID that is assigned to the given RGB values.
+     *
+     * @param color The color
+     * @return The ID or the COLOR_OFF ID if none is mapped
+     */
+    public static String getColorID (final ColorEx color)
     {
         final DAWColor [] values = DAWColor.values ();
         DAWColor cid = values[0];
         double minError = 5.0;
-        final ColorEx color = new ColorEx (red, green, blue);
         for (int i = 1; i < values.length; i++)
         {
-            final double error = ColorEx.calcDistance (values[i].getColor (), color);
+            final double error = ColorEx.calcDistance (values[i].getColor (), color, true);
             if (error < minError)
             {
                 cid = values[i];

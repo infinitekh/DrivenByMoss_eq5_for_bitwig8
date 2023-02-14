@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.fire.view;
@@ -49,7 +49,7 @@ public class MixView extends AbstractView<FireControlSurface, FireConfiguration>
             if (track.doesExist ())
             {
                 // Select
-                final int colorIndex = this.colorManager.getColorIndex (DAWColor.getColorIndex (track.getColor ()));
+                final int colorIndex = this.colorManager.getColorIndex (DAWColor.getColorID (track.getColor ()));
                 if (track.isSelected ())
                     padGrid.lightEx (i, 0, colorIndex, FireColorManager.FIRE_COLOR_WHITE, false);
                 else

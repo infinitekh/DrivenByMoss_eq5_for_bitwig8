@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.osc.module;
@@ -230,9 +230,7 @@ public class MidiModule extends AbstractModule
                 break;
 
             case "aftertouch":
-                int numValue = toInteger (value);
-                if (numValue > 0)
-                    numValue = conf.isAccentActive () ? conf.getFixedAccentValue () : numValue;
+                final int numValue = toInteger (value);
                 if (path.isEmpty ())
                 {
                     input.sendRawMidiEvent (MidiConstants.CMD_CHANNEL_AFTERTOUCH + midiChannel, 0, numValue);

@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.osc.module;
@@ -15,9 +15,9 @@ import de.mossgrabers.framework.daw.constants.DeviceID;
 import de.mossgrabers.framework.daw.data.EqualizerBandType;
 import de.mossgrabers.framework.daw.data.IChannel;
 import de.mossgrabers.framework.daw.data.ICursorDevice;
+import de.mossgrabers.framework.daw.data.IDevice;
 import de.mossgrabers.framework.daw.data.IEqualizerDevice;
 import de.mossgrabers.framework.daw.data.ILayer;
-import de.mossgrabers.framework.daw.data.IParameter;
 import de.mossgrabers.framework.daw.data.ISend;
 import de.mossgrabers.framework.daw.data.ISpecificDevice;
 import de.mossgrabers.framework.daw.data.ITrack;
@@ -29,6 +29,7 @@ import de.mossgrabers.framework.daw.data.bank.IParameterPageBank;
 import de.mossgrabers.framework.daw.data.bank.ISendBank;
 import de.mossgrabers.framework.daw.data.empty.EmptyLayer;
 import de.mossgrabers.framework.osc.IOpenSoundControlWriter;
+import de.mossgrabers.framework.parameter.IParameter;
 
 import java.util.LinkedList;
 import java.util.Optional;
@@ -135,7 +136,7 @@ public class DeviceModule extends AbstractModule
     {
         writer.sendOSC (deviceAddress + TAG_EXISTS, device.doesExist (), dump);
         writer.sendOSC (deviceAddress + TAG_NAME, device.getName (), dump);
-        writer.sendOSC (deviceAddress + "bypass", !device.isEnabled (), dump);
+        writer.sendOSC (deviceAddress + TAG_BYPASS, !device.isEnabled (), dump);
         writer.sendOSC (deviceAddress + "expand", device.isExpanded (), dump);
         writer.sendOSC (deviceAddress + "parameters", device.isParameterPageSectionVisible (), dump);
         writer.sendOSC (deviceAddress + "window", device.isWindowOpen (), dump);
@@ -147,9 +148,9 @@ public class DeviceModule extends AbstractModule
                 final int oneplus = i + 1;
 
                 writer.sendOSC (deviceAddress + "type/" + oneplus + "/value", equalizer.getTypeID (i).name ().toLowerCase (), dump);
-                this.flushParameterData (writer, deviceAddress + "gain/" + oneplus + "/", equalizer.getGain (i), dump);
-                this.flushParameterData (writer, deviceAddress + "freq/" + oneplus + "/", equalizer.getFrequency (i), dump);
-                this.flushParameterData (writer, deviceAddress + "q/" + oneplus + "/", equalizer.getQ (i), dump);
+                this.flushParameterData (writer, deviceAddress + "gain/" + oneplus + "/", equalizer.getGainParameter (i), dump);
+                this.flushParameterData (writer, deviceAddress + "freq/" + oneplus + "/", equalizer.getFrequencyParameter (i), dump);
+                this.flushParameterData (writer, deviceAddress + "q/" + oneplus + "/", equalizer.getQParameter (i), dump);
             }
             return;
         }
@@ -161,8 +162,12 @@ public class DeviceModule extends AbstractModule
             for (int i = 0; i < deviceBank.getPageSize (); i++)
             {
                 final int oneplus = i + 1;
-                writer.sendOSC (deviceAddress + "sibling/" + oneplus + "/name", deviceBank.getItem (i).getName (), dump);
-                writer.sendOSC (deviceAddress + "sibling/" + oneplus + "/selected", i == positionInBank, dump);
+                final IDevice siblingDevice = deviceBank.getItem (i);
+                final String siblingAddress = deviceAddress + "sibling/" + oneplus + "/";
+                writer.sendOSC (siblingAddress + TAG_EXISTS, siblingDevice.doesExist (), dump);
+                writer.sendOSC (siblingAddress + TAG_NAME, siblingDevice.getName (), dump);
+                writer.sendOSC (siblingAddress + TAG_BYPASS, !siblingDevice.isEnabled (), dump);
+                writer.sendOSC (siblingAddress + TAG_SELECTED, i == positionInBank, dump);
             }
         }
 
@@ -178,11 +183,15 @@ public class DeviceModule extends AbstractModule
         for (int i = 0; i < parameterPageBank.getPageSize (); i++)
         {
             final int oneplus = i + 1;
-            writer.sendOSC (deviceAddress + "page/" + oneplus + "/", parameterPageBank.getItem (i), dump);
-            writer.sendOSC (deviceAddress + "page/" + oneplus + "/selected", selectedParameterPage == i, dump);
+            final String pageName = parameterPageBank.getItem (i);
+            final String pageAddress = deviceAddress + "page/" + oneplus + "/";
+            writer.sendOSC (pageAddress, pageName, dump);
+            writer.sendOSC (pageAddress + TAG_EXISTS, !pageName.isBlank (), dump);
+            writer.sendOSC (pageAddress + TAG_NAME, pageName, dump);
+            writer.sendOSC (pageAddress + TAG_SELECTED, selectedParameterPage == i, dump);
         }
         final Optional<String> selectedItem = parameterPageBank.getSelectedItem ();
-        writer.sendOSC (deviceAddress + "page/selected/name", selectedItem.isPresent () ? selectedItem.get () : "", dump);
+        writer.sendOSC (deviceAddress + "page/selected/" + TAG_NAME, selectedItem.isPresent () ? selectedItem.get () : "", dump);
     }
 
 
@@ -233,8 +242,7 @@ public class DeviceModule extends AbstractModule
                 final String subCommand2 = getSubCommand (path);
                 switch (subCommand2)
                 {
-                    case TAG_SELECT:
-                    case TAG_SELECTED:
+                    case TAG_SELECT, TAG_SELECTED:
                         if (isTrigger (value) && cursorDevice != null)
                             cursorDevice.getDeviceBank ().getItem (siblingNo - 1).select ();
                         break;
@@ -288,6 +296,8 @@ public class DeviceModule extends AbstractModule
 
     private void parseDeviceValue (final ISpecificDevice device, final LinkedList<String> path, final Object value) throws UnknownCommandException, MissingCommandException, IllegalParameterException
     {
+        final IParameterPageBank parameterPageBank = device.getParameterPageBank ();
+
         final String command = getSubCommand (path);
         switch (command)
         {
@@ -295,16 +305,15 @@ public class DeviceModule extends AbstractModule
                 final String subCommand = getSubCommand (path);
                 switch (subCommand)
                 {
-                    case TAG_SELECT:
-                    case TAG_SELECTED:
-                        device.getParameterPageBank ().selectPage (toInteger (value) - 1);
+                    case TAG_SELECT, TAG_SELECTED:
+                        parameterPageBank.selectPage (toInteger (value) - 1);
                         break;
 
                     default:
                         try
                         {
                             final int index = Integer.parseInt (subCommand) - 1;
-                            device.getParameterPageBank ().selectPage (index);
+                            parameterPageBank.selectPage (index);
                         }
                         catch (final NumberFormatException ex)
                         {
@@ -322,7 +331,7 @@ public class DeviceModule extends AbstractModule
                 device.remove ();
                 break;
 
-            case "bypass":
+            case TAG_BYPASS:
                 device.toggleEnabledState ();
                 break;
 
@@ -364,10 +373,10 @@ public class DeviceModule extends AbstractModule
                         switch (subCommand5)
                         {
                             case "+":
-                                device.getParameterBank ().selectNextPage ();
+                                parameterPageBank.scrollForwards ();
                                 break;
                             case "-":
-                                device.getParameterBank ().selectPreviousPage ();
+                                parameterPageBank.scrollBackwards ();
                                 break;
 
                             case "bank":
@@ -376,9 +385,9 @@ public class DeviceModule extends AbstractModule
                                 {
                                     final String subCommand7 = getSubCommand (path);
                                     if ("+".equals (subCommand7))
-                                        device.getParameterPageBank ().scrollForwards ();
+                                        parameterPageBank.selectNextPage ();
                                     else // "-"
-                                        device.getParameterPageBank ().scrollBackwards ();
+                                        parameterPageBank.selectPreviousPage ();
                                 }
                                 else
                                     throw new UnknownCommandException (subCommand6);
@@ -430,7 +439,7 @@ public class DeviceModule extends AbstractModule
                 try
                 {
                     final int bandNo = Integer.parseInt (subCommand2) - 1;
-                    equalizerDevice.getGain (bandNo).setValue (toInteger (value));
+                    equalizerDevice.getGainParameter (bandNo).setValue (toInteger (value));
                 }
                 catch (final NumberFormatException ex)
                 {
@@ -443,7 +452,7 @@ public class DeviceModule extends AbstractModule
                 try
                 {
                     final int bandNo = Integer.parseInt (subCommand3) - 1;
-                    equalizerDevice.getFrequency (bandNo).setValue (toInteger (value));
+                    equalizerDevice.getFrequencyParameter (bandNo).setValue (toInteger (value));
                 }
                 catch (final NumberFormatException ex)
                 {
@@ -456,7 +465,7 @@ public class DeviceModule extends AbstractModule
                 try
                 {
                     final int bandNo = Integer.parseInt (subCommand4) - 1;
-                    equalizerDevice.getQ (bandNo).setValue (toInteger (value));
+                    equalizerDevice.getQParameter (bandNo).setValue (toInteger (value));
                 }
                 catch (final NumberFormatException ex)
                 {
@@ -549,8 +558,7 @@ public class DeviceModule extends AbstractModule
         final IChannel layer = layerBank.getItem (layerIndex);
         switch (command)
         {
-            case TAG_SELECT:
-            case TAG_SELECTED:
+            case TAG_SELECT, TAG_SELECTED:
                 layer.select ();
                 break;
 

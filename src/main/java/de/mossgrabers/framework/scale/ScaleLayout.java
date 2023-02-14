@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.scale;
@@ -30,13 +30,18 @@ public enum ScaleLayout
     /** Eighth steps centered upwards. */
     EIGHT_UP_CENTER("8th ^ centered"),
     /** Eighth steps centered to the right. */
-    EIGHT_RIGHT_CENTER("8th > centered");
+    EIGHT_RIGHT_CENTER("8th > centered"),
+    /** Upward by ~five steps and rightward by two steps. (dx = 2, dy = 5) */
+    STAGGERED_UP("Staggered ^"),
+    /** Rightward by ~five steps and upward by two steps. (dx = 5, dy = 2) */
+    STAGGERED_RIGHT("Staggered >");
 
 
-    private static final String [] scaleLayoutNames = new String [10];
+    private static final String [] scaleLayoutNames;
     static
     {
         final ScaleLayout [] values = ScaleLayout.values ();
+        scaleLayoutNames = new String [values.length];
         for (int i = 0; i < values.length; i++)
             scaleLayoutNames[i] = values[i].name;
     }

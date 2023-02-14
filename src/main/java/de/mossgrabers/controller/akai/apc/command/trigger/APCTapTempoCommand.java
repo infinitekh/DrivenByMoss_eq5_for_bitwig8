@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.apc.command.trigger;
@@ -40,17 +40,26 @@ public class APCTapTempoCommand extends TapTempoCommand<APCControlSurface, APCCo
 
     /** {@inheritDoc} */
     @Override
-    public void execute (final ButtonEvent event, final int velocity)
+    public void executeNormal (final ButtonEvent event)
     {
         if (event != ButtonEvent.DOWN)
             return;
 
-        super.execute (event, velocity);
+        super.executeNormal (event);
 
         final ViewManager viewManager = this.surface.getViewManager ();
         if (!viewManager.isActive (Views.TEMPO))
             viewManager.setTemporary (Views.TEMPO);
         this.timeout.delay (viewManager::restore);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public void executeShifted (final ButtonEvent event)
+    {
+        if (event == ButtonEvent.UP)
+            this.model.getMarkerBank ().addMarker ();
     }
 
 

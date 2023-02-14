@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.command.trigger.transport;
@@ -21,10 +21,10 @@ import de.mossgrabers.framework.utils.ButtonEvent;
  */
 public class WindCommand<S extends IControlSurface<C>, C extends Configuration> extends AbstractTriggerCommand<S, C>
 {
-    private final boolean isFastForwarding;
+    protected final boolean isFastForwarding;
 
-    private boolean       isRewinding;
-    private boolean       isForwarding;
+    private boolean         isRewinding;
+    private boolean         isForwarding;
 
 
     /**

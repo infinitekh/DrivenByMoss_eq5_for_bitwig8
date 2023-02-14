@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ni.maschine.jam;
@@ -11,7 +11,6 @@ import de.mossgrabers.controller.ni.maschine.core.command.trigger.MaschineMonito
 import de.mossgrabers.controller.ni.maschine.core.controller.EncoderModeManager;
 import de.mossgrabers.controller.ni.maschine.jam.command.trigger.MaschineJamAuxCommand;
 import de.mossgrabers.controller.ni.maschine.jam.command.trigger.MaschineJamControlCommand;
-import de.mossgrabers.controller.ni.maschine.jam.command.trigger.MaschineJamGridCommand;
 import de.mossgrabers.controller.ni.maschine.jam.command.trigger.MaschineJamLevelCommand;
 import de.mossgrabers.controller.ni.maschine.jam.command.trigger.MaschineJamMacroCommand;
 import de.mossgrabers.controller.ni.maschine.jam.command.trigger.MaschineJamMuteCommand;
@@ -53,6 +52,7 @@ import de.mossgrabers.framework.command.trigger.BrowserCommand;
 import de.mossgrabers.framework.command.trigger.FootswitchCommand;
 import de.mossgrabers.framework.command.trigger.clip.DoubleCommand;
 import de.mossgrabers.framework.command.trigger.clip.FillModeNoteRepeatCommand;
+import de.mossgrabers.framework.command.trigger.clip.QuantizeCommand;
 import de.mossgrabers.framework.command.trigger.transport.AutomationCommand;
 import de.mossgrabers.framework.command.trigger.transport.ConfiguredRecordCommand;
 import de.mossgrabers.framework.command.trigger.transport.PlayCommand;
@@ -92,6 +92,7 @@ import de.mossgrabers.framework.view.TempoView;
 import de.mossgrabers.framework.view.Views;
 
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 
 
 /**
@@ -156,7 +157,7 @@ public class MaschineJamControllerSetup extends AbstractControllerSetup<Maschine
     protected void createModel ()
     {
         final ModelSetup ms = new ModelSetup ();
-        ms.enableDrum64Device (true);
+        ms.enableDrum64Device ();
         this.model = this.factory.createModel (this.configuration, this.colorManager, this.valueChanger, this.scales, ms);
 
         final ITrackBank trackBank = this.model.getTrackBank ();
@@ -214,11 +215,11 @@ public class MaschineJamControllerSetup extends AbstractControllerSetup<Maschine
         viewManager.register (Views.CHORDS, new ChordsView (surface, this.model));
         viewManager.register (Views.PIANO, new PianoView (surface, this.model));
         viewManager.register (Views.DRUM64, new Drum64View (surface, this.model));
-        viewManager.register (Views.SEQUENCER, new SequencerView (surface, this.model));
         viewManager.register (Views.DRUM, new DrumView (surface, this.model));
         viewManager.register (Views.DRUM4, new Drum4View (surface, this.model));
         viewManager.register (Views.DRUM8, new Drum8View (surface, this.model));
         viewManager.register (Views.RAINDROPS, new RaindropsView (surface, this.model));
+        viewManager.register (Views.SEQUENCER, new SequencerView (surface, this.model));
         viewManager.register (Views.POLY_SEQUENCER, new PolySequencerView (surface, this.model));
         viewManager.register (Views.TEMPO, new TempoView<> (surface, this.model, MaschineColorManager.COLOR_BLUE, MaschineColorManager.COLOR_WHITE, MaschineColorManager.COLOR_BLACK));
         viewManager.register (Views.SHUFFLE, new ShuffleView<> (surface, this.model, MaschineColorManager.COLOR_PINK, MaschineColorManager.COLOR_WHITE, MaschineColorManager.COLOR_BLACK));
@@ -283,7 +284,7 @@ public class MaschineJamControllerSetup extends AbstractControllerSetup<Maschine
         }, MaschineJamControlSurface.PLAY, t::isPlaying, ColorManager.BUTTON_STATE_ON, ColorManager.BUTTON_STATE_HI);
 
         final ConfiguredRecordCommand<MaschineJamControlSurface, MaschineJamConfiguration> recordCommand = new ConfiguredRecordCommand<> (this.model, surface);
-        this.addButton (ButtonID.RECORD, "REC", recordCommand, MaschineJamControlSurface.RECORD, recordCommand::isLit);
+        this.addButton (ButtonID.RECORD, "REC", recordCommand, MaschineJamControlSurface.RECORD, (BooleanSupplier) recordCommand::isLit);
 
         this.addButton (ButtonID.PAGE_LEFT, "PAGE LEFT", new MaschineJamPageLeftCommand (this.model, surface), MaschineJamControlSurface.LEFT);
         this.addButton (ButtonID.PAGE_RIGHT, "PAGE RIGHT", new MaschineJamPageRightCommand (this.model, surface), MaschineJamControlSurface.RIGHT);
@@ -366,8 +367,8 @@ public class MaschineJamControllerSetup extends AbstractControllerSetup<Maschine
 
         final MaschineMonitorEncoderCommand<MaschineJamControlSurface, MaschineJamConfiguration> encoderCommandMaster = new MaschineMonitorEncoderCommand<> (this.encoderManager, EncoderMode.MASTER_VOLUME, this.model, surface);
         this.addButton (ButtonID.MASTERTRACK, "MST", encoderCommandMaster, MaschineJamControlSurface.MASTER, encoderCommandMaster::isLit);
-        final MaschineMonitorEncoderCommand<MaschineJamControlSurface, MaschineJamConfiguration> encoderCommandSelectedTrack = new MaschineMonitorEncoderCommand<> (this.encoderManager, EncoderMode.SELECTED_TRACK_VOLUME, this.model, surface);
-        this.addButton (ButtonID.ALT, "GRP", encoderCommandSelectedTrack, MaschineJamControlSurface.GROUP, encoderCommandSelectedTrack::isLit);
+        final MaschineMonitorEncoderCommand<MaschineJamControlSurface, MaschineJamConfiguration> encoderCommandPlayPosition = new MaschineMonitorEncoderCommand<> (this.encoderManager, EncoderMode.PLAY_POSITION, this.model, surface);
+        this.addButton (ButtonID.ALT, "GRP", encoderCommandPlayPosition, MaschineJamControlSurface.GROUP, encoderCommandPlayPosition::isLit);
         final MaschineMonitorEncoderCommand<MaschineJamControlSurface, MaschineJamConfiguration> encoderCommandMetronome = new MaschineMonitorEncoderCommand<> (this.encoderManager, EncoderMode.METRONOME_VOLUME, this.model, surface);
         this.addButton (ButtonID.METRONOME, "IN 1", encoderCommandMetronome, MaschineJamControlSurface.IN, encoderCommandMetronome::isLit);
         final MaschineMonitorEncoderCommand<MaschineJamControlSurface, MaschineJamConfiguration> encoderCommandCue = new MaschineMonitorEncoderCommand<> (this.encoderManager, EncoderMode.CUE_VOLUME, this.model, surface);
@@ -389,7 +390,7 @@ public class MaschineJamControllerSetup extends AbstractControllerSetup<Maschine
 
         this.addButton (ButtonID.TAP_TEMPO, "TEMPO", new MaschineJamTapTempoCommand (this.encoderManager, this.model, surface), MaschineJamControlSurface.TEMPO);
         this.addButton (ButtonID.ACCENT, "SWING", new MaschineJamSwingCommand (this.encoderManager, this.model, surface), MaschineJamControlSurface.SWING, () -> this.model.getGroove ().getParameter (GrooveParameterID.ENABLED).getValue () > 0);
-        this.addButton (ButtonID.GROOVE, "GRID", new MaschineJamGridCommand (this.encoderManager, this.model, surface), MaschineJamControlSurface.GRID);
+        this.addButton (ButtonID.GROOVE, "GRID", new QuantizeCommand<> (this.model, surface), MaschineJamControlSurface.GRID);
 
         this.addButton (ButtonID.ROW1_1, "PERFORM", new MaschineJamViewCommand (this.encoderManager, EncoderMode.TEMPORARY_PERFORM, this.model, surface), MaschineJamControlSurface.PERFORM);
         this.addButton (ButtonID.ROW1_2, "NOTES", new MaschineJamViewCommand (this.encoderManager, EncoderMode.TEMPORARY_NOTES, this.model, surface), MaschineJamControlSurface.NOTES);
@@ -539,7 +540,7 @@ public class MaschineJamControllerSetup extends AbstractControllerSetup<Maschine
     {
         final MaschineJamControlSurface surface = this.getSurface ();
         surface.getModeManager ().setActive (Modes.VOLUME);
-        surface.getViewManager ().setActive (Views.SESSION);
+        surface.getViewManager ().setActive (this.configuration.shouldStartWithSessionView () ? Views.SESSION : this.configuration.getPreferredNoteView ());
     }
 
 
@@ -570,39 +571,6 @@ public class MaschineJamControllerSetup extends AbstractControllerSetup<Maschine
         final int vuRight = this.valueChanger.toMidiValue (track.getVuRight ());
         midiOutput.sendCC (MaschineJamControlSurface.STRIP_LEFT, vuLeft);
         midiOutput.sendCC (MaschineJamControlSurface.STRIP_RIGHT, vuRight);
-    }
-
-
-    /**
-     * Handle a track selection change.
-     *
-     * @param isSelected Has the track been selected?
-     */
-    private void handleTrackChange (final boolean isSelected)
-    {
-        if (!isSelected)
-            return;
-
-        final MaschineJamControlSurface surface = this.getSurface ();
-        final ViewManager viewManager = surface.getViewManager ();
-
-        if (!viewManager.isActive (Views.SESSION))
-        {
-            final ITrack cursorTrack = this.model.getCursorTrack ();
-            if (cursorTrack.doesExist ())
-            {
-                final Views preferredView = viewManager.getPreferredView (cursorTrack.getPosition ());
-                viewManager.setActive (preferredView == null ? Views.PLAY : preferredView);
-            }
-        }
-
-        if (viewManager.isActive (Views.PLAY))
-            viewManager.getActive ().updateNoteMapping ();
-
-        // Reset drum octave because the drum pad bank is also reset
-        this.scales.resetDrumOctave ();
-        if (viewManager.isActive (Views.DRUM))
-            viewManager.get (Views.DRUM).updateNoteMapping ();
     }
 
 

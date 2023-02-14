@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ni.maschine.jam.view;
@@ -11,11 +11,12 @@ import de.mossgrabers.controller.ni.maschine.jam.controller.MaschineJamControlSu
 import de.mossgrabers.framework.command.trigger.Direction;
 import de.mossgrabers.framework.controller.ButtonID;
 import de.mossgrabers.framework.daw.IModel;
-import de.mossgrabers.framework.daw.INoteClip;
+import de.mossgrabers.framework.daw.clip.INoteClip;
+import de.mossgrabers.framework.daw.clip.NotePosition;
 import de.mossgrabers.framework.scale.Scales;
 import de.mossgrabers.framework.utils.ButtonEvent;
-import de.mossgrabers.framework.view.AbstractNoteSequencerView;
 import de.mossgrabers.framework.view.Views;
+import de.mossgrabers.framework.view.sequencer.AbstractNoteSequencerView;
 
 
 /**
@@ -60,7 +61,7 @@ public class SequencerView extends AbstractNoteSequencerView<MaschineJamControlS
                     this.scales.nextScaleOffset ();
                 else
                     this.scales.prevScaleOffset ();
-                this.mvHelper.delayDisplay ( () -> "Scale Offset: " + Scales.BASES.get (this.scales.getScaleOffset ()));
+                this.mvHelper.delayDisplay ( () -> "Scale Offset: " + Scales.BASES.get (this.scales.getScaleOffsetIndex ()));
                 break;
 
             case TEMPORARY_LOCK:
@@ -133,17 +134,17 @@ public class SequencerView extends AbstractNoteSequencerView<MaschineJamControlS
 
     /** {@inheritDoc} */
     @Override
-    protected boolean handleSequencerAreaButtonCombinations (final INoteClip clip, final int channel, final int step, final int row, final int note, final int velocity)
+    protected boolean handleSequencerAreaButtonCombinations (final INoteClip clip, final NotePosition notePosition, final int row, final int velocity)
     {
         final boolean isSelectPressed = this.surface.isSelectPressed ();
         if (isSelectPressed)
         {
             if (velocity > 0)
-                this.handleSequencerAreaRepeatOperator (clip, channel, step, note, velocity, isSelectPressed);
+                this.handleSequencerAreaRepeatOperator (clip, notePosition, velocity, isSelectPressed);
             return true;
         }
 
-        return super.handleSequencerAreaButtonCombinations (clip, channel, step, row, note, velocity);
+        return super.handleSequencerAreaButtonCombinations (clip, notePosition, row, velocity);
     }
 
 
@@ -151,7 +152,7 @@ public class SequencerView extends AbstractNoteSequencerView<MaschineJamControlS
     {
         final MaschineJamConfiguration config = this.surface.getConfiguration ();
         config.setScale (this.scales.getScale ().getName ());
-        config.setScaleBase (Scales.BASES.get (this.scales.getScaleOffset ()));
+        config.setScaleBase (Scales.BASES.get (this.scales.getScaleOffsetIndex ()));
         config.setScaleInKey (!this.scales.isChromatic ());
         config.setScaleLayout (this.scales.getScaleLayout ().getName ());
 

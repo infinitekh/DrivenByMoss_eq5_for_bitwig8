@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ableton.push.mode;
@@ -105,7 +105,6 @@ public class ScaleLayoutMode extends BaseMode<IItem>
         for (int i = 0; i < names.length; i += 2)
             display.addOptionElement ("", "", false, i == 0 ? "Scale layout" : "", names[i].replace (" ^", ""), pos == i / 2, false);
 
-        display.addOptionElement ("", "", false, "", "", false, false);
         display.addOptionElement ("", "", false, "", "", false, false);
         display.addOptionElement ("", "", false, "", sl % 2 == 0 ? "Horizontal" : "Vertical", false, false);
     }

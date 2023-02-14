@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.bitwig.framework.daw.data.bank;
@@ -73,7 +73,10 @@ public class DrumPadBankImpl extends AbstractChannelBankImpl<DrumPadBank, ILayer
             this.getItem (i).enableObservers (enable);
 
         if (this.bank.isPresent ())
+        {
+            Util.setIsSubscribed (this.bank.get ().hasMutedPads (), enable);
             Util.setIsSubscribed (this.bank.get ().hasSoloedPads (), enable);
+        }
     }
 
 
@@ -92,7 +95,7 @@ public class DrumPadBankImpl extends AbstractChannelBankImpl<DrumPadBank, ILayer
         final Optional<ILayer> sel = this.getSelectedItem ();
         if (sel.isEmpty ())
             return DAWColor.COLOR_OFF.name ();
-        return DAWColor.getColorIndex (sel.get ().getColor ());
+        return DAWColor.getColorID (sel.get ().getColor ());
     }
 
 
@@ -124,9 +127,33 @@ public class DrumPadBankImpl extends AbstractChannelBankImpl<DrumPadBank, ILayer
 
     /** {@inheritDoc} */
     @Override
+    public boolean hasMutedPads ()
+    {
+        return this.bank.isPresent () && this.bank.get ().hasMutedPads ().get ();
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
     public void setIndication (final boolean enable)
     {
         if (this.bank.isPresent ())
             this.bank.get ().setIndication (enable);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean canEditSend (final int sendIndex)
+    {
+        return this.getItem (0).getSendBank ().getItem (sendIndex).doesExist ();
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public String getEditSendName (final int sendIndex)
+    {
+        return this.getItem (0).getSendBank ().getItem (sendIndex).getName ();
     }
 }

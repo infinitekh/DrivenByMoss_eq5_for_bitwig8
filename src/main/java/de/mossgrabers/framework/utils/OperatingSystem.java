@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.utils;
@@ -47,6 +47,17 @@ public enum OperatingSystem
                     os = MAC;
             }
         }
+    }
+
+
+    /**
+     * Returns true if the operating system is MacOS no matter if it is Intel or ARM based.
+     *
+     * @return True if MacOS
+     */
+    public static boolean isMacOS ()
+    {
+        return os == MAC || os == MAC_ARM;
     }
 
 

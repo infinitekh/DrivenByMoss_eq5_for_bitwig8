@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ni.maschine.mk3.controller;
@@ -11,6 +11,7 @@ import de.mossgrabers.controller.ni.maschine.mk3.MaschineConfiguration;
 import de.mossgrabers.controller.ni.maschine.mk3.command.trigger.MaschineStopCommand;
 import de.mossgrabers.framework.controller.ButtonID;
 import de.mossgrabers.framework.controller.color.ColorManager;
+import de.mossgrabers.framework.controller.hardware.BindType;
 import de.mossgrabers.framework.daw.IHost;
 import de.mossgrabers.framework.daw.midi.IMidiInput;
 import de.mossgrabers.framework.daw.midi.IMidiOutput;
@@ -176,7 +177,7 @@ public class MaschineControlSurface extends AbstractMaschineControlSurface<Masch
 
     /** {@inheritDoc} */
     @Override
-    public void setTrigger (final int channel, final int cc, final int state)
+    public void setTrigger (final BindType bindType, final int channel, final int cc, final int state)
     {
         if (cc == MODE_BUTTON_7)
             this.output.sendNoteEx (channel, cc, state);

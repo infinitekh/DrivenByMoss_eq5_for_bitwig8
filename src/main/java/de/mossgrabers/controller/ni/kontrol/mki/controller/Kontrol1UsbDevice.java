@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.ni.kontrol.mki.controller;
@@ -719,11 +719,15 @@ public class Kontrol1UsbDevice
 
 
     /**
-     * Stop sending USB data.
+     * Stop sending USB data and close USB device.
      */
     public void shutdown ()
     {
+        if (this.hidDevice == null)
+            return;
+        final IHidDevice device = this.hidDevice;
         this.hidDevice = null;
+        device.close ();
     }
 
 

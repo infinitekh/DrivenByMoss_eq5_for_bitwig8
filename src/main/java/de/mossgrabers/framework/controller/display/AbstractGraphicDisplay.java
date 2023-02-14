@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.controller.display;
@@ -7,7 +7,7 @@ package de.mossgrabers.framework.controller.display;
 import de.mossgrabers.framework.controller.color.ColorEx;
 import de.mossgrabers.framework.controller.hardware.IHwGraphicsDisplay;
 import de.mossgrabers.framework.daw.IHost;
-import de.mossgrabers.framework.daw.INoteClip;
+import de.mossgrabers.framework.daw.clip.INoteClip;
 import de.mossgrabers.framework.daw.data.IScene;
 import de.mossgrabers.framework.daw.data.ISlot;
 import de.mossgrabers.framework.daw.data.ITrack;
@@ -120,6 +120,17 @@ public abstract class AbstractGraphicDisplay implements IGraphicDisplay
         synchronized (this.counterSync)
         {
             this.counter.set (0);
+        }
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isNotificationActive ()
+    {
+        synchronized (this.counterSync)
+        {
+            return this.counter.get () > 0;
         }
     }
 

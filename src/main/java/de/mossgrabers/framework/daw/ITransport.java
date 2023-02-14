@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.daw;
@@ -7,8 +7,8 @@ package de.mossgrabers.framework.daw;
 import de.mossgrabers.framework.daw.constants.AutomationMode;
 import de.mossgrabers.framework.daw.constants.LaunchQuantization;
 import de.mossgrabers.framework.daw.constants.PostRecordingAction;
-import de.mossgrabers.framework.daw.data.IParameter;
 import de.mossgrabers.framework.observer.IObserverManagement;
+import de.mossgrabers.framework.parameter.IParameter;
 
 import java.util.Arrays;
 
@@ -186,20 +186,6 @@ public interface ITransport extends IObserverManagement
      * @return The value
      */
     int getMetronomeVolume ();
-
-
-    /**
-     * Should the metronome be audible during pre-roll?
-     *
-     * @return True if the metronome should be audible during pre-roll
-     */
-    boolean isPrerollMetronomeEnabled ();
-
-
-    /**
-     * Toggle if the metronome should be audible during pre-roll.
-     */
-    void togglePrerollMetronome ();
 
 
     /**
@@ -541,12 +527,17 @@ public interface ITransport extends IObserverManagement
 
 
     /**
-     * Get the value that reports the current preroll setting. Possible values are `"none"`,
-     * `"one_bar"`, `"two_bars"`, or `"four_bars"`.
+     * Should the metronome be audible during pre-roll?
      *
-     * @return The value
+     * @return True if the metronome should be audible during pre-roll
      */
-    String getPreroll ();
+    boolean isPrerollMetronomeEnabled ();
+
+
+    /**
+     * Toggle if the metronome should be audible during pre-roll.
+     */
+    void togglePrerollMetronome ();
 
 
     /**
@@ -554,15 +545,7 @@ public interface ITransport extends IObserverManagement
      *
      * @return The number of preroll bars.
      */
-    int getPrerollAsBars ();
-
-
-    /**
-     * Set the value that reports the current pre-roll setting.
-     *
-     * @param preroll Possible values are `"none"`, `"one_bar"`, `"two_bars"`, or `"four_bars"`.
-     */
-    void setPreroll (String preroll);
+    int getPrerollMeasures ();
 
 
     /**
@@ -570,7 +553,7 @@ public interface ITransport extends IObserverManagement
      *
      * @param preroll Possible values are 0, 1, 2, 4.
      */
-    void setPrerollAsBars (int preroll);
+    void setPrerollMeasures (int preroll);
 
 
     /**

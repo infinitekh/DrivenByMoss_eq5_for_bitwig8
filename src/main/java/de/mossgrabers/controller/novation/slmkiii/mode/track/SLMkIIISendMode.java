@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.novation.slmkiii.mode.track;
@@ -40,7 +40,7 @@ public class SLMkIIISendMode extends AbstractTrackMode
 
         this.sendIndex = sendIndex;
 
-        final SendParameterProvider parameterProvider = new SendParameterProvider (model, sendIndex);
+        final SendParameterProvider parameterProvider = new SendParameterProvider (model, sendIndex, 0);
         this.setParameterProvider (parameterProvider);
         this.setParameterProvider (ButtonID.DELETE, new ResetParameterProvider (parameterProvider));
     }

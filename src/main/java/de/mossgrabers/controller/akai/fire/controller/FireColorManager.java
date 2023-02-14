@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.fire.controller;
@@ -11,10 +11,10 @@ import de.mossgrabers.framework.controller.grid.IPadGrid;
 import de.mossgrabers.framework.daw.DAWColor;
 import de.mossgrabers.framework.featuregroup.AbstractFeatureGroup;
 import de.mossgrabers.framework.scale.Scales;
-import de.mossgrabers.framework.view.AbstractDrumView;
 import de.mossgrabers.framework.view.AbstractPlayView;
-import de.mossgrabers.framework.view.AbstractSequencerView;
 import de.mossgrabers.framework.view.AbstractSessionView;
+import de.mossgrabers.framework.view.sequencer.AbstractDrumView;
+import de.mossgrabers.framework.view.sequencer.AbstractSequencerView;
 
 
 /**
@@ -69,7 +69,7 @@ public class FireColorManager extends ColorManager
     public static final int    FIRE_COLOR_DARKER_YELLOW = 73;
     /** ID for the color brown. */
     public static final int    FIRE_COLOR_BROWN         = 74;
-    /** ID for the color grey. */
+    /** ID for the color gray. */
     public static final int    FIRE_COLOR_GRAY          = 75;
 
 
@@ -83,7 +83,7 @@ public class FireColorManager extends ColorManager
         this.registerColorIndex (Scales.SCALE_COLOR_NOTE, SCALE_COLOR_NOTE);
         this.registerColorIndex (Scales.SCALE_COLOR_OUT_OF_SCALE, SCALE_COLOR_OUT_OF_SCALE);
 
-        this.registerColorIndex (IPadGrid.GRID_OFF, 0);
+        this.registerColorIndex (IPadGrid.GRID_OFF, FIRE_COLOR_BLACK);
 
         this.registerColorIndex (AbstractSequencerView.COLOR_STEP_HILITE_NO_CONTENT, FIRE_COLOR_DARK_GREEN);
         this.registerColorIndex (AbstractSequencerView.COLOR_STEP_HILITE_CONTENT, FIRE_COLOR_GREEN);
@@ -92,11 +92,12 @@ public class FireColorManager extends ColorManager
         this.registerColorIndex (AbstractSequencerView.COLOR_STEP_SELECTED, FIRE_COLOR_DARKER_YELLOW);
 
         this.registerColorIndex (AbstractSequencerView.COLOR_NO_CONTENT, FIRE_COLOR_BLACK);
+        this.registerColorIndex (AbstractSequencerView.COLOR_NO_CONTENT_4, FIRE_COLOR_GRAY);
         this.registerColorIndex (AbstractSequencerView.COLOR_CONTENT, FIRE_COLOR_BLUE);
         this.registerColorIndex (AbstractSequencerView.COLOR_CONTENT_CONT, FIRE_COLOR_DARK_BLUE);
-        this.registerColorIndex (AbstractSequencerView.COLOR_PAGE, FIRE_COLOR_WHITE);
-        this.registerColorIndex (AbstractSequencerView.COLOR_ACTIVE_PAGE, FIRE_COLOR_GREEN);
-        this.registerColorIndex (AbstractSequencerView.COLOR_SELECTED_PAGE, FIRE_COLOR_DARK_OCEAN);
+        this.registerColorIndex (AbstractSequencerView.COLOR_PAGE, FIRE_COLOR_GRAY);
+        this.registerColorIndex (AbstractSequencerView.COLOR_ACTIVE_PAGE, FIRE_COLOR_RED);
+        this.registerColorIndex (AbstractSequencerView.COLOR_SELECTED_PAGE, FIRE_COLOR_DARKER_RED);
         this.registerColorIndex (AbstractSequencerView.COLOR_RESOLUTION, FIRE_COLOR_DARK_ORANGE);
         this.registerColorIndex (AbstractSequencerView.COLOR_RESOLUTION_SELECTED, FIRE_COLOR_ORANGE);
         this.registerColorIndex (AbstractSequencerView.COLOR_RESOLUTION_OFF, FIRE_COLOR_BLACK);

@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.controller.akai.apcmini.view;
@@ -10,7 +10,7 @@ import de.mossgrabers.framework.controller.ButtonID;
 import de.mossgrabers.framework.controller.color.ColorManager;
 import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.utils.ButtonEvent;
-import de.mossgrabers.framework.view.AbstractRaindropsView;
+import de.mossgrabers.framework.view.sequencer.AbstractRaindropsView;
 
 
 /**
@@ -65,7 +65,7 @@ public class RaindropsView extends AbstractRaindropsView<APCminiControlSurface, 
         final int index = buttonID.ordinal () - ButtonID.SCENE1.ordinal ();
         final int res = 7 - index;
         final boolean isKeyboardEnabled = this.model.canSelectedTrackHoldNotes ();
-        return isKeyboardEnabled && res == this.selectedResolutionIndex ? ColorManager.BUTTON_STATE_ON : ColorManager.BUTTON_STATE_OFF;
+        return isKeyboardEnabled && res == this.getResolutionIndex () ? ColorManager.BUTTON_STATE_ON : ColorManager.BUTTON_STATE_OFF;
     }
 
 

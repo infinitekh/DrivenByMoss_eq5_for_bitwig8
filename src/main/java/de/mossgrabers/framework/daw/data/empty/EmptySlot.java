@@ -1,5 +1,5 @@
 // Written by Jürgen Moßgraber - mossgrabers.de
-// (c) 2017-2022
+// (c) 2017-2023
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
 package de.mossgrabers.framework.daw.data.empty;
@@ -97,6 +97,23 @@ public class EmptySlot extends EmptyItem implements ISlot
     public void launch ()
     {
         // Intentionally empty
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public void launchImmediately ()
+    {
+        // Intentionally empty
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean testAndClearLaunchedImmediately ()
+    {
+        // Intentionally empty
+        return false;
     }
 
 
